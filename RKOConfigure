@@ -4,7 +4,7 @@ LDFLAGS=-g
 CC=gcc
 export CFLAGS LDFLAGS CC
 #TCLTKROOT=/usr/local/tcltk/8.0.5
-export TCLTKROOT
+#export TCLTKROOT
 
 ./configure \
 		--prefix=/usr/local/Modules/@VERSION@ \
@@ -12,9 +12,9 @@ export TCLTKROOT
 		--with-version-path=/usr/local/Modules/versions \
 		--with-etc-path=/etc \
 		--with-skel-path=/etc/skel \
-		--with-tclx \
 		--with-split-size=960
 exit
+		--enable-free \
 
 # the above values for
 #	--with-module-path, --with-version-path,
