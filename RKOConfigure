@@ -12,10 +12,10 @@ export CFLAGS LDFLAGS CC
 		--with-version-path=/usr/local/Modules/versions \
 		--with-etc-path=/etc \
 		--with-skel-path=/etc/skel \
-		--enable-free \
 		--with-split-size=960
 exit
 
+		--enable-free \
 # the above values for
 #	--with-module-path, --with-version-path,
 #	--with-etc-path, --with-skel-path
