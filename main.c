@@ -28,7 +28,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: main.c,v 1.2.2.1 2001/08/30 17:50:41 rkowen Exp $";
+static char Id[] = "@(#)$Id: main.c,v 1.2.2.2 2001/09/06 20:14:10 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -64,8 +64,6 @@ char	 *g_current_module = NULL;	/** The module which is handled by   **/
 					/** the current command		     **/
 char	 *specified_module = NULL;	/** The module that was specified    **/
 					/** on the command line		     **/
-char	**shell_startups;		/** A list off all startup files our **/
-					/** invoking shell will source	     **/
 char	  shell_name[20];		/** Name of the shell (first para-   **/
 					/** meter to modulcmd)		     **/
 char	  shell_derelict[20];		/** Shell family (sh, csh)	     **/

@@ -462,7 +462,6 @@ extern	char	**environ;
 extern	char	 *version_string;
 extern	char	 *g_current_module;
 extern	char	 *specified_module;
-extern	char	**shell_startups;
 extern	char	  shell_name[];
 extern	char	  shell_derelict[];
 extern	int	  g_flags;
@@ -659,7 +658,7 @@ extern	char	 *ExpandVersions( char*);
 extern	int	  Initialize_Tcl( Tcl_Interp**, int, char*[], char*[]);
 extern	int	  InitializeModuleCommands( Tcl_Interp*);
 extern	int	  Setup_Environment( Tcl_Interp*);
-extern	int	  SetStartupFiles( void);
+extern	char	**SetStartupFiles( char *shell_name);
 extern	int	  TieStdout( void);
 extern	int	  UnTieStdout( int);
 
