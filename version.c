@@ -1,4 +1,4 @@
-const char *version_string = "3.1.4.1";
-const char *date_string = "2001-08-03";
-/* NEW TAG "modules-3-1-4" */
-/* OLD TAG "modules-3-1-3" */
+const char *version_string = "3.2.0";
+const char *date_string = "2001-08-08";
+/* NEW TAG "modules-3-2-0" */
+/* OLD TAG "modules-3-2-0" */
