@@ -6,6 +6,38 @@
   or spelling correction your name will probably not be listed.)
 
 ****************************   Release 3.1 ******************************
+Modules 3.1.6
+Thu Jan	 3 20:56:16 PST 2002		R.K. Owen (rk@owen.sj.ca.us)
+	Contributors: 
+		Scott Gaskins		<sgaskins@us.ibm.com>
+		Leo Butler		<lbutler@brocade.com>)
+		Philip Kearns		<Philip.Kearns@tellabs.com>
+		Andy Bruce		<abruce@infocruiser.com>
+	* A 'break' in a modulefile will cause the modulefile to
+	  not be added to $LOADEDMODULES, but will be considered
+	  a successful execution to not affect other modulefiles
+	  being loaded concurrently (Patch due to Scott Gaskins).
+	* Tests and docs added for the above.
+	* Added CYGWIN/Windows specific code (due to Andy Bruce)
+	* Fixed problem with module load when the full path
+	  is given (patch due to Scott Gaskins).
+	* Added tests for the above problem.
+	* Added the Modules-Paper in PDF format (thanks to Philip Kearns
+	  and Leo Butler for raising the issue).
+	* Modified probetcl to avoid using the -c option
+	  (patch due to Philip Kearns).
+	* Modified probetcl to use tclsh first then tcl
+	* Added TCL_VERSION to configure and use it in the Makefile
+	  to use the -ltcl@TCL_VERSION@ library.
+	
+Modules 3.1.5
+Sat Aug 18 07:32:48 PDT 2001		R.K. Owen (rk@owen.sj.ca.us)
+	Contributors:
+		Eric Stanley		<barnabas@knicknack.net>
+	* Fixed up cmdPath to remove individual items from a path
+	  (patch due to Eric Stanley).
+	* Fixed problem of failed "module loads" in a modulefile
+	  (patch due to Eric Stanley).
 Modules 3.1.4
 Fri Aug  3 12:45:55 PDT 2001		R.K. Owen (rk@owen.sj.ca.us)
 	* Some preliminary steps to a rpm file.
@@ -975,3 +1007,4 @@ Sat Jun 18 22:57:01 1994  Leif Hedstrom  (hedstrom@neptune.inf.ethz.ch)
 	Changed NEED_TERMIOS to HAVE_SYS_TERMIOS_H.
 
 	* modules_def.h: Removed include of sysconf.h
+
