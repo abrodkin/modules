@@ -36,14 +36,6 @@
 #undef HAS_X11LIBS
 
 
-/* TCL_MINOR_VERSION:
- * TCL_MAJOR_VERSION:
- *     This symbol, if defined, contains the version of TCL (and TCLX)
- */
-#undef TCL_MINOR_VERSION
-#undef TCL_MAJOR_VERSION
-
-
 /* HAS_TCLXLIBS:
  *     This symbol, if defined, indicates that Modules should support
  *     extended TCL (tclX) commands.
@@ -66,7 +58,7 @@
 
 
 /* EVAL_ALIAS:
- *     This symbol, if defined, indicates that Modules should ask the sheel
+ *     This symbol, if defined, indicates that Modules should ask the shell
  *     to evaluate aliases via stdout like other environment changes instead
  *     of opening a file and then asking the shell to source the file and
  *     then remove it.
@@ -82,7 +74,7 @@
 
 
 /* HAS_BOURNE_FUNCS:
- *     This symbol, if defined, indicates that Modules should ask the sheel
+ *     This symbol, if defined, indicates that Modules should ask the shell
  *     to evaluate aliases via stdout like other environment changes instead
  *     of opening a file and then asking the shell to source the file and
  *     then remove it.
@@ -135,6 +127,11 @@
  *	define enables these calls again.
  */
 #undef USE_FREE
+
+/* MODULEPATH:
+ *	Directory that contains the module files.
+ */
+#define MODULEPATH	"/usr/local/Modules/modulefiles"
 
 /* VERSIONPATH:
  *	Directory that contains the env.modules version files.

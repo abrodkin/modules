@@ -6,12 +6,15 @@ dnl Created:     94/06/19
 dnl Author:      Leif Hedstrom<hedstrom@inf.ethz.ch>
 dnl		 Martin S. Utesch <wstd@hl.siemens.de>
 dnl 		 Peter W. Osel <pwo@guug.de>
+dnl Modified:	 R.K.Owen <rk@owen.sj.ca.us>
 dnl
 dnl Search a set of full-path file names, and select the first one
 dnl that we can locate. Works a little bit like AC_PATH_PROG, but
 dnl search paths can be defined with $3.
 dnl
-AC_DEFUN(AC_PATH_PROG_SEARCH,
+builtin(include,config/tcl.m4)
+
+AC_DEFUN(EM_PATH_PROG_SEARCH,
 [# Extract the first word of "$2", so it can be a program name with args.
 set dummy $2; ac_word=[$]2
 AC_MSG_CHECKING([for $ac_word])
@@ -45,81 +48,15 @@ fi
 AC_SUBST($1)dnl
 ])
 dnl --------------------------------------------------------------
-dnl AC_FIND_TCL
-dnl
-dnl Find TCL libraries and include file. If they are in /usr/lib
-dnl and /usr/include, we don't set anything.
-dnl
-AC_DEFUN(AC_FIND_TCL, [
-AC_MSG_CHECKING([for tcl])
-AC_ARG_WITH(tcl-include,
-	[  --with-tcl-include          define TCL include path],
-	tcl_includes=$withval)
-if test ! -n "$tcl_includes"; then
-    for dir in ../tcl* ./tcl* ../tcl*/include ./tcl*/include ../include \
-	    /usr/include /usr/include/tcl /usr/local/include \
-	    /usr/gnu/include /opt/include /opt/local/include /opt/gnu/include \
-	    /local/include /opt/local/gnu/include /usr/local/gnu/include;
-    do
-       if test -r "$dir/tcl.h"; then
-	  tcl_includes=$dir
-	  break
-       fi
-    done
-fi
-if test -z "$tcl_includes"; then
-   AC_MSG_ERROR(can't find TCL include files; ...exit configure)
-fi
-
-AC_ARG_WITH(tcl-version,
-	[  --with-tcl-version          define TCL version],
-	tcl_version=$withval)
-if test ! -n "$tcl_version"; then
-    for dir in `echo "$tcl_includes" | sed s/include/bin/` \
-	    ../tcl* ./tcl* ../tcl*/bin ./tcl*/bin ../bin \
-	    /usr/bin /usr/local/bin /usr/gnu/bin /usr/local/gnu/bin /local/bin \
-	    /opt/bin /opt/local/bin /opt/gnu/bin /opt/local/gnu/bin;
-    do
-       if test -r "$dir/tcl"; then
-	  tcl_binaries=$dir
-	  break
-       fi
-    done
-    tcl_version=`./probetcl $tcl_binaries`
-fi
-
-AC_ARG_WITH(tcl-libraries,
-	[  --with-tcl-libraries        define TCL include path],
-	tcl_libraries=$withval)
-if test ! -n "$tcl_libraries"; then
-    for dir in `echo "$tcl_includes" | sed s/include/lib/` \
-	    ../tcl* ./tcl* ../tcl*/lib ./tcl*/lib ../lib \
-	    /usr/lib /usr/local/lib /usr/gnu/lib /usr/local/gnu/lib /local/lib \
-	    /opt/lib /opt/local/lib /opt/gnu/lib /opt/local/gnu/lib;
-    do
-       if test -r "$dir/libtcl.a"; then
-	  tcl_libraries=$dir
-	  break
-       fi
-    done
-fi
-test -z "$tcl_libraries" && AC_MSG_ERROR(can't find TCL library file; ...exit configure)
-AC_CACHE_VAL(ac_cv_path_tcl,
-[#cache values $tcl_includes and $tcl_libraries
-ac_cv_path_tcl="ac_tcl_includes=$tcl_includes ac_tcl_libraries=$tcl_libraries"
-])dnl
-AC_MSG_RESULT([version $tcl_version; libraries $tcl_libraries; headers $tcl_includes])
-])dnl
-dnl --------------------------------------------------------------
-dnl AC_FIND_TCLX
+dnl EM_FIND_TCLX
 dnl
 dnl Find extended TCL (tclX) libraries and include file.  If they
 dnl are in $tcl_includes and $tcl_libraries we don't set anything.
-dnl Thus run this after AC_FIND_TCL, not before.
+dnl Thus run this after EM_FIND_TCL, not before.
 dnl
-AC_DEFUN(AC_FIND_TCLX, [
+AC_DEFUN(EM_FIND_TCLX, [
 AC_MSG_CHECKING([for tclX (extended TCL)])
-AC_REQUIRE([AC_FIND_TCL])dnl
+AC_REQUIRE([SC_LOAD_TCLCONFIG])dnl
 AC_ARG_WITH(tclx-include,
 	[  --with-tclx-include         define TCLX include path],
 	tclx_includes=$withval)
@@ -178,7 +115,7 @@ dnl AC_MAKE_INCLUDE(INCLUDE, INCLUDE_DIR)
 dnl
 dnl Avoid /usr in -I, and generate a -I<directory> if needed
 dnl
-AC_DEFUN(AC_MAKE_INCLUDE, [
+AC_DEFUN(EM_MAKE_INCLUDE, [
 if test "[$]$1" != "/usr/include" -a -n "[$]$1"; then
     $2=-I[$]$1
 fi])dnl
@@ -191,7 +128,7 @@ dnl IF we are on Solaris2, we will also add a -R<directory>.
 dnl I tried to use the `case' structure here, but it wouldn't
 dnl work well when called within another macro call...
 dnl
-AC_DEFUN(AC_MAKE_LIBRARY, [
+AC_DEFUN(EM_MAKE_LIBRARY, [
 if test "[$]$1" != "/usr/lib" -a -n "[$]$1"; then
     $2=-L[$]$1
     if test "$UNAME" != ""; then
@@ -210,11 +147,11 @@ dnl
 dnl --------------------------------------------------------------
 dnl AC_SET_STATIC(VARIABLE [, VALUE])
 dnl
-dnl Define a subtition variable ($1) to be a reasonable option to
+dnl Define a substition variable ($1) to be a reasonable option to
 dnl link the binary `static'. $2 is the option as provided with
 dnl the command line switch, e.g. yes, no,  "-static" etc.
 dnl
-AC_DEFUN(AC_SET_STATIC, [
+AC_DEFUN(EM_SET_STATIC, [
 AC_MSG_CHECKING([for static linking flag])
 if test "$2" = "yes"; then
     if test "$CC" = "gcc"; then
@@ -242,13 +179,13 @@ else
 fi])dnl
 dnl
 dnl --------------------------------------------------------------
-dnl AC_PROG_TOUCH(VARIABLE)
+dnl AC_PROG_TOUCH(VARIABLE) -- not used
 dnl
 dnl Checks, how 'touch' has to be called in order to change file
 dnl modification dates
 dnl VARIABLE is set to the correct invocation of 'touch'
 dnl
-AC_DEFUN(AC_PROG_TOUCH, [
+AC_DEFUN(EM_PROG_TOUCH, [
 AC_MSG_CHECKING([how to call 'touch'])
     cwd=`pwd`
     cd /tmp

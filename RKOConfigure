@@ -12,14 +12,13 @@ export TCLTKROOT
 		--with-version-path=/usr/local/Modules/versions \
 		--with-etc-path=/etc \
 		--with-skel-path=/etc/skel \
-		--with-split-size=960 \
-		--x-includes=/usr/include/X11 \
-		--x-libraries=/usr/X11/lib \
-		--with-tcl-include=$TCLTKROOT/include \
-		--with-tcl-libraries=$TCLTKROOT/lib
+		--with-tclx \
+		--with-split-size=960
 exit
 
 # the above values for
 #	--with-module-path, --with-version-path,
 #	--with-etc-path, --with-skel-path
 # are default values and are here for pedagogical purposes
+		--with-tcl-include=$TCLTKROOT/include \
+		--with-tcl-libraries=$TCLTKROOT/lib
