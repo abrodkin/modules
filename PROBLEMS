@@ -72,6 +72,21 @@ compile Modules with another compiler. If you get a warning about missing
 
 LINUX
 -----
+If the modulefile does not end with a blank line then the modulecmd
+will spew out error messages, but yet successfully intepret the
+modulefile.
+
+nnn(18):ERROR:102: Tcl command execution failed: 3.1.5
+nnn(18):ERROR:102: Tcl command execution failed: 3.1.5
+nnn(18):ERROR:102: Tcl command execution failed: 3.1.5
+nnn(18):ERROR:102: Tcl command execution failed: 3.1.5
+nnn(18):ERROR:102: Tcl command execution failed: 3.1.5
+nnn(18):ERROR:102: Tcl command execution failed: 3.1.5
+nnn(18):ERROR:102: Tcl command execution failed: 3.1.5
+nnn(18):ERROR:102: Tcl command execution failed: 3.1.5
+
+REDHAT 6.2
+----------
 If using RedHat 6.2 have experienced malloc problems.
 
 Linux version 2.2.14-5.0 (root@porky.devel.redhat.com)
@@ -79,3 +94,9 @@ Linux version 2.2.14-5.0 (root@porky.devel.redhat.com)
 #1 Tue Mar 7 21:07:39 EST 2000
 
 Install gcc-2.95.2 or later ... and it then appears to work just fine.
+
+REDHAT 7.2
+----------
+If you have dejagnu installed to run the testsuite
+and it complains about not finding config.guess, do the following:
+	cd /usr/share/dejagnu; ln -s ../automake/config.guess .
