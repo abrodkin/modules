@@ -2,8 +2,7 @@ THINGS TODO FOR 3.2
 -------------------
 * Add national language support for error messages.
 
-* Modernize configure.in (use TclConfig.sh finding code from PostgreSQL7.1
-  or elsewhere).  Incorporate TclConfig.sh to Makefile.
+* Remove assumptions about modulefile directories to allow deep dirs.
 
 THINGS TODO
 -----------

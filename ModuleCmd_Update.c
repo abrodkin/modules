@@ -26,7 +26,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Update.c,v 1.1 2000/06/28 00:17:32 rk Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Update.c,v 1.1.1.1.2.1 2001/08/30 17:50:41 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -105,7 +105,7 @@ int	ModuleCmd_Update(	Tcl_Interp	*interp,
     FILE	 *file;			/** Handle to read in a file	     **/
     int		  list_count = 0,
 		  maxlist = 16;		/** Max. number of list entries	     **/
-    int		  buffer_size;		/** Cirrent size of the input buffer **/
+    int		  buffer_size;		/** Current size of the input buffer **/
     char	 *ptr, c;		/** Read pointers and char buffer    **/
 
 #if WITH_DEBUGGING_MODULECMD
@@ -239,14 +239,12 @@ int	ModuleCmd_Update(	Tcl_Interp	*interp,
 	    return( TCL_ERROR);		/** -------- EXIT (FAILURE) -------> **/
     }
     
-    if( NULL == (loaded = (char*) malloc( strlen( tmpload) + 1))) {
-	if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL)) {
+    if( NULL == (loaded = stringer(NULL, 0, tmpload, NULL))) {
+	if( OK != ErrorLogger( ERR_STRING, LOC, NULL)) {
 	    free( load_list);
 	    return( TCL_ERROR);		/** -------- EXIT (FAILURE) -------> **/
 	}
     }
-    
-    strcpy( loaded, tmpload);
     
     /**
      **  Tokenize and build the list
