@@ -29,7 +29,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdTrace.c,v 1.2 2001/06/09 09:48:46 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdTrace.c,v 1.2.2.1 2001/08/30 17:50:41 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -491,7 +491,7 @@ static	int	ChangeTraceSel(	Tcl_Interp *interp,
 	    if( cmd_table[ i]) {
 
 		if( TraceSelect[ i].alloc)
-		    free( TraceSelect[ i].tracing)
+		    free( TraceSelect[ i].tracing);
 		TraceSelect[ i].alloc = 0;
 
 		TraceSelect[ i].tracing = ('+' == on_off) ?

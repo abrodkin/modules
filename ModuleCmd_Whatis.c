@@ -23,7 +23,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Whatis.c,v 1.2 2001/06/09 09:48:46 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Whatis.c,v 1.2.2.1 2001/08/30 17:50:41 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -533,10 +533,11 @@ static	int	whatis_dir( char *dir, int argc, char **argv, FILE *cfp,
 	 **  locate the filename related to the passed module
 	 **/
 
-	/* sprintf( modulefile, "%s/%s", dir, list[ i]); */
-	strcpy( modulefile, dir);
-	strcat( modulefile, "/");
-	strcat( modulefile, list[ i]);
+	if( (char *) NULL == stringer(modulefile,MOD_BUFSIZE,
+		dir,"/",list[i],NULL)) {
+	    result = TCL_ERROR;
+	    break; /** for( i) **/
+	}
 	g_current_module = list[ i];
 
 	if( stat( modulefile, &stats) || S_ISDIR( stats.st_mode))
@@ -749,15 +750,15 @@ static	char	*apropos_cache()
      **/
 
     if( env_path == instpath) {
-	/* sprintf( buffer, "%s/etc/%s", env_path, env_file); */
-	strcpy( buffer, env_path);
-	strcat( buffer, "/etc/");
-	strcat( buffer, env_file);
+	if( (char *) NULL == stringer(buffer,MOD_BUFSIZE,
+		env_path,"/etc/",env_file,NULL)) {
+	    return (char *) NULL;
+	}
     } else {
-	/* sprintf( buffer, "%s/%s", env_path, env_file); */
-	strcpy( buffer, env_path);
-	strcat( buffer, "/");
-	strcat( buffer, env_file);
+	if( (char *) NULL == stringer(buffer,MOD_BUFSIZE,
+		env_path,"/",env_file,NULL)) {
+	    return (char *) NULL;
+	}
     }
 
     /**

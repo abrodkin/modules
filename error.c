@@ -30,7 +30,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: error.c,v 1.2 2001/06/09 09:48:46 rkowen Exp $";
+static char Id[] = "@(#)$Id: error.c,v 1.2.2.1 2001/08/30 17:50:41 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -284,6 +284,7 @@ static	ErrTransTab	TransTab[] = {
     { ERR_UNAME,	WGHT_FATAL, "'uname (2)' failed." },
     { ERR_GETHOSTNAME,	WGHT_FATAL, "'gethostname (2)' failed." },
     { ERR_GETDOMAINNAME,WGHT_FATAL, "'getdomainname (2)' failed." },
+    { ERR_STRING,	WGHT_FATAL, "string error" },
     { ERR_DISPLAY,	WGHT_ERROR, "Cannot open display" },
     { ERR_PARSE,	WGHT_ERROR, "Parse error" },
     { ERR_EXEC,		WGHT_ERROR, "Tcl command execution failed: $1" },

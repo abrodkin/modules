@@ -28,7 +28,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Init.c,v 1.2 2001/06/09 09:48:46 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Init.c,v 1.2.2.1 2001/08/30 17:50:41 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -119,8 +119,9 @@ int	ModuleCmd_Init(	Tcl_Interp	*interp,
 	       		int            	 argc,
 	       		char		*argv[])
 {
-    static char	  home_pathname[ MOD_BUFSIZE + 40];
-    static char	  home_pathname2[ MOD_BUFSIZE + 40];
+    static char	 *home_pathname;
+    static char	 *home_pathname2;
+    int		  max_home_path = MOD_BUFSIZE + 40;
     Tcl_RegExp	 modcmdPtr = Tcl_RegExpCompile(interp,
 	"^([ \t]*module[ \t]+)(load|add)[ \t]+([^#\n]*)([#.\n]*)");
     char	**modlist;
@@ -155,55 +156,60 @@ int	ModuleCmd_Init(	Tcl_Interp	*interp,
 
     if(g_flags & M_SWITCH) {
 	argc--;
-	if(argc != 1) {
-	    if( OK != ErrorLogger( ERR_USAGE, LOC, "initswitch oldmodule newmodule",
-		NULL))
-		return( TCL_ERROR);	/** -------- EXIT (FAILURE) -------> **/
-	}
+	if(argc != 1)
+	    if( OK != ErrorLogger( ERR_USAGE, LOC,
+		"initswitch oldmodule newmodule", NULL))
+		goto unwind0;
     }
   
     /**
      **  Allocate a buffer for fgets ...
      **/
 
-    if( NULL == (buffer = (char*) malloc( bufsiz * sizeof(char)))) {
-	if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
-	    return( TCL_ERROR);		/** -------- EXIT (FAILURE) -------> **/
-    }
+    if( NULL == (buffer = stringer(NULL, bufsiz * sizeof(char),NULL)))
+	if( OK != ErrorLogger( ERR_STRING, LOC, NULL))
+	    goto unwind0;
 
     /**
      **  Where's my HOME?
      **/
 
     if( NULL == (home = (char *) getenv("HOME")))
-	if( OK != ErrorLogger( ERR_HOME, LOC, NULL)) {
-	    free( buffer);
-	    return( TCL_ERROR);		/** -------- EXIT (FAILURE) -------> **/
-	}
+	if( OK != ErrorLogger( ERR_HOME, LOC, NULL))
+	    goto unwind1;
       
-    home_end = strlen( home);
-  
     /**
      **  Put HOME into a buffer and store a slash where the end of HOME is
-     **  for quick contatination of the shell startup files.
+     **  for quick concatination of the shell startup files.
      **/
 
-    strcpy( home_pathname, home);
-    home_pathname[ home_end++] = '/';
-    home_pathname[ home_end] = '\0';
+  
+    if ((char *) NULL ==
+	(home_pathname = stringer( NULL, strlen(home) + 40, home,"/", NULL)))
+	if( OK != ErrorLogger( ERR_STRING, LOC, NULL))
+	    goto unwind1;
+
+    if ((char *) NULL ==
+	(home_pathname2 = stringer( NULL, strlen(home) + 40, NULL)))
+	if( OK != ErrorLogger( ERR_STRING, LOC, NULL))
+	    goto unwind2;
+
+    home_end = strlen(home_pathname);
   
     /**
      **  Scan all startup files related to the current invoking shell
      **/
 
-    if( TCL_OK != SetStartupFiles()) {
-	free( buffer);
-	return( TCL_ERROR);		/** -------- EXIT (FAILURE) -------> **/
-    }
+    if( TCL_OK != SetStartupFiles())
+	goto unwind3;
 
     while( shell_startups[ shell_num]) {
 
-	strcpy( &home_pathname[ home_end], shell_startups[ shell_num]);
+	if ((char *) NULL == stringer( home_pathname + home_end , 40,
+		shell_startups[ shell_num]))
+		if( OK != ErrorLogger( ERR_STRING, LOC, NULL))
+			goto unwind3;
+
 	if( NULL == (fileptr = fopen(home_pathname, "r"))) {
 	    shell_num++;
 	    continue;			/** while( shell_startups) ...	     **/
@@ -214,8 +220,11 @@ int	ModuleCmd_Init(	Tcl_Interp	*interp,
 	 **  open a new startupfile with the extension -NEW for output
 	 **/
 
-	path_end = home_end + strlen( shell_startups[ shell_num]);
-	strcpy( &home_pathname[ path_end], "-NEW");
+	path_end = strlen( home_pathname );
+	if ((char *) NULL == stringer( home_pathname + path_end , 5,
+		"-NEW", NULL))
+	    if( OK != ErrorLogger( ERR_STRING, LOC, NULL))
+		goto unwind3;
 
 	shell_num++;
 
@@ -434,15 +443,16 @@ int	ModuleCmd_Init(	Tcl_Interp	*interp,
 	 **/
 
 	home_pathname[ path_end] = '\0';
-	/* sprintf( home_pathname2, "%s-OLD", home_pathname); */
-	strcpy( home_pathname2, home_pathname);
-	strcat( home_pathname2, "-OLD");
+
+	if ((char *) NULL == stringer( home_pathname2,strlen(home) + 40,
+		home_pathname, "-OLD", NULL))
+		if( OK != ErrorLogger( ERR_STRING, LOC, NULL))
+		    goto unwind3;
 
 	if( 0 > rename( home_pathname, home_pathname2)) {
 	    if( OK != ErrorLogger(ERR_RENAME,LOC,home_pathname,home_pathname2,
 		NULL)) {
-		free( buffer);
-		return( TCL_ERROR);	/** -------- EXIT (FAILURE) -------> **/
+		    goto unwind3;
 	    }
 	}
 
@@ -451,9 +461,10 @@ int	ModuleCmd_Init(	Tcl_Interp	*interp,
 	 **  Move ~/.startup-NEW to ~/.startup
 	 **/
 
-	/* sprintf( home_pathname2, "%s-NEW", home_pathname); */
-	strcpy( home_pathname2, home_pathname);
-	strcat( home_pathname2, "-NEW");
+	if ((char *) NULL == stringer( home_pathname2,strlen(home) + 40,
+		home_pathname, "-NEW", NULL))
+		if( OK != ErrorLogger( ERR_STRING, LOC, NULL))
+		    goto unwind3;
 
 	if( 0 > rename( home_pathname2, home_pathname)) {
 	    if( OK != ErrorLogger(ERR_RENAME,LOC,home_pathname2,home_pathname,
@@ -463,42 +474,43 @@ int	ModuleCmd_Init(	Tcl_Interp	*interp,
 		 **  Put the -OLD one back if I can't rename it
 		 **/
 
-		/* sprintf( home_pathname2, "%s-OLD", home_pathname); */
-		strcpy( home_pathname2, home_pathname);
-		strcat( home_pathname2, "-OLD");
+		if ((char *) NULL == stringer( home_pathname2,strlen(home) + 40,
+			home_pathname, "-OLD", NULL))
+			if( OK != ErrorLogger( ERR_STRING, LOC, NULL))
+			    goto unwind3;
 
 		if( 0 > rename( home_pathname2, home_pathname)) 
 		    ErrorLogger(ERR_RENAME,LOC,home_pathname2,home_pathname,
 		    NULL);
 
-		free( buffer);
-		return( TCL_ERROR);	/** -------- EXIT (FAILURE) -------> **/
+		goto unwind3;
 	    }
 	}
 
     } /** while( shell_startups) **/
   
     /**
-     **  Free up internal buffers
+     **  Free up internal I/O buffers
      **/
-
     free( buffer);
 
     /**
      **  Create a -NEW name. This may conditionally be used for removing the
-     **  new files if the operation hasn't had success
+     **  new files if the operation wasn't a success
      **  Check the SWITCH command
      **/
 
-    /* sprintf( home_pathname2, "%s-NEW", home_pathname); */
-    strcpy( home_pathname2, home_pathname);
-    strcat( home_pathname2, "-NEW");
+    if ((char *) NULL == stringer( home_pathname2,strlen(home) + 40,
+	home_pathname, "-NEW", NULL))
+	if( OK != ErrorLogger( ERR_STRING, LOC, NULL))
+	    goto unwind3;
+
 
     if((g_flags & M_SWITCH) && !sw_found) {
 	if( OK != ErrorLogger( ERR_LOCATE, LOC, argv[0], NULL)) {
 	    if( -1 == unlink( home_pathname2))
 		ErrorLogger( ERR_UNLINK, LOC, home_pathname2, NULL);
-	    return( TCL_ERROR);		/** -------- EXIT (FAILURE) -------> **/
+	    goto unwind3;
 	}
     }
 	
@@ -510,18 +522,34 @@ int	ModuleCmd_Init(	Tcl_Interp	*interp,
 	if( OK != ErrorLogger( ERR_LOCATE, LOC, NULL)) {
 	    if( -1 == unlink( home_pathname2))
 		ErrorLogger( ERR_UNLINK, LOC, home_pathname2, NULL);
-	    return( TCL_ERROR);		/** -------- EXIT (FAILURE) -------> **/
+	    goto unwind3;
 	}
     }
     
     if( !found_module_command) {
 	if( OK != ErrorLogger( ERR_INIT_STUP, LOC, shell_name, NULL)) 
-	    return( TCL_ERROR);		/** -------- EXIT (FAILURE) -------> **/
+	    goto unwind3;
     }
 
 #if WITH_DEBUGGING_MODULECMD
     ErrorLogger( NO_ERR_END, LOC, _proc_ModuleCmd_Init, NULL);
 #endif
 
-    return( TCL_OK);
+    /**
+     **  Free up memory
+     **/
+    free( home_pathname2);
+    free( home_pathname);
+
+    return( TCL_OK);			/** -------- EXIT (SUCCESS) -------> **/
+
+unwind3:
+    free( home_pathname2);
+unwind2:
+    free( home_pathname);
+unwind1:
+    free( buffer);
+unwind0:
+    return( TCL_ERROR);		/** -------- EXIT (FAILURE) -------> **/
+
 } /** end of 'ModuleCmd_Init' **/

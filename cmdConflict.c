@@ -27,7 +27,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdConflict.c,v 1.2 2001/06/09 09:48:46 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdConflict.c,v 1.2.2.1 2001/08/30 17:50:41 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -461,13 +461,6 @@ int	cmdPrereq(	ClientData	 client_data,
                     notloaded_flag = NULL;
                 }
             }
-
-	    /**
-	     **  Free what has been allocted in the loop
-	     **/
-
-            FreeList( modulelist, nummodules);
-
         } /** for( j) **/
     } /** for( i) **/
 

@@ -114,6 +114,10 @@
 extern	int	  errno;
 #endif
 
+#ifdef MEMDEBUG
+#  include <librko.h>
+#endif
+
 /** ************************************************************************ **/
 /** 				  LOCAL DATATYPES			     **/
 /** ************************************************************************ **/
@@ -176,6 +180,7 @@ typedef	enum	{
 	ERR_UNAME,			/** Uname failed		     **/
 	ERR_GETHOSTNAME,		/** gethostname failed		     **/
 	ERR_GETDOMAINNAME,		/** getdomainname failed	     **/
+	ERR_STRING,			/** string error		     **/
 	ERR_DISPLAY = 90,		/** cannot open display	    	     **/
 	ERR_IN_MODULEFILE = 100,	/** modulefile related errors	     **/
 	ERR_PARSE,			/** Parse error (modulefile)	     **/
@@ -412,18 +417,20 @@ typedef	enum	{
 /** ************************************************************************ **/
 
 /**
- **  I'm going to remove all of the calls to free( ) since they arn't
- **    very necessary for Modules.  Since the modulecmd program is only run for
+ **  I'm going to remove all of the calls to free( ) since they are not
+ **    necessary for Modules.  Since the modulecmd program is only run for
  **    a very short time ( usually <1sec) it's faster to not clutter the heap
  **    by freeing up memory.
  **
  **  If you disagree with this decision, or have some problems with this
  **    behavior on your system, configure with --enable-free
+ **
+ **  Note that all memory deallocations should go through null_free()
  **/
 
 #ifndef USE_FREE
-#define  free( x)  
-#define  FreeList( x, y)  
+#  define  free( x)  
+#  define  FreeList( x, y)  
 #endif
 
 /** 
@@ -686,6 +693,7 @@ extern	void	  cleanse_path( const char*, char*, int);
 extern	char	 *xdup(char const *);
 extern	char	 *xgetenv(char const *);
 extern	char	 *stringer(char *, int, ...);
+extern	void	  null_free(void **);
 
 #ifndef HAVE_STRDUP
 extern	char	 * strdup( char*);
