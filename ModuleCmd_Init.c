@@ -28,7 +28,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Init.c,v 1.2.2.3 2001/09/06 20:14:10 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Init.c,v 1.2.2.4 2001/09/07 04:26:36 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -195,7 +195,7 @@ int	ModuleCmd_Init(	Tcl_Interp	*interp,
     /**
      **  Scan all startup files related to the current invoking shell
      **/
-    if((char *) NULL == (shell_startups = SetStartupFiles(shell_name)))
+    if((char **) NULL == (shell_startups = SetStartupFiles(shell_name)))
 	goto unwind3;
 
     while( shell_startups[ shell_num]) {
