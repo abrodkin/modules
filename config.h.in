@@ -229,8 +229,17 @@
 /* Define if you have the `socket' library (-lsocket). */
 #undef HAVE_LIBSOCKET
 
+/* Define if you have the `X11' library (-lX11). */
+#undef HAVE_LIBX11
+
+/* Define if you have the `Xmu' library (-lXmu). */
+#undef HAVE_LIBXMU
+
 /* Define if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
+
+/* Define if you have the `mktemp' function. */
+#undef HAVE_MKTEMP
 
 /* Define if you have the <ndir.h> header file, and it defines `DIR'. */
 #undef HAVE_NDIR_H
@@ -244,9 +253,6 @@
 /* Define if you have the <stdlib.h> header file. */
 #undef HAVE_STDLIB_H
 
-/* Define if you have the `strcspn' function. */
-#undef HAVE_STRCSPN
-
 /* Define if you have the `strdup' function. */
 #undef HAVE_STRDUP
 
@@ -255,9 +261,6 @@
 
 /* Define if you have the <string.h> header file. */
 #undef HAVE_STRING_H
-
-/* Define if you have the `strstr' function. */
-#undef HAVE_STRSTR
 
 /* Define if you have the `strtok' function. */
 #undef HAVE_STRTOK

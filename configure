@@ -4280,17 +4280,18 @@ EOF
 
 fi
 
-for ac_func in strdup strtok uname gethostname getdomainname tempnam tmpnam \
+for ac_func in strdup strtok uname gethostname getdomainname \
+	mktemp tmpnam tempnam \
 	syslog dup2
 do
 as_ac_var=`echo "ac_cv_func_$ac_func" | $as_tr_sh`
-echo "$as_me:4287: checking for $ac_func" >&5
+echo "$as_me:4288: checking for $ac_func" >&5
 echo $ECHO_N "checking for $ac_func... $ECHO_C" >&6
 if eval "test \"\${$as_ac_var+set}\" = set"; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   cat >conftest.$ac_ext <<_ACEOF
-#line 4293 "configure"
+#line 4294 "configure"
 #include "confdefs.h"
 /* System header to define __stub macros and hopefully few prototypes,
     which can conflict with char $ac_func (); below.  */
@@ -4321,16 +4322,16 @@ f = $ac_func;
 }
 _ACEOF
 rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:4324: \"$ac_link\"") >&5
+if { (eval echo "$as_me:4325: \"$ac_link\"") >&5
   (eval $ac_link) 2>&5
   ac_status=$?
-  echo "$as_me:4327: \$? = $ac_status" >&5
+  echo "$as_me:4328: \$? = $ac_status" >&5
   (exit $ac_status); } &&
          { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:4330: \"$ac_try\"") >&5
+  { (eval echo "$as_me:4331: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
-  echo "$as_me:4333: \$? = $ac_status" >&5
+  echo "$as_me:4334: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
   eval "$as_ac_var=yes"
 else
@@ -4340,7 +4341,7 @@ eval "$as_ac_var=no"
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
 fi
-echo "$as_me:4343: result: `eval echo '${'$as_ac_var'}'`" >&5
+echo "$as_me:4344: result: `eval echo '${'$as_ac_var'}'`" >&5
 echo "${ECHO_T}`eval echo '${'$as_ac_var'}'`" >&6
 if test `eval echo '${'$as_ac_var'}'` = yes; then
   cat >>confdefs.h <<EOF
@@ -4352,7 +4353,7 @@ done
 
 # Extract the first word of "cpp", so it can be a program name with args.
 set dummy cpp; ac_word=$2
-echo "$as_me:4355: checking for $ac_word" >&5
+echo "$as_me:4356: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
 if test "${ac_cv_path__CPPSTDIN+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -4378,10 +4379,10 @@ esac
 fi
 _CPPSTDIN="$ac_cv_path__CPPSTDIN"
 if test -n "$_CPPSTDIN"; then
-  echo "$as_me:4381: result: $_CPPSTDIN" >&5
+  echo "$as_me:4382: result: $_CPPSTDIN" >&5
 echo "${ECHO_T}$_CPPSTDIN" >&6
 else
-  echo "$as_me:4384: result: no" >&5
+  echo "$as_me:4385: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi
 
@@ -4391,7 +4392,7 @@ EOF
 
 # Extract the first word of "hostname", so it can be a program name with args.
 set dummy hostname; ac_word=$2
-echo "$as_me:4394: checking for $ac_word" >&5
+echo "$as_me:4395: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
 if test "${ac_cv_path__PHOST+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -4408,7 +4409,7 @@ for ac_dir in $ac_dummy; do
   test -z "$ac_dir" && ac_dir=.
   if $as_executable_p "$ac_dir/$ac_word"; then
    ac_cv_path__PHOST="$ac_dir/$ac_word"
-   echo "$as_me:4411: found $ac_dir/$ac_word" >&5
+   echo "$as_me:4412: found $ac_dir/$ac_word" >&5
    break
 fi
 done
@@ -4420,10 +4421,10 @@ fi
 _PHOST=$ac_cv_path__PHOST
 
 if test -n "$_PHOST"; then
-  echo "$as_me:4423: result: $_PHOST" >&5
+  echo "$as_me:4424: result: $_PHOST" >&5
 echo "${ECHO_T}$_PHOST" >&6
 else
-  echo "$as_me:4426: result: no" >&5
+  echo "$as_me:4427: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi
 
@@ -4433,7 +4434,7 @@ EOF
 
 # Extract the first word of "runtest", so it can be a program name with args.
 set dummy runtest; ac_word=$2
-echo "$as_me:4436: checking for $ac_word" >&5
+echo "$as_me:4437: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
 if test "${ac_cv_path_RUNTEST+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -4450,7 +4451,7 @@ for ac_dir in $ac_dummy; do
   test -z "$ac_dir" && ac_dir=.
   if $as_executable_p "$ac_dir/$ac_word"; then
    ac_cv_path_RUNTEST="$ac_dir/$ac_word"
-   echo "$as_me:4453: found $ac_dir/$ac_word" >&5
+   echo "$as_me:4454: found $ac_dir/$ac_word" >&5
    break
 fi
 done
@@ -4462,84 +4463,15 @@ fi
 RUNTEST=$ac_cv_path_RUNTEST
 
 if test -n "$RUNTEST"; then
-  echo "$as_me:4465: result: $RUNTEST" >&5
+  echo "$as_me:4466: result: $RUNTEST" >&5
 echo "${ECHO_T}$RUNTEST" >&6
 else
-  echo "$as_me:4468: result: no" >&5
+  echo "$as_me:4469: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi
 
 test "$RUNTEST" = "" && echo "Install DEJAGNU and rerun configure if you \
 want to run the testsuite"
-
-for ac_func in gethostname strcspn strdup strstr uname
-do
-as_ac_var=`echo "ac_cv_func_$ac_func" | $as_tr_sh`
-echo "$as_me:4478: checking for $ac_func" >&5
-echo $ECHO_N "checking for $ac_func... $ECHO_C" >&6
-if eval "test \"\${$as_ac_var+set}\" = set"; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cat >conftest.$ac_ext <<_ACEOF
-#line 4484 "configure"
-#include "confdefs.h"
-/* System header to define __stub macros and hopefully few prototypes,
-    which can conflict with char $ac_func (); below.  */
-#include <assert.h>
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char $ac_func ();
-char (*f) ();
-
-int
-main ()
-{
-/* The GNU C library defines this for functions which it implements
-    to always fail with ENOSYS.  Some functions are actually named
-    something starting with __ and the normal name is an alias.  */
-#if defined (__stub_$ac_func) || defined (__stub___$ac_func)
-choke me
-#else
-f = $ac_func;
-#endif
-
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:4515: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:4518: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:4521: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:4524: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  eval "$as_ac_var=yes"
-else
-  echo "$as_me: failed program was:" >&5
-cat conftest.$ac_ext >&5
-eval "$as_ac_var=no"
-fi
-rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-fi
-echo "$as_me:4534: result: `eval echo '${'$as_ac_var'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_var'}'`" >&6
-if test `eval echo '${'$as_ac_var'}'` = yes; then
-  cat >>confdefs.h <<EOF
-#define `echo "HAVE_$ac_func" | $as_tr_cpp` 1
-EOF
-
-fi
-done
 
 # Check whether --with-force-path or --without-force-path was given.
 if test "${with_force_path+set}" = set; then
@@ -4569,36 +4501,36 @@ fi;
 if test "${with_static+set}" = set; then
   withval="$with_static"
 
-echo "$as_me:4572: checking for static linking flag" >&5
+echo "$as_me:4504: checking for static linking flag" >&5
 echo $ECHO_N "checking for static linking flag... $ECHO_C" >&6
 if test "$withval" = "yes"; then
     if test "$CC" = "gcc"; then
         STATIC="-static"
-	echo "$as_me:4577: result: setting STATIC to '-static'" >&5
+	echo "$as_me:4509: result: setting STATIC to '-static'" >&5
 echo "${ECHO_T}setting STATIC to '-static'" >&6
     elif test "$UNAME" != ""; then
         os_system=`$UNAME -s`
         if test "$os_system" = "IRIX"; then
             STATIC="-non_shared"
-	    echo "$as_me:4583: result: setting STATIC to '-non_shared'" >&5
+	    echo "$as_me:4515: result: setting STATIC to '-non_shared'" >&5
 echo "${ECHO_T}setting STATIC to '-non_shared'" >&6
         else
             STATIC="-Bstatic"
-	    echo "$as_me:4587: result: setting STATIC to '-Bstatic'" >&5
+	    echo "$as_me:4519: result: setting STATIC to '-Bstatic'" >&5
 echo "${ECHO_T}setting STATIC to '-Bstatic'" >&6
         fi
     else
         STATIC="-Bstatic"
-	echo "$as_me:4592: result: setting STATIC to '-Bstatic'" >&5
+	echo "$as_me:4524: result: setting STATIC to '-Bstatic'" >&5
 echo "${ECHO_T}setting STATIC to '-Bstatic'" >&6
     fi
 elif test "$withval" != "no"; then
-    echo "$as_me:4596: result: setting STATIC to '$withval'" >&5
+    echo "$as_me:4528: result: setting STATIC to '$withval'" >&5
 echo "${ECHO_T}setting STATIC to '$withval'" >&6
     STATIC=$withval
 else
     test "$withval" != "no" && STATIC=$withval
-    echo "$as_me:4601: result: no" >&5
+    echo "$as_me:4533: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi
 fi;
@@ -5107,7 +5039,7 @@ EOF
 	fi
 fi;
 
-echo "$as_me:5110: checking for log in -lm" >&5
+echo "$as_me:5042: checking for log in -lm" >&5
 echo $ECHO_N "checking for log in -lm... $ECHO_C" >&6
 if test "${ac_cv_lib_m_log+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -5115,7 +5047,7 @@ else
   ac_check_lib_save_LIBS=$LIBS
 LIBS="-lm  $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
-#line 5118 "configure"
+#line 5050 "configure"
 #include "confdefs.h"
 
 /* Override any gcc2 internal prototype to avoid an error.  */
@@ -5134,16 +5066,16 @@ log ();
 }
 _ACEOF
 rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:5137: \"$ac_link\"") >&5
+if { (eval echo "$as_me:5069: \"$ac_link\"") >&5
   (eval $ac_link) 2>&5
   ac_status=$?
-  echo "$as_me:5140: \$? = $ac_status" >&5
+  echo "$as_me:5072: \$? = $ac_status" >&5
   (exit $ac_status); } &&
          { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:5143: \"$ac_try\"") >&5
+  { (eval echo "$as_me:5075: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
-  echo "$as_me:5146: \$? = $ac_status" >&5
+  echo "$as_me:5078: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
   ac_cv_lib_m_log=yes
 else
@@ -5154,7 +5086,7 @@ fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-echo "$as_me:5157: result: $ac_cv_lib_m_log" >&5
+echo "$as_me:5089: result: $ac_cv_lib_m_log" >&5
 echo "${ECHO_T}$ac_cv_lib_m_log" >&6
 if test $ac_cv_lib_m_log = yes; then
   cat >>confdefs.h <<EOF
@@ -5167,7 +5099,7 @@ fi
 
 if test "${STATIC-foobar}" = "foobar"; then
 
-echo "$as_me:5170: checking for dlopen in -ldl" >&5
+echo "$as_me:5102: checking for dlopen in -ldl" >&5
 echo $ECHO_N "checking for dlopen in -ldl... $ECHO_C" >&6
 if test "${ac_cv_lib_dl_dlopen+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -5175,7 +5107,7 @@ else
   ac_check_lib_save_LIBS=$LIBS
 LIBS="-ldl  $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
-#line 5178 "configure"
+#line 5110 "configure"
 #include "confdefs.h"
 
 /* Override any gcc2 internal prototype to avoid an error.  */
@@ -5194,16 +5126,16 @@ dlopen ();
 }
 _ACEOF
 rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:5197: \"$ac_link\"") >&5
+if { (eval echo "$as_me:5129: \"$ac_link\"") >&5
   (eval $ac_link) 2>&5
   ac_status=$?
-  echo "$as_me:5200: \$? = $ac_status" >&5
+  echo "$as_me:5132: \$? = $ac_status" >&5
   (exit $ac_status); } &&
          { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:5203: \"$ac_try\"") >&5
+  { (eval echo "$as_me:5135: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
-  echo "$as_me:5206: \$? = $ac_status" >&5
+  echo "$as_me:5138: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
   ac_cv_lib_dl_dlopen=yes
 else
@@ -5214,7 +5146,7 @@ fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-echo "$as_me:5217: result: $ac_cv_lib_dl_dlopen" >&5
+echo "$as_me:5149: result: $ac_cv_lib_dl_dlopen" >&5
 echo "${ECHO_T}$ac_cv_lib_dl_dlopen" >&6
 if test $ac_cv_lib_dl_dlopen = yes; then
   cat >>confdefs.h <<EOF
@@ -5242,7 +5174,7 @@ if test "${with_tcl+set}" = set; then
   withval="$with_tcl"
   with_tclconfig=${withval}
 fi;
-	echo "$as_me:5245: checking for Tcl configuration" >&5
+	echo "$as_me:5177: checking for Tcl configuration" >&5
 echo $ECHO_N "checking for Tcl configuration... $ECHO_C" >&6
 	if test "${ac_cv_c_tclconfig+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -5253,7 +5185,7 @@ else
 		if test -f "${with_tclconfig}/tclConfig.sh" ; then
 		    ac_cv_c_tclconfig=`(cd ${with_tclconfig}; pwd)`
 		else
-		    { { echo "$as_me:5256: error: ${with_tclconfig} directory doesn't contain tclConfig.sh" >&5
+		    { { echo "$as_me:5188: error: ${with_tclconfig} directory doesn't contain tclConfig.sh" >&5
 echo "$as_me: error: ${with_tclconfig} directory doesn't contain tclConfig.sh" >&2;}
    { (exit 1); exit 1; }; }
 		fi
@@ -5303,26 +5235,26 @@ fi
 
 	if test x"${ac_cv_c_tclconfig}" = x ; then
 	    TCL_BIN_DIR="# no Tcl configs found"
-	    { echo "$as_me:5306: WARNING: Can't find Tcl configuration definitions" >&5
+	    { echo "$as_me:5238: WARNING: Can't find Tcl configuration definitions" >&5
 echo "$as_me: WARNING: Can't find Tcl configuration definitions" >&2;}
 	    exit 0
 	else
 	    no_tcl=
 	    TCL_BIN_DIR=${ac_cv_c_tclconfig}
-	    echo "$as_me:5312: result: found $TCL_BIN_DIR/tclConfig.sh" >&5
+	    echo "$as_me:5244: result: found $TCL_BIN_DIR/tclConfig.sh" >&5
 echo "${ECHO_T}found $TCL_BIN_DIR/tclConfig.sh" >&6
 	fi
     fi
 
-    echo "$as_me:5317: checking for existence of $TCL_BIN_DIR/tclConfig.sh" >&5
+    echo "$as_me:5249: checking for existence of $TCL_BIN_DIR/tclConfig.sh" >&5
 echo $ECHO_N "checking for existence of $TCL_BIN_DIR/tclConfig.sh... $ECHO_C" >&6
 
     if test -f "$TCL_BIN_DIR/tclConfig.sh" ; then
-        echo "$as_me:5321: result: loading" >&5
+        echo "$as_me:5253: result: loading" >&5
 echo "${ECHO_T}loading" >&6
 	. $TCL_BIN_DIR/tclConfig.sh
     else
-        echo "$as_me:5325: result: file not found" >&5
+        echo "$as_me:5257: result: file not found" >&5
 echo "${ECHO_T}file not found" >&6
     fi
 
@@ -5334,7 +5266,7 @@ echo "${ECHO_T}file not found" >&6
     eval TCL_LIB_FILE=${TCL_LIB_FILE}
     eval TCL_LIB_FLAG=${TCL_LIB_FLAG}
 
-    echo "$as_me:5337: checking for Tcl public headers" >&5
+    echo "$as_me:5269: checking for Tcl public headers" >&5
 echo $ECHO_N "checking for Tcl public headers... $ECHO_C" >&6
 
 # Check whether --with-tclinclude or --without-tclinclude was given.
@@ -5347,7 +5279,7 @@ fi;
 	if test -f "${with_tclinclude}/tcl.h" ; then
 	    ac_cv_c_tclh=${with_tclinclude}
 	else
-	    { { echo "$as_me:5350: error: ${with_tclinclude} directory does not contain Tcl public header file tcl.h" >&5
+	    { { echo "$as_me:5282: error: ${with_tclinclude} directory does not contain Tcl public header file tcl.h" >&5
 echo "$as_me: error: ${with_tclinclude} directory does not contain Tcl public header file tcl.h" >&2;}
    { (exit 1); exit 1; }; }
 	fi
@@ -5381,11 +5313,11 @@ fi
     # Print a message based on how we determined the include path
 
     if test x"${ac_cv_c_tclh}" = x ; then
-	{ { echo "$as_me:5384: error: tcl.h not found.  Please specify its location with --with-tclinclude" >&5
+	{ { echo "$as_me:5316: error: tcl.h not found.  Please specify its location with --with-tclinclude" >&5
 echo "$as_me: error: tcl.h not found.  Please specify its location with --with-tclinclude" >&2;}
    { (exit 1); exit 1; }; }
     else
-	echo "$as_me:5388: result: ${ac_cv_c_tclh}" >&5
+	echo "$as_me:5320: result: ${ac_cv_c_tclh}" >&5
 echo "${ECHO_T}${ac_cv_c_tclh}" >&6
     fi
 
@@ -5410,7 +5342,7 @@ if test "${with_tclx+set}" = set; then
   withval="$with_tclx"
   with_tclxconfig=${withval}
 fi;
-	echo "$as_me:5413: checking for Tcl configuration" >&5
+	echo "$as_me:5345: checking for Tcl configuration" >&5
 echo $ECHO_N "checking for Tcl configuration... $ECHO_C" >&6
 	if test "${ac_cv_c_tclxconfig+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -5422,7 +5354,7 @@ else
 		    if -f "${with_tclxconfig}/tclxConfig.sh" ; then
 			ac_cv_c_tclxconfig=`(cd ${with_tclxconfig}; pwd)`
 		    else
-			{ { echo "$as_me:5425: error: ${with_tclxconfig} directory doesn't contain tclxConfig.sh" >&5
+			{ { echo "$as_me:5357: error: ${with_tclxconfig} directory doesn't contain tclxConfig.sh" >&5
 echo "$as_me: error: ${with_tclxconfig} directory doesn't contain tclxConfig.sh" >&2;}
    { (exit 1); exit 1; }; }
 		    fi
@@ -5475,28 +5407,28 @@ fi
 
 	if test x"${ac_cv_c_tclxconfig}" = x ; then
 	    TCLX_BIN_DIR="# no Tcl configs found"
-	    { echo "$as_me:5478: WARNING: Can't find Tcl configuration definitions" >&5
+	    { echo "$as_me:5410: WARNING: Can't find Tcl configuration definitions" >&5
 echo "$as_me: WARNING: Can't find Tcl configuration definitions" >&2;}
 	    exit 0
 	else
 	    if test x"${ac_cv_c_tclxconfig}" != x"no_tclx" ; then
 		no_tclx=
 		TCLX_BIN_DIR=${ac_cv_c_tclxconfig}
-		echo "$as_me:5485: result: found $TCLX_BIN_DIR/tclxConfig.sh" >&5
+		echo "$as_me:5417: result: found $TCLX_BIN_DIR/tclxConfig.sh" >&5
 echo "${ECHO_T}found $TCLX_BIN_DIR/tclxConfig.sh" >&6
 	    fi
 	fi
     fi
 
-    echo "$as_me:5491: checking for existence of $TCLX_BIN_DIR/tclxConfig.sh" >&5
+    echo "$as_me:5423: checking for existence of $TCLX_BIN_DIR/tclxConfig.sh" >&5
 echo $ECHO_N "checking for existence of $TCLX_BIN_DIR/tclxConfig.sh... $ECHO_C" >&6
 
     if test -f "$TCLX_BIN_DIR/tclxConfig.sh" ; then
-        echo "$as_me:5495: result: loading" >&5
+        echo "$as_me:5427: result: loading" >&5
 echo "${ECHO_T}loading" >&6
 	. $TCLX_BIN_DIR/tclxConfig.sh
     else
-        echo "$as_me:5499: result: file not found" >&5
+        echo "$as_me:5431: result: file not found" >&5
 echo "${ECHO_T}file not found" >&6
     fi
 
@@ -5511,19 +5443,19 @@ fi
 if test "${with_module_path+set}" = set; then
   withval="$with_module_path"
   MODULEPATH="$withval"
-	echo "$as_me:5514: result: MODULEPATH = $with_module_path" >&5
+	echo "$as_me:5446: result: MODULEPATH = $with_module_path" >&5
 echo "${ECHO_T}MODULEPATH = $with_module_path" >&6
 	cat >>confdefs.h <<EOF
 #define MODULEPATH "$withval"
 EOF
 
 else
-  { echo "$as_me:5521: WARNING: if using '--with-module-path': need to specify a path!" >&5
+  { echo "$as_me:5453: WARNING: if using '--with-module-path': need to specify a path!" >&5
 echo "$as_me: WARNING: if using '--with-module-path': need to specify a path!" >&2;}
 	if test "$withval" = "no" || test "$withval" = "yes"; then
 		withval="/usr/local/Modules/modulefiles"
 	fi
-	{ echo "$as_me:5526: WARNING: will use MODULEPATH=$withval" >&5
+	{ echo "$as_me:5458: WARNING: will use MODULEPATH=$withval" >&5
 echo "$as_me: WARNING: will use MODULEPATH=$withval" >&2;}
 	MODULEPATH="$withval"
 	cat >>confdefs.h <<EOF
@@ -5536,19 +5468,19 @@ fi;
 if test "${with_version_path+set}" = set; then
   withval="$with_version_path"
   VERSIONPATH="$withval"
-	echo "$as_me:5539: result: VERSIONPATH = $with_version_path" >&5
+	echo "$as_me:5471: result: VERSIONPATH = $with_version_path" >&5
 echo "${ECHO_T}VERSIONPATH = $with_version_path" >&6
 	cat >>confdefs.h <<EOF
 #define VERSIONPATH "$withval"
 EOF
 
 else
-  { echo "$as_me:5546: WARNING: if using '--with-version-path': need to specify a path!" >&5
+  { echo "$as_me:5478: WARNING: if using '--with-version-path': need to specify a path!" >&5
 echo "$as_me: WARNING: if using '--with-version-path': need to specify a path!" >&2;}
 	if test "$withval" = "no" || test "$withval" = "yes"; then
 		withval="$prefix/Modules/versions"
 	fi
-	{ echo "$as_me:5551: WARNING: will use VERSIONPATH=$withval" >&5
+	{ echo "$as_me:5483: WARNING: will use VERSIONPATH=$withval" >&5
 echo "$as_me: WARNING: will use VERSIONPATH=$withval" >&2;}
 	VERSIONPATH="$withval"
 	cat >>confdefs.h <<EOF
@@ -5578,7 +5510,7 @@ fi;
 if test "${with_etc_path+set}" = set; then
   withval="$with_etc_path"
   if test "$withval" = "no" || test "$withval" = "yes"; then
-	{ echo "$as_me:5581: WARNING: if using '--with-etc-path': need to specify a path! Using /etc" >&5
+	{ echo "$as_me:5513: WARNING: if using '--with-etc-path': need to specify a path! Using /etc" >&5
 echo "$as_me: WARNING: if using '--with-etc-path': need to specify a path! Using /etc" >&2;}
 		withval="/etc"
 	fi
@@ -5592,7 +5524,7 @@ fi;
 if test "${with_skel_path+set}" = set; then
   withval="$with_skel_path"
   if test "$withval" = "no" || test "$withval" = "yes"; then
-	{ echo "$as_me:5595: WARNING: if using '--with-skel-path': need to specify a path! Using /etc/skel" >&5
+	{ echo "$as_me:5527: WARNING: if using '--with-skel-path': need to specify a path! Using /etc/skel" >&5
 echo "$as_me: WARNING: if using '--with-skel-path': need to specify a path! Using /etc/skel" >&2;}
 		withval="/etc/skel"
 	fi
@@ -5701,7 +5633,7 @@ DEFS=-DHAVE_CONFIG_H
 : ${CONFIG_STATUS=./config.status}
 ac_clean_files_save=$ac_clean_files
 ac_clean_files="$ac_clean_files $CONFIG_STATUS"
-{ echo "$as_me:5704: creating $CONFIG_STATUS" >&5
+{ echo "$as_me:5636: creating $CONFIG_STATUS" >&5
 echo "$as_me: creating $CONFIG_STATUS" >&6;}
 cat >$CONFIG_STATUS <<_ACEOF
 #! $SHELL
@@ -5877,7 +5809,7 @@ cat >>$CONFIG_STATUS <<\EOF
     echo "$ac_cs_version"; exit 0 ;;
   --he | --h)
     # Conflict between --help and --header
-    { { echo "$as_me:5880: error: ambiguous option: $1
+    { { echo "$as_me:5812: error: ambiguous option: $1
 Try \`$0 --help' for more information." >&5
 echo "$as_me: error: ambiguous option: $1
 Try \`$0 --help' for more information." >&2;}
@@ -5896,7 +5828,7 @@ Try \`$0 --help' for more information." >&2;}
     ac_need_defaults=false;;
 
   # This is an error.
-  -*) { { echo "$as_me:5899: error: unrecognized option: $1
+  -*) { { echo "$as_me:5831: error: unrecognized option: $1
 Try \`$0 --help' for more information." >&5
 echo "$as_me: error: unrecognized option: $1
 Try \`$0 --help' for more information." >&2;}
@@ -5989,7 +5921,7 @@ do
   "testsuite/modules.50-cmds/100-loglevel.exp" ) CONFIG_FILES="$CONFIG_FILES testsuite/modules.50-cmds/100-loglevel.exp" ;;
   "default" ) CONFIG_COMMANDS="$CONFIG_COMMANDS default" ;;
   "config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
-  *) { { echo "$as_me:5992: error: invalid argument: $ac_config_target" >&5
+  *) { { echo "$as_me:5924: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
    { (exit 1); exit 1; }; };;
   esac
@@ -6240,7 +6172,7 @@ done; }
   esac
 
   if test x"$ac_file" != x-; then
-    { echo "$as_me:6243: creating $ac_file" >&5
+    { echo "$as_me:6175: creating $ac_file" >&5
 echo "$as_me: creating $ac_file" >&6;}
     rm -f "$ac_file"
   fi
@@ -6258,7 +6190,7 @@ echo "$as_me: creating $ac_file" >&6;}
       -) echo $tmp/stdin ;;
       [\\/$]*)
          # Absolute (can't be DOS-style, as IFS=:)
-         test -f "$f" || { { echo "$as_me:6261: error: cannot find input file: $f" >&5
+         test -f "$f" || { { echo "$as_me:6193: error: cannot find input file: $f" >&5
 echo "$as_me: error: cannot find input file: $f" >&2;}
    { (exit 1); exit 1; }; }
          echo $f;;
@@ -6271,7 +6203,7 @@ echo "$as_me: error: cannot find input file: $f" >&2;}
            echo $srcdir/$f
          else
            # /dev/null tree
-           { { echo "$as_me:6274: error: cannot find input file: $f" >&5
+           { { echo "$as_me:6206: error: cannot find input file: $f" >&5
 echo "$as_me: error: cannot find input file: $f" >&2;}
    { (exit 1); exit 1; }; }
          fi;;
@@ -6332,7 +6264,7 @@ for ac_file in : $CONFIG_HEADERS; do test "x$ac_file" = x: && continue
   * )   ac_file_in=$ac_file.in ;;
   esac
 
-  test x"$ac_file" != x- && { echo "$as_me:6335: creating $ac_file" >&5
+  test x"$ac_file" != x- && { echo "$as_me:6267: creating $ac_file" >&5
 echo "$as_me: creating $ac_file" >&6;}
 
   # First look for the input files in the build tree, otherwise in the
@@ -6343,7 +6275,7 @@ echo "$as_me: creating $ac_file" >&6;}
       -) echo $tmp/stdin ;;
       [\\/$]*)
          # Absolute (can't be DOS-style, as IFS=:)
-         test -f "$f" || { { echo "$as_me:6346: error: cannot find input file: $f" >&5
+         test -f "$f" || { { echo "$as_me:6278: error: cannot find input file: $f" >&5
 echo "$as_me: error: cannot find input file: $f" >&2;}
    { (exit 1); exit 1; }; }
          echo $f;;
@@ -6356,7 +6288,7 @@ echo "$as_me: error: cannot find input file: $f" >&2;}
            echo $srcdir/$f
          else
            # /dev/null tree
-           { { echo "$as_me:6359: error: cannot find input file: $f" >&5
+           { { echo "$as_me:6291: error: cannot find input file: $f" >&5
 echo "$as_me: error: cannot find input file: $f" >&2;}
    { (exit 1); exit 1; }; }
          fi;;
@@ -6473,7 +6405,7 @@ cat >>$CONFIG_STATUS <<\EOF
   rm -f $tmp/in
   if test x"$ac_file" != x-; then
     if cmp -s $ac_file $tmp/config.h 2>/dev/null; then
-      { echo "$as_me:6476: $ac_file is unchanged" >&5
+      { echo "$as_me:6408: $ac_file is unchanged" >&5
 echo "$as_me: $ac_file is unchanged" >&6;}
     else
       ac_dir=`$as_expr X"$ac_file" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \

@@ -1,6 +1,6 @@
 dnl
 dnl File:        configure.in
-dnl Revision:    $Id: configure.in,v 1.5.2.1 2001/08/24 19:51:30 rkowen Exp $
+dnl Revision:    $Id: configure.in,v 1.5.2.2 2001/09/06 22:59:09 rkowen Exp $
 dnl Created:     94/06/18
 dnl Author:      Leif Hedstrom<hedstrom@inf.ethz.ch>
 dnl		 Martin S. Utesch <wstd@hl.siemens.de>
@@ -127,7 +127,12 @@ dnl              MUST be done BEFORE AC_PATH_XTRA!
 dnl --------------------------------------------------------------
 AC_CHECK_LIB(socket, socket)
 AC_CHECK_LIB(nsl, t_accept)
-AC_CHECK_FUNCS([strdup strtok uname gethostname getdomainname tempnam tmpnam \
+
+dnl --------------------------------------------------------------
+dnl Checks for library functions.
+dnl --------------------------------------------------------------
+AC_CHECK_FUNCS([strdup strtok uname gethostname getdomainname \
+	mktemp tmpnam tempnam \
 	syslog dup2])
 EM_PATH_PROG_SEARCH(_CPPSTDIN, cpp, /lib /usr/lib /usr/lang \
 	/usr/local/lang /usr/ccs/lib, [${CC} -E])
@@ -137,10 +142,6 @@ test "$_PHOST" != ""  && AC_DEFINE_UNQUOTED(PHOSTNAME, "$_PHOST")
 AC_PATH_PROG(RUNTEST, runtest, "./not_installed")
 test "$RUNTEST" = "" && echo "Install DEJAGNU and rerun configure if you \
 want to run the testsuite"
-dnl --------------------------------------------------------------
-dnl Checks for library functions.
-dnl --------------------------------------------------------------
-AC_CHECK_FUNCS(gethostname strcspn strdup strstr uname)
 
 dnl
 dnl Here we define some --with & --enable things:
