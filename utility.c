@@ -34,6 +34,7 @@
  **			chk4spch					     **
  **			xdup						     **
  **			xgetenv						     **
+ **			stringer					     **
  **									     **
  **			strdup		if not defined by the system libs.   **
  **			strtok		if not defined by the system libs.   **
@@ -50,7 +51,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.5 2001/07/09 18:21:37 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.5.2.1 2001/08/24 19:51:31 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -2644,7 +2645,7 @@ void chk4spch(char* s)
  **			\$ escapes the expansion and substitutes a '$' in    **
  **			its place.					     **
  ** 									     **
- **   First Edition:	2000/01/21					     **
+ **   First Edition:	2000/01/21	R.K.Owen <rk@owen.sj.ca.us>	     **
  ** 									     **
  **   Parameters:	char	*string		Environment variable	     **
  ** 									     **
@@ -2750,7 +2751,7 @@ char *xdup(char const *string) {
  ** 			However, it will only expand 1 level.		     **
  ** 			See xdup() for details.				     **
  ** 									     **
- **   First Edition:	2000/01/18					     **
+ **   First Edition:	2000/01/18	R.K.Owen <rk@owen.sj.ca.us>	     **
  ** 									     **
  **   Parameters:	char	*var		Environment variable	     **
  ** 									     **
@@ -2770,3 +2771,89 @@ char *xgetenv(char const * var) {
 	return xdup(getenv(var));
 
 } /** End of 'xgetenv' **/
+
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
+ **   Function:		stringer					     **
+ ** 									     **
+ **   Description:	Safely copies and concates series of strings	     **
+ **			until it hits a NULL argument.			     **
+ **			Either a buffer & length are given or if the buffer  **
+ **			pointer is NULL then it will allocate memory to the  **
+ **			given length. If the length is 0 then get the length **
+ **			from the series of strings.			     **
+ **			The resultant buffer is returned unless there	     **
+ **			is an error then NULL is returned.		     **
+ **			(Therefore, one of the main uses of stringer is to   **
+ **			 allocate string memory.)			     **
+ ** 									     **
+ ** 									     **
+ **   First Edition:	2001/08/08	R.K.Owen <rk@owen.sj.ca.us>	     **
+ ** 									     **
+ **   Parameters:	char		*buffer	string buffer (if not NULL)  **
+ **			int		 len	maximum length of buffer     **
+ **			const char	*str1	1st string to copy to buffer **
+ **			const char	*str2	2nd string to cat  to buffer **
+ ** 			...						     **
+ **			const char	*strN	Nth string to cat  to buffer **
+ **			const char	*NULL	end of arguments	     **
+ ** 									     **
+ **   Result:		char		*buffer	if successfull completion    **
+ ** 					else NULL			     **
+ ** 									     **
+ **   Attached Globals:	-						     **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
+
+char *stringer(	char *		buffer,
+		int		len,
+		... )
+{
+	va_list argptr;		/** stdarg argument ptr			**/
+	char *ptr;		/** argument string ptr			**/
+	char *tbuf = buffer;	/** tempory buffer  ptr			**/
+	int sumlen = 0;		/** length of all the concat strings	**/
+	char *(*strfn)(char*,const char*) = strcpy;
+				/** ptr to 1st string function		**/
+
+#if WITH_DEBUGGING_UTIL_2
+    ErrorLogger( NO_ERR_START, LOC, _proc_stringer, NULL);
+#endif
+
+	/* get start of optional arguments and sum string lengths */
+	va_start(argptr, len);
+	while (ptr = va_arg(argptr, char *)) {
+		sumlen += strlen(ptr);
+	}
+	va_end(argptr);
+
+	/* can we even proceed? */
+	if (tbuf && (sumlen > len || len < 0)) {
+		return (char *) NULL;
+	}
+
+	/* do we need to allocate memory? */
+	if (tbuf == (char *) NULL) {
+		if (len == 0) {
+			len = sumlen;
+		}
+		if ((char *) NULL == (tbuf = (char*) malloc(len))) {
+			if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
+				return (char *) NULL;
+		}
+	}
+
+	/* concat all the strings to buffer */
+	va_start(argptr, len);
+	while (ptr = va_arg(argptr, char *)) {
+		strfn(tbuf, ptr);
+		strfn = strcat;
+	}
+	va_end(argptr);
+
+	/* got here successfully - return buffer */
+	return tbuf;
+
+} /** End of 'stringer' **/
