@@ -398,6 +398,8 @@ AC_DEFUN(EM_PATH_TCLXCONFIG, [
 			AC_MSG_ERROR([${with_tclxconfig} directory doesn't contain tclxConfig.sh])
 		    fi
 		fi
+	    else
+		ac_cv_c_tclxconfig='no_tclx'
 	    fi
 
 	    # then check for a private Tcl installation
@@ -446,9 +448,11 @@ AC_DEFUN(EM_PATH_TCLXCONFIG, [
 	    AC_MSG_WARN(Can't find Tcl configuration definitions)
 	    exit 0
 	else
-	    no_tclx=
-	    TCLX_BIN_DIR=${ac_cv_c_tclxconfig}
-	    AC_MSG_RESULT(found $TCLX_BIN_DIR/tclxConfig.sh)
+	    if test x"${ac_cv_c_tclxconfig}" != x"no_tclx" ; then
+		no_tclx=
+		TCLX_BIN_DIR=${ac_cv_c_tclxconfig}
+		AC_MSG_RESULT(found $TCLX_BIN_DIR/tclxConfig.sh)
+	    fi
 	fi
     fi
 ])
