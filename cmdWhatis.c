@@ -28,7 +28,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdWhatis.c,v 1.2 2001/06/09 09:48:46 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdWhatis.c,v 1.2.2.1 2001/09/05 21:41:16 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -231,7 +231,7 @@ void	cmdModuleWhatisShut()
 
     if( whatis) {
 	while( *ptr) {		/** go until NULL token **/
-	    free( *ptr);
+	    null_free((void *) ptr);
 	    *ptr = (char *) NULL;
 	    ptr++;
 	}
