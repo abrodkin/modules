@@ -35,6 +35,7 @@
  **			xdup						     **
  **			xgetenv						     **
  **			stringer					     **
+ **			null_clean					     **
  **									     **
  **			strdup		if not defined by the system libs.   **
  **			strtok		if not defined by the system libs.   **
@@ -51,7 +52,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.5.2.1 2001/08/24 19:51:31 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.5.2.2 2001/08/30 17:50:41 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -2742,6 +2743,7 @@ char *xdup(char const *string) {
 	}
 
 } /** End of 'xdup' **/
+
 /*++++
  ** ** Function-Header ***************************************************** **
  ** 									     **
@@ -2761,7 +2763,6 @@ char *xdup(char const *string) {
  ** 									     **
  ** ************************************************************************ **
  ++++*/
-
 
 char *xgetenv(char const * var) {
 	char *result = NULL;
@@ -2830,14 +2831,14 @@ char *stringer(	char *		buffer,
 	va_end(argptr);
 
 	/* can we even proceed? */
-	if (tbuf && (sumlen > len || len < 0)) {
+	if (tbuf && (sumlen >= len || len < 0)) {
 		return (char *) NULL;
 	}
 
 	/* do we need to allocate memory? */
 	if (tbuf == (char *) NULL) {
 		if (len == 0) {
-			len = sumlen;
+			len = sumlen + 1;
 		}
 		if ((char *) NULL == (tbuf = (char*) malloc(len))) {
 			if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
@@ -2857,3 +2858,33 @@ char *stringer(	char *		buffer,
 	return tbuf;
 
 } /** End of 'stringer' **/
+
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
+ **   Function:		null_free					     **
+ ** 									     **
+ **   Description:	does a free and then nulls the pointer.		     **
+ ** 									     **
+ **   first edition:	2000/08/24	r.k.owen <rk@owen.sj.ca.us>	     **
+ ** 									     **
+ **   parameters:	void	**var		allocated memory	     **
+ ** 									     **
+ **   result:		void    		(nothing)		     **
+ ** 									     **
+ **   attached globals:	-						     **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
+
+void null_free(void ** var) {
+
+	if (! *var) return;	/* passed in a NULL ptr */
+
+#ifdef USE_FREE
+	free( *var);
+#endif
+	*var = NULL;
+
+} /** End of 'null_free' **/
+
