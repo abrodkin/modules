@@ -1,0 +1,10 @@
+.modulespath
+Makefile
+Makefile.in
+bash
+csh
+ksh
+perl
+python
+sh
+zsh
