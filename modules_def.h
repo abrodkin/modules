@@ -35,6 +35,7 @@
 /** ************************************************************************ **/
 
 #include <stdio.h>
+#include <stdarg.h>
 #include <tcl.h>
 #include "config.h"
 
@@ -234,15 +235,8 @@ typedef	enum	{
 /** 				     CONSTANTS				     **/
 /** ************************************************************************ **/
 
-/**
- **   VERSION of MODULE
- **/
-
 #define      MODULES_MAGIC_COOKIE         "#%Module"
 #define      MODULES_MAGIC_COOKIE_LENGTH  8
-
-#define      MODULES_RELEASE       "3.0RKO"
-#define      MODULES_PATCHLEVEL    "0"
 
 /**
  **  User level
@@ -691,6 +685,7 @@ extern	void	  chk4spch( char*);
 extern	void	  cleanse_path( const char*, char*, int);
 extern	char	 *xdup(char const *);
 extern	char	 *xgetenv(char const *);
+extern	char	 *stringer(char *, int, ...);
 
 #ifndef HAVE_STRDUP
 extern	char	 * strdup( char*);
