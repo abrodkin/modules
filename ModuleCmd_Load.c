@@ -28,7 +28,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Load.c,v 1.3.2.1 2001/08/24 19:51:30 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Load.c,v 1.3.2.2 2001/09/05 21:41:16 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -171,8 +171,10 @@ int	ModuleCmd_Load(	Tcl_Interp	*interp,
 		 **  So it is loaded ...
 		 **  Do we know the filename?
 		 **/
-
-                strcpy( modulename, tmpname);
+                if ((char *) NULL == stringer(modulename, MOD_BUFSIZE,
+			tmpname, NULL))
+		    if( OK != ErrorLogger( ERR_STRING, LOC, NULL))
+			goto unwind0;
                 if( !filename[0])
                     if( TCL_ERROR == (return_val = Locate_ModuleFile(
 			tmp_interp, argv[i], tmpname, filename))) 
@@ -182,8 +184,8 @@ int	ModuleCmd_Load(	Tcl_Interp	*interp,
                  **  If IsLoaded() created tmpname, then we must free it.
                  **/
 
-                if( tmpname && tmpname != argv[i]) 
-                    free( tmpname);
+                if( tmpname && (tmpname != argv[i]))
+                    null_free((void *) &tmpname);
 
             } /** if loaded **/
 
@@ -222,7 +224,7 @@ int	ModuleCmd_Load(	Tcl_Interp	*interp,
 
         	if( oldTables) {
                     Delete_Hash_Tables( oldTables);
-                    free((char*) oldTables);
+                    null_free((void *) &oldTables);
         	}
         	oldTables = Copy_Hash_Tables();
 		a_successful_load = 1;
@@ -251,7 +253,7 @@ int	ModuleCmd_Load(	Tcl_Interp	*interp,
 
     if( return_val == TCL_OK && oldTables) {
         Delete_Hash_Tables( oldTables);
-        free((char*) oldTables);
+        null_free((void *) &oldTables);
     }
 
     /**
@@ -268,5 +270,8 @@ int	ModuleCmd_Load(	Tcl_Interp	*interp,
 #endif
 
     return( a_successful_load);
+
+unwind0:
+    return( TCL_ERROR);			/** -------- EXIT (FAILURE) -------> **/
 
 } /** End of 'ModuleCmd_Load' **/
