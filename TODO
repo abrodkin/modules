@@ -1,3 +1,10 @@
+THINGS TODO FOR 3.2
+-------------------
+* Add national language support for error messages.
+
+* Modernize configure.in (use TclConfig.sh finding code from PostgreSQL7.1
+  or elsewhere).  Incorporate TclConfig.sh to Makefile.
+
 THINGS TODO
 -----------
 * Make "unload" be more sensible, as to what is the opposite behavior
