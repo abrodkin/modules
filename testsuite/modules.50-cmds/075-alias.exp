@@ -35,7 +35,8 @@ set alias "ps -auxww | grep modulecmd"
 #  For the different shells ...
 #
 
-set tfnam_pat "/\[a-zA-Z_0-9_/\\.\\-\]+M_od_\[a-zA-Z_0-9\\.\\-\]+"
+# can't rely on a M_od_XXXXXX-type name
+set tfnam_pat "\[a-zA-Z_0-9_/\\.\\-\]*(M_od_|\[a-zA-Z_0-9\\.\]+)\[a-zA-Z_0-9\\.\\-\]+"
 set fil_cmd_sh "testsuite() {\n$alias;\n}"
 set fil_cmd_ksh "alias testsuite='$alias'"
 set fil_cmd_csh "alias testsuite '$alias'"

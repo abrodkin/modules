@@ -27,7 +27,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdConflict.c,v 1.2.2.2 2001/08/31 01:19:46 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdConflict.c,v 1.2.2.3 2001/09/06 22:59:09 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -447,7 +447,7 @@ int	cmdPrereq(	ClientData	 client_data,
     for( i=1; i<argc && argv[i] && notloaded_flag; i++) {
         for( j = 0; j < numpaths && notloaded_flag; j++) {
 
-            if((char *) NULL == (modulelist = SortedDirList(interp,pathlist[j],
+            if((char **) NULL == (modulelist = SortedDirList(interp,pathlist[j],
 	        argv[i], &nummodules)))
                 continue;
 
