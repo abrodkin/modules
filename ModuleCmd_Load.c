@@ -28,7 +28,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Load.c,v 1.3.2.2 2001/09/05 21:41:16 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Load.c,v 1.3.2.3 2002/03/10 06:08:30 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -212,25 +212,35 @@ int	ModuleCmd_Load(	Tcl_Interp	*interp,
 
 	g_current_module = modulename;
 	if( TCL_OK == return_val) {
-            if( 0 == Read_Modulefile( tmp_interp, filename)) {
+	    return_val = Read_Modulefile( tmp_interp, filename);
 
+	    switch (return_val) {
+	    case TCL_OK:
+		/**
+		 ** If module terminates TCL_OK, add it to the loaded list...
+		 **/
 		Update_LoadedList( tmp_interp, modulename, filename);
 
+	    case TCL_BREAK:
+		/**
+		 ** If module terminates TCL_BREAK, don't add it to the list,
+		 ** but assume that everything was OK with the module anyway.
+		 **/
 		/**
 		 **  Save the current environment setup before the next module
 		 **  file is (un)loaded in case something is broken ...
 		 **  ... for Unwind_Modulefile_Changes later on
 		 **/
-
         	if( oldTables) {
                     Delete_Hash_Tables( oldTables);
                     null_free((void *) &oldTables);
         	}
         	oldTables = Copy_Hash_Tables();
 		a_successful_load = 1;
+		break;	/* switch */
 
-	    } else {
-
+	    case TCL_ERROR:
+	    default:
 		/**
 		 **  Reset what has been changed.
 		 **/
@@ -239,18 +249,16 @@ int	ModuleCmd_Load(	Tcl_Interp	*interp,
             
         	oldTables = NULL;
 		return_val = TCL_ERROR;
+		break;	/* switch */
 	    }
 	}
-
         Tcl_DeleteInterp(tmp_interp);
-
     } /** for **/
     
     /**
      **  There may only be a spare save environment left, if the final module
      **  has been load successfully. Remove it in this case
      **/
-
     if( return_val == TCL_OK && oldTables) {
         Delete_Hash_Tables( oldTables);
         null_free((void *) &oldTables);
@@ -259,7 +267,6 @@ int	ModuleCmd_Load(	Tcl_Interp	*interp,
     /**
      **  Clean up the flags and return 
      **/
-
     if( load)
         g_flags &= ~M_LOAD;
     else
