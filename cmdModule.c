@@ -31,7 +31,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdModule.c,v 1.4 2001/07/11 20:11:02 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdModule.c,v 1.4.2.1 2001/09/05 21:41:16 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -527,7 +527,8 @@ int   Read_Modulefile( Tcl_Interp	*interp,
 		if( startp != '\0')
 		    result = atoi( startp );
 	    }
-	    if (tstr) free(tstr);
+	    if (tstr)
+		null_free((void *) &tstr);
 	}
     }
 
