@@ -52,7 +52,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.5.2.3 2001/09/05 21:41:16 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.5.2.4 2001/09/06 22:59:09 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -740,7 +740,6 @@ static	int Output_Modulefile_Aliases( Tcl_Interp *interp)
      **  The following hash tables do contain all changes to be made on
      **  shell aliases
      **/
-
     Tcl_HashTable	*table[2];
 
 #ifndef EVAL_ALIAS
@@ -749,20 +748,20 @@ static	int Output_Modulefile_Aliases( Tcl_Interp *interp)
      **  If configured so, all changes to aliases are written into a temporary
      **  file which is sourced by the invoking shell ...
      **  In this case a temporary filename has to be assigned for the alias
-     **  source file. The file has to be openend as 'aliasfile'.
+     **  source file. The file has to be opened as 'aliasfile'.
      **  The default for aliasfile, if no shell sourcing is used, is stdout.
      **/
-
-#ifdef HAVE_TEMPNAM
+#  if defined(HAVE_MKTEMP)
+    char	     aliasfn_temp[] = "M_od_XXXXXX";
+    char*            aliasfilename = (char *) mktemp(aliasfn_temp);
+#  elif defined(HAVE_TEMPNAM)
     char*            aliasfilename = (char *)tempnam(NULL, "M_od_");
-#else
-#ifdef HAVE_TMPNAM
-    char*            aliasfilename[L_tmpnam + 16]; /* Just to be sure... */
-    tmpnam((char *)aliasfilename);
-#else /* not HAVE_TMPNAM */
+#  elif defined(HAVE_TMPNAM)
+    char*            aliasfilename[L_tmpnam];
+    (void) tmpnam((char *) aliasfilename);
+#  else /* default */
     char*            aliasfilename = "M_od_temp";
-#endif /* not HAVE_TMPNAM */
-#endif /* not HAVE_TEMPNAM */
+#  endif
 #endif /* not EVAL_ALIAS */
 
     table[0] = aliasSetHashTable;
@@ -780,7 +779,7 @@ static	int Output_Modulefile_Aliases( Tcl_Interp *interp)
     if( hashEntry = Tcl_FirstHashEntry( aliasSetHashTable, &searchPtr)) {
 
 	/**
-	 **  We only support sh and csh varients for aliases.  If not either
+	 **  We only support sh and csh variants for aliases.  If not either
 	 **  sh or csh print warning message and return
 	 **/
 	if( !strcmp( shell_derelict, "csh")) {
@@ -794,7 +793,7 @@ static	int Output_Modulefile_Aliases( Tcl_Interp *interp)
 	/**
 	 **  Open the file ...
 	 **/
-	if( !( aliasfile = fopen((char *) aliasfilename, "w+"))) {
+	if((FILE *) NULL ==(aliasfile = fopen((char *) aliasfilename, "w+"))) {
 	    if( OK != ErrorLogger( ERR_OPEN, LOC, aliasfilename,"append",NULL))
 		return( TCL_ERROR);	/** -------- EXIT (FAILURE) -------> **/
 
@@ -812,7 +811,7 @@ static	int Output_Modulefile_Aliases( Tcl_Interp *interp)
 	} /** if( fopen) **/
     } /** if( alias to set) **/
 
-    null_free((void *) &aliasfilename);
+    /* null_free((void *) &aliasfilename); *//* generally not malloc'd space */
 
 #endif /* EVAL_ALIAS */
   
