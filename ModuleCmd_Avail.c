@@ -34,7 +34,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Avail.c,v 1.2.2.1 2001/08/30 17:50:41 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Avail.c,v 1.2.2.2 2002/03/10 07:22:32 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -2010,7 +2010,7 @@ static	char *mkdirnm(	char	*dir,
      **  return just the file.
      **/
 
-    if( dir == NULL || *dir == '\0' || *dir == '.')
+    if( dir == NULL || *dir == '\0' || !strcmp(dir,".")
 	return( strcpy( dirbuf, file));
 
     /**
