@@ -1,4 +1,4 @@
-.TH MODULE 1 "1 July 1994"
+.TH MODULE 1 "26 April 2002
 .nh
 .SH NAME
 module \- command interface to the Modules package
@@ -62,54 +62,83 @@ and its associated arguments.
 .LP
 The Modules package and the
 .B module
-command are initialized when a shell-specific initialization script is
-sourced into the shell.
-The script creates the
+command are initialized by evaluating the output of the bootstrap
+command. The bootstrap command generates the necessary shell-specific
+code to set some environment variables and sets up the actual
 .B module
-command as either an alias or function, creates Modules environment variables,
-and a snapshot of the environment is saved in ${\s-1HOME\s0}/\fI.modulesbeginenv\fP.
-The
-.B module
-alias or function executes the
-.B modulecmd
-program located in ${\s-1MODULESHOME\s0}/bin and has the shell evaluate
-the command's output.  The first argument to
-.B modulecmd
-specifies the type of shell.
+command, either as an alias or shell function.
 .LP
-The initialization scripts are kept in ${\s-1MODULESHOME\s0}/init/\fIshellname\fP 
-where \fIshellname\fP 
-is the name of the sourcing shell.
-For example, a C Shell user sources the ${\s-1MODULESHOME\s0}/init/\fIcsh\fP
-script.  The sh, csh, tcsh, bash, ksh, and zsh shells are supported by
-.B modulecmd.
-In addition, python and perl "shells" are supported which writes
-the environment changes to stdout as python or perl code.
-.SS Examples of initialization
-In the following examples, replace ${\s-1MODULESHOME\s0} with the actual
-directory name.
-.LP
-C Shell initialization (and derivatives):
+If you install the 
+.B modulecmd
+binary in your
+.B PATH
+(for example /usr/local/bin)
+then all you need to do is
+.B eval
+the output of the 
+.B modulecmd 
+.I shell
+.B bootstrap
+command. In most shells, this looks like
 .nf
 
-	source ${\s-1MODULESHOME\s0}/init/csh
+        eval `modulecmd <shell> bootstrap`
+
+.fi
+where <shell> is replaced by the name of the shell being used. Allowed
+shell names are
+.nf
+
+        sh ksh bash zsh csh tcsh perl
+
+.fi
+If 
+.B modulecmd
+is not on the default PATH, then you can insert the full path in the
+eval command.
+.LP
+C Shell initialization example:
+.nf
+
+	eval `modulecmd csh bootstrap`
 	module load modulefile modulefile ...
 
 .fi
-Bourne Shell (sh) (and derivatives):
+ZSH initialization example:
 .nf
 
-	. ${\s-1MODULESHOME\s0}/init/sh
+	eval `modulecmd zsh bootstrap`
 	module load modulefile modulefile ...
 
 .fi
 Perl:
 .nf
 
-	require "${\s-1MODULESHOME\s0}/init/perl";
-	&module("load modulefile modulefile ...");
+	eval `modulecmd perl bootstrap`;
+	module("load modulefile modulefile ...");
 
 .fi
+Python:
+.nf
+        <no example yet>
+.fi
+
+
+The
+.B module
+alias or function executes the
+.B modulecmd
+program and has the shell evaluate
+the command's output.  The first argument to
+.B modulecmd
+specifies the type of shell.
+.LP
+The sh, csh, tcsh, bash, ksh, and zsh shells are supported by
+.B modulecmd.
+In addition, python and perl "shells" are supported which writes
+the environment changes to stdout as python or perl code.
+
+
 .SS Modulecmd startup
 .LP
 Upon invocation \fImodulecmd\fP sources rc files which contain global, user
@@ -138,6 +167,17 @@ may be used to control output format of all information displayed and the
 All switches may be entered either in short or long notation. The following
 switches are accepted:
 .PP
+.TP
+.I --help, -H
+Give some helpful usage information, and terminates the command.
+.RS
+.RE
+.TP
+.I --version, -V
+Lists the current version of the module command, and some configured
+option values.  The command then terminates without further processing.
+.RS
+.RE
 .TP
 .I --force, -f
 Force active dependency resolution. This will result in modules found on a
@@ -206,6 +246,15 @@ Advanced module user
 .SS Module Sub-Commands
 .RS
 .TP 15
+.B bootstrap
+Used to bootstrap the 
+.B module
+command and necessary support environment variables. You only use this
+in the context of setting up the 
+.B module 
+command, not in actual use. See the section on Package Initialization
+for instructions on how to use this.
+.TP 15
 .B help [modulefile...]
 Print the usage of each sub-command.
 If an argument is given, print the Module specific help information for the
@@ -229,15 +278,19 @@ Remove
 .I modulefile
 from the shell environment.
 .TP 15
-.B switch modulefile1 modulefile2
+.B switch [ modulefile1 ] modulefile2
 .PD 0
 .TP 15
-.B swap modulefile1 modulefile2
+.B swap [ modulefile1 ] modulefile2
 .PD
 Switch loaded
 .I modulefile1
 with
 .I modulefile2.
+If 
+.I modulefile1
+is not specified, then it is assumed to be the currently loaded module
+with the same root name as modulefile2.
 .TP 15
 .B display modulefile [modulefile...]
 .PD 0
@@ -291,6 +344,8 @@ Attempt to reload all loaded
 The environment will be reconfigured to match the saved
 .I ${\s-1HOME\s0}/.modulesbeginenv
 and the modulefiles will be reloaded.
+This is only valid if modules was configured with --enable-beginenv
+else this will cause a warning.  The default is --disable-beginenv.
 .B update
 will only change the environment variables that the
 .I modulefiles
@@ -396,9 +451,7 @@ The path that the
 .B module
 command searches when looking for
 .I modulefiles.
-Typically, it is set to the master modulefiles directory,
-.I ${\s-1MODULESHOME\s0}/modulefiles,
-by the initialization script.
+Typically, it is set to a default value by the bootstrap procedure.
 \s-1MODULEPATH\s0 can be set using 'module use' or by the module
 initialization script to search group or personal
 .I modulefile
@@ -410,7 +463,7 @@ directory.
 A colon separated list of all loaded
 .I modulefiles.
 .TP
-.SB \s-1_LOADED_MODULEFILES_\s0
+.SB \s-1_LMFILES_\s0
 A colon separated list of the full pathname for all loaded
 .I modulefiles.
 .TP
@@ -446,10 +499,6 @@ interpreter that gets executed upon each invocation of
 .B ${\s-1MODULESHOME\s0}/init/\fIshellname\fP
 The Modules package initialization file sourced into the user's
 environment.
-.TP
-.B ${\s-1MODULESHOME\s0}/init/.modulespath
-The initial search path setup for module files. This file is read
-by all shell init files.
 .TP
 .B ${\s-1MODULEPATH\s0}/.moduleavailcache
 File containing the cached list of all

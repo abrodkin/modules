@@ -1,7 +1,7 @@
 ###########################################################################
 ##
 ## File:        ./Makefile.am
-## Versions:    $Id: Makefile.am,v 1.11 2004/10/22 01:31:59 harlan Exp $
+## Versions:    $Id: Makefile.am,v 1.6 2002/06/14 21:57:03 rkowen Exp $
 ## Created:     2002/06/14
 ##
 ###########################################################################
@@ -16,23 +16,21 @@ AUTOMAKE_OPTIONS=foreign dejagnu no-installinfo
 
 ACLOCAL_AMFLAGS= -I config
 
-SUBDIRS = lib . init modulefiles @EXTDIR@
-INCLUDES = -I$(srcdir)/lib -I$(srcdir)
-
 man_MANS = doc/module.1 doc/modulefile.4
+SUBDIRS =. init modulefiles @EXTDIR@
 bin_PROGRAMS = modulecmd
 # bin_SCRIPTS = etc/mkroot etc/add.modules ext/add.ext
-modulecmd_CFLAGS = ${X_CFLAGS} ${TCL_INCLUDES}
-modulecmd_LDFLAGS=-Llib @TCL_LIB_SPEC@ @TCLX_LIB_SPEC@ @X_LIBS@ @X_EXTRA_LIBS@
+modulecmd_CFLAGS=
+modulecmd_LDFLAGS= @TCL_LIB_SPEC@ @TCLX_LIB_SPEC@ @X_LIBS@ @X_EXTRA_LIBS@ @LIBS@
 modulecmd_SOURCES = \
 	ModuleCmd_Avail.c ModuleCmd_Bootstrap.c \
         ModuleCmd_Clear.c ModuleCmd_Display.c ModuleCmd_Help.c \
 	ModuleCmd_Init.c ModuleCmd_List.c ModuleCmd_Load.c ModuleCmd_Purge.c \
 	ModuleCmd_Switch.c ModuleCmd_Update.c ModuleCmd_Use.c \
 	ModuleCmd_Whatis.c \
-	cmdAlias.c cmdConflict.c cmdIsLoaded.c cmdInfo.c cmdMisc.c \
-	cmdModule.c cmdPath.c cmdSetenv.c cmdUname.c cmdXResource.c cmdUlvl.c \
-	cmdLog.c cmdTrace.c cmdVersion.c cmdVerbose.c cmdWhatis.c \
+	cmdAlias.c cmdConflict.c cmdIsLoaded.c cmdInfo.c cmdMisc.c cmdModule.c\
+	cmdPath.c cmdSetenv.c cmdUname.c cmdXResource.c cmdUlvl.c cmdLog.c \
+	cmdTrace.c cmdVersion.c cmdVerbose.c cmdWhatis.c		\
 	init.c locate_module.c utility.c main.c error.c getopt.c version.c
 
 #aclocal.m4 : acinclude.m4
@@ -50,7 +48,7 @@ check-local:	modulecmd
 	MODULEVERSION=@VERSION@; export MODULEVERSION; TESTSUITEDIR=$(srcdir)/testsuite; export TESTSUITEDIR; $(RUNTEST) --srcdir $$TESTSUITEDIR $(RUNTESTFLAGS) --tool=modules
 
 cxref:
-	cxref $(modulecmd_SOURCES)
+	cxref $(SRCS)
 	@echo "==============================="
 	@echo "You may need to run this twice!"
 	@echo "==============================="

@@ -3,7 +3,8 @@
                                 Version 3.1
                                 
                                 4 July 1999
-			   (updated 20 June 2001)
+			   (updated Mar 8 2002)
+                           
 
                                INSTALL guide
 
@@ -57,33 +58,80 @@ an adequately prepared system administer should attempt this.
 2.1 What's Needed Initially
 ___________________________
 
-Should have Tcl 8.x.  Earlier versions may work, but not supported.
-Recent sources can be found
-at http://dev.scriptics.com/ .  Build Tcl using a directory
-structure anticipating a modules environment, such as:
-	configure --prefix=/usr/local/pkg/tcltk/8.x.y/
+The first thing to do is just run './configure' without any arguments
+and see how far it gets. The main stumbling block is usually the TCL
+installation. Watch carefully which version of TCL is autoconfigured,
+as well as the other default paths. If they are what you expected,
+congratulations!
 
-For later use, define the environment variable TCLTKROOT to
-/usr/local/pkg/tcltk/8.x.y/ in this case.
+Chances are, you'll want to rerun './configure' again with the proper
+path to the destination installation as well as the path to the
+modulefiles themselves, but first just see if the other ingredients
+are ok. If rerunning "./configure" doesn't fix a problem, try deleting
+the "config.cache" first.
+
+
+2.1.1 TCL (Tool Command Language)
+
+You need Tcl8.x installed on your system.  Sources and precompiled
+binary distributions can be downloaded from http://www.scriptics.com.
+Build Tcl using a directory structure anticipating a modules environment,
+for example, in the TCL src directory, 
+ ./configure --prefix=/usr/local/pkg/tcltk/8.x.y" 
+
+
+If the executable 'tclsh' is on your path, all information regarding how it
+was installed should be automatically configured for you using the
+modules configure script.
+
+
+If the configure script doesn't do the right thing, you will
+need to set --with-tcl-include, --with-tcl-libraries and/or
+--with-tcl-library. The configure script tries its best to derive the later
+two settings from the --with-tcl-include setting, so you might need to just
+specify the first one, if at all.
+
+TCL configuration parameters:
+
+  --with-tcl-include=<path> points to the directory containing the TCL
+header files, such as tcl.h.
+
+  --with-tcl-libraries=<path> points to the directory containing TCL binary
+object libraries, such as libtcl.a or libtcl.so.8.3. This is usually
+/usr/local/lib .
+
+  --with-tcl-library=<path> points to the directory containing TCL
+support files (namely init.tcl) that are part of the TCL package. This is
+usually /usr/local/lib/tcl8.3 . 
+
+
+2.1.2 A location for the "modulefile" Files
 
 Decide where you will place your local module files and the root
 for the module package.  It should be a file system separate from
 your system root, else it may get wiped out with every OS upgrade.
-For this document, the root /usr/local/Modules/ will be used.
-The local module files will be placed in /usr/local/Modules/modulefiles/.
-This will remain constant regardless what module version is used.
+The default is /usr/local/Modules/modulefiles/. You will use the
+--with-module-path=<path> option to the configure script to set this
+directory.  After the initial hardwork of getting the module command
+working, all of your future effort will be in maintaining the modulefiles
+themselves. 
+
 Put the module version files in /usr/local/Modules/versions/. This
 directory is only visible if the "modules" modulefile is loaded,
 and is only intended for switching between differing module command
 versions.
 
-The root for the a particular version of modules will have an
-indicative name, such as /usr/local/Modules/@VERSION@/, where
-@VERSION@ will get substituted with something like 3.0.8-rko .
+
+2.1.3 A location for the "module" executables and init scripts.
+
+The root for a particular version of modules should have an
+indicative name, such as /usr/local/Modules/3.1.6/.
 Once the installation is done, put a symbolic link in the
 /usr/local/Modules directory named default pointing to the version
-(e.g. "cd /usr/local/Modules; ln -s @VERSION@ default", where you
-have substituted the actual version for @VERSION@).
+(e.g. "cd /usr/local/Modules; ln -s 3.1.6 default"). The default path to
+the installation directory is /usr/local.  It is NOT recommended to keep
+this default!
+
 
 2.2 Building and Installing Modules
 ___________________________________
@@ -91,36 +139,55 @@ ___________________________________
 First - I recommend placing the sources into /usr/local/Modules/src/
 either from the tar file or CVS.
 
-Second - modify the RKOConfigure file, which looks something like this,
-to the actual paths used:
+If you plan on installing everything in the standard places, and you
+have TCL and X installed in the standard places, then just run
 
-#!/bin/sh
-CFLAGS=-g
-LDFLAGS=-g
-CC=gcc
-export CFLAGS LDFLAGS CC
-TCLTKROOT=/usr/local/tcltk/8.2.3
-export TCLTKROOT
+ ./configure
+ make
+ make install
 
-./configure \
-		--prefix=/usr/local/Modules/@VERSION@ \
-		--with-module-path=/usr/local/Modules/modulefiles \
-		--with-version-path=/usr/local/Modules/versions \
-		--with-etc-path=/etc \
-		--with-skel-path=/etc/skel \
-		--with-split-size=960 \
-		--x-includes=/usr/include/X11 \
-		--x-libraries=/usr/X11/lib \
-		--with-tcl-include=$TCLTKROOT/include \
-		--with-tcl-libraries=$TCLTKROOT/lib
-exit
+and you are done if it all runs successfully.
 
-Then run ./RKOConfigure to configure the sources for your machine.
+If you want to specify where the module files are located, AND/OR
+you want to install the binaries/man pages elsewhere (you probably
+do, since that is what modules is good for!), then the two relevant
+options you must specify for configure are --with-module-path and
+--prefix, for example
+
+ ./configure --with-module-path=/your/path/to/module/files \
+             --prefix=/alternate/usr/local/or/equivalent/1.0/eg
+
+The default for --prefix is /usr/local.
+The default for --with-module-path is "", so you should define it.
+
+If you have trouble with the configuration, then you might consider
+editing RKOConfigure and running that instead. Look at this file if
+you have TCL or X installed in a non-standard place.
+
 Run "./configure --help" to view some of the other options.
 
 After the sources are configured then:
 	make
-	make check	# only if you have dejagnu available
+As a sanity check, try running the 'modulecmd' binary with just a
+shell name as the only option:
+
+      ./modulecmd sh
+
+You should get the usage instructions. If you get an error message of
+the form:
+
+init.c(425):ERROR:159: Cannot initialize TCL
+
+Then your TCL installation is probably corrupted. This usually means
+the internally compiled path to the "init.tcl" script does not match
+with reality. You can try getting around this by setting the
+TCLLIBPATH environment variable to point to the right directory
+(/usr/local/tcl* or /usr/share/tcl* in some cases), but you are
+probably better off reinstalling TCL correctly.
+
+If you are successful with the sanity check, then go ahead and install
+the binaries.
+
 	make install
 
 Each successive step depends on successfully completing the previous steps.
@@ -131,6 +198,25 @@ modified to use modules.
 Make sure you have a "default" symbolic link in /usr/local/Modules
 to point to some version, since the system rc files will refer to
 it.
+
+
+2.2.1 Running the test suite
+
+If you are a developer or overly paranoid, you can run the test suite
+to make sure that a minimal set of functionality is working. You must
+have 'dejagnu' installed before you run configure. To run the tests, do
+
+  make check
+
+If you find some errors and you wish to get more information, run the
+test again as follows
+
+  make check RUNTESTFLAGS=--verbose
+
+Using TCL version 8.3, all the tests should pass. TCL Version 8.0
+causes a 7 failures, however these are not serious and are due to the
+interaction of the test harness with the module command, and will not
+be a problem (the problem is the way that stdout/stderr are handled).
 
 2.3 Setting Up the Shell RC Files
 _________________________________

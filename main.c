@@ -14,6 +14,7 @@
  **			the global data.				     **
  ** 									     **
  **   Exports:		main		Main program			     **
+ **			module_usage	Module usage information	     **
  **			Tcl_AppInit	Tcl Application initialization	     **
  ** 									     **
  **   Notes:								     **
@@ -28,7 +29,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: main.c,v 1.2 2001/06/09 09:48:46 rkowen Exp $";
+static char Id[] = "@(#)$Id: main.c,v 1.8 2002/06/17 05:58:43 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -60,33 +61,32 @@ static void *UseId[] = { &UseId, Id };
 /** 				    GLOBAL DATA				     **/
 /** ************************************************************************ **/
 
-char	 *g_current_module = NULL;	/** The module which is handled by   **/
+char	 *g_current_module = NULL,	/** The module which is handled by   **/
 					/** the current command		     **/
-char	 *specified_module = NULL;	/** The module that was specified    **/
+	 *specified_module = NULL,	/** The module that was specified    **/
 					/** on the command line		     **/
-char	**shell_startups;		/** A list off all startup files our **/
-					/** invoking shell will source	     **/
-char	  shell_name[20];		/** Name of the shell (first para-   **/
-					/** meter to modulcmd)		     **/
-char	  shell_derelict[20];		/** Shell family (sh, csh)	     **/
-int	  g_flags = 0;			/** Control what to do at the moment **/
+	 *shell_name,			/** Name of the shell		     **/
+					/** (first parameter to modulcmd)    **/
+	 *shell_derelict,		/** Shell family (sh, csh, etc)	     **/
+	 *shell_init,			/** Shell init script name	     **/
+	 *shell_cmd_separator;		/** Shell command separator char     **/
+int	  g_flags = 0,			/** Control what to do at the moment **/
 					/** The posible values are defined in**/
 					/** module_def.h		     **/
-int	  append_flag = 0;		/** only used by the 'use' command   **/
+	  append_flag = 0;		/** only used by the 'use' command   **/
 
 char	  _default[] = "default";	/** id string for default versions   **/
 
 /**
  **  Name of the rc files
- **  INSTPATH points to the location where modules is going to be installed.
+ **  PREFIX points to the location where modules is going to be installed.
  **  It comes from the Makefile
  **/
 
-char	*instpath = INSTPATH;
-
-char	*rc_file = RCFILE;
-char	*modulerc_file = MODULERCFILE;
-char	*version_file = VERSIONFILE;
+char	*instpath = PREFIX,
+	*rc_file = RCFILE,
+	*modulerc_file = MODULERCFILE,
+	*version_file = VERSIONFILE;
 
 /**
  **  pointers for regular expression evaluations
@@ -106,6 +106,7 @@ char
     *purgeRE    = "^purge",			/** 'module purge'	     **/
     *clearRE    = "^clear",			/** 'module clear'	     **/
     *whatisRE   = "^wh",			/** 'module whatis'	     **/
+    *bootstrapRE= "^boot",			/** 'module bootstrap'	     **/
     *aproposRE  = "^(apr|key)";			/** 'module apropos'	     **/
 
 /**
@@ -113,12 +114,12 @@ char
  **  ??? What do we save here, the old or the new setup ???
  **/
 
-Tcl_HashTable	*setenvHashTable;
-Tcl_HashTable	*unsetenvHashTable;
-Tcl_HashTable	*aliasSetHashTable;
-Tcl_HashTable	*aliasUnsetHashTable;
-Tcl_HashTable	*markVariableHashTable;
-Tcl_HashTable	*markAliasHashTable;
+Tcl_HashTable	*setenvHashTable,
+		*unsetenvHashTable,
+		*aliasSetHashTable,
+		*aliasUnsetHashTable,
+		*markVariableHashTable,
+		*markAliasHashTable;
 
 /**
  **  A buffer for reading a single line
@@ -130,13 +131,13 @@ char	*line = NULL;
  **  Flags influenced by the command line switches
  **/
 
-int	sw_force = 0;
-int	sw_detach = 0;
-int	sw_format = 0;
-int	sw_verbose = 0;
-int	sw_create = 0;
-int	sw_userlvl = UL_ADVANCED;
-int	sw_icase = 0;
+int	sw_force = 0,
+	sw_detach = 0,
+	sw_format = 0,
+	sw_verbose = 0,
+	sw_create = 0,
+	sw_userlvl = UL_ADVANCED,
+	sw_icase = 0;
 
 /** ************************************************************************ **/
 /** 				    LOCAL DATA				     **/
@@ -157,6 +158,7 @@ static	char	_proc_Tcl_AppInit[] = "Tcl_AppInit";
 /** ************************************************************************ **/
 
 static int	Check_Switches( int *argc, char *argv[]);
+static void	version (FILE *output);
 
 /*++++
  ** ** Function-Header ***************************************************** **
@@ -192,17 +194,17 @@ int	main( int argc, char *argv[], char *environ[]) {
 #if WITH_DEBUGGING
     ErrorLogger( NO_ERR_START, LOC, _proc_main, NULL);
 #endif
-	/**
-	 ** check if first argument is --version or -V then output the
-	 ** version to stdout.  This is a special circumstance handled
-	 ** by the regular options.
-	 **/
-	if (argc > 1 && *argv[1] == '-') {
-		if (!strcmp("-V", argv[1]) || !strcmp("--version", argv[1])) {
-		    printf("%s\n", version_string);
-		    return 0;
-		}
-	}
+    /**
+     ** check if first argument is --version or -V then output the
+     ** version to stdout.  This is a special circumstance handled
+     ** by the regular options.
+     **/
+    if (argc > 1 && *argv[1] == '-') {
+        if (!strcmp("-V", argv[1]) || !strcmp("--version", argv[1])) {
+	    version(stdout);
+	    return 0;
+        }
+    }
     /**
      **  Initialization. 
      **  Check the command line syntax. There will be no return from the
@@ -210,23 +212,23 @@ int	main( int argc, char *argv[], char *environ[]) {
      **/
 
     if( TCL_OK != Initialize_Tcl( &interp, argc, argv, environ))
-	exit( 1);
+	goto unwind0;
 
     if( TCL_OK != Setup_Environment( interp))
-	exit( 1);
+	goto unwind0;
 
     /**
      **  Check for command line switches
      **/
 
     if( TCL_OK != Check_Switches( &argc, argv))
-	exit( 1);
+	goto unwind0;
 
     /**
      **  Figure out, which global RC file to use. This depends on the environ-
      **  ment variable 'MODULERCFILE', which can be set to one of the following:
      **
-     **		<filename>	-->	INSTPATH/etc/<filename>
+     **		<filename>	-->	PREFIX/etc/<filename>
      **		<dir>/		-->	<dir>/RC_FILE
      **		<dir>/<file>	-->	<dir>/<file>
      **  Use xgetenv to expand 1 level of env.vars.
@@ -234,47 +236,39 @@ int	main( int argc, char *argv[], char *environ[]) {
 
     if((rc_name = xgetenv( "MODULERCFILE"))) {
 	/* found something in MODULERCFILE */
-	if((char *) NULL == (rc_path = strdup(rc_name))) {
-	    if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
-		exit( 1);
-	    else {
-		free(rc_name);
-		rc_name = NULL;
-	    }
+	if((char *) NULL == (rc_path = stringer(NULL,0,rc_name,NULL))) {
+	    if( OK != ErrorLogger( ERR_STRING, LOC, NULL))
+		goto unwind1;
+	    else
+		null_free((void *) &rc_name);
 	} else {
-	    free(rc_name);
+	    null_free((void *) &rc_name);
 	    if((char *) NULL == (rc_name = strrchr( rc_path, '/'))) {
 		rc_name = rc_path;
 		rc_path = instpath;
 	    } else
 		*rc_name++ = '\0';
-	    
 	    if( !*rc_name) {
 		rc_name = rc_file;
 	    }
 	}
-
     } else {
 	rc_path = instpath;
-	free(rc_name);
+	null_free((void *) &rc_name);
 	rc_name = rc_file;
     }
 
     /**
-     **  Finaly we have to change INSTPATH -> INSTPATH/etc
+     **  Finally we have to change PREFIX -> PREFIX/etc
      **/
 
     if( rc_path == instpath) {
-	if((char *) NULL == (rc_path = malloc( strlen( instpath) + 5))) {
+	if((char *) NULL == (rc_path = stringer(NULL,0, instpath,"/etc",NULL))){
 	    if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
-		exit( 1);
+		goto unwind1;
 	    else
 		rc_path = NULL;
 	
-	} else {
-	    /* sprintf( rc_path, "%s/etc", instpath); */
-	    strcpy( rc_path, instpath);
-	    strcat( rc_path, "/etc");
 	}
     }
 
@@ -289,7 +283,7 @@ int	main( int argc, char *argv[], char *environ[]) {
 	exit( 1);
 
     if( rc_path)
-	free( rc_path);
+	null_free((void *) &rc_path);
 
     /**
      **  Invocation of the module command as specified in the command line
@@ -328,21 +322,104 @@ int	main( int argc, char *argv[], char *environ[]) {
     Delete_Global_Hash_Tables();
 
     if( line)
-	free( line);
+	null_free((void *) &line);
     if( error_line)
-	free( error_line);
+	null_free((void *) &error_line);
 
     /**
      **  This return value may be evaluated by the calling shell
      **/
-
 #if WITH_DEBUGGING
     ErrorLogger( NO_ERR_END, LOC, _proc_main, NULL);
 #endif
 
-    return( return_val);
+    return ( return_val);
+
+unwind2:
+    null_free((void *) &rc_path);
+unwind1:
+    null_free((void *) &rc_name);
+unwind0:
+
+    /* and error occurred of some type */
+    return( 1);
 
 } /** End of 'main' **/
+
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
+ **   Function:		module_usage					     **
+ ** 									     **
+ **   Description:	Lists out the helpful usage info that we've all come **
+ ** 			to expect from unix commands.			     **
+ ** 									     **
+ **   First Edition:	2002/10/13					     **
+ ** 									     **
+ **   Parameters:	FILE	*output		Where the output goes	     **
+ ** 									     **
+ **   Result:		void			No return values	     **
+ ** 									     **
+ **   Attached Globals:							     **
+ ** 			version_string		Current module version	     **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
+
+void module_usage(FILE *output)
+{
+    /**
+     **  General help wanted.
+     **/
+
+#if WITH_DEBUGGING_MODULECMD
+    ErrorLogger( NO_ERR_START, LOC, _proc_ModuleCmd_Help, NULL);
+#endif
+
+	fprintf(output,
+		"\n  Modules Release %s (Copyright GNU GPL v2 1991):\n\n",
+                version_string);
+	
+	fprintf(output,
+"  Usage: module [ switches ] [ subcommand ] [subcommand-args ]\n\n"
+"Switches:\n"
+"	-H|--help		this usage info\n"
+"	-V|--version		modules version & configuration options\n"
+"	-f|--force		force active dependency resolution\n"
+"	-t|--terse		terse    format avail and list format\n"
+"	-l|--long		long     format avail and list format\n"
+"	-h|--human		readable format avail and list format\n"
+"	-v|--verbose		enable  verbose messages\n"
+"	-s|--silent		disable verbose messages\n"
+"	-c|--create		create caches for avail and apropos\n"
+"	-i|--icase		case insensitive\n"
+"	-u|--userlvl <lvl>	set user level to (nov[ice],exp[ert],adv[anced])\n"
+"  Available SubCommands and Args:\n"
+"	+ add|load		modulefile [modulefile ...]\n"
+"	+ rm|unload		modulefile [modulefile ...]\n"
+"	+ switch|swap		[modulefile1] modulefile2\n"
+"	+ display|show		modulefile [modulefile ...]\n"
+"	+ avail			[modulefile [modulefile ...]]\n"
+"	+ use [-a|--append]	dir [dir ...]\n"
+"	+ unuse			dir [dir ...]\n"
+#ifdef BEGINENV
+"	+ update\n"
+#endif
+"	+ purge\n"
+"	+ list\n"
+"	+ clear\n"
+"	+ help			[modulefile [modulefile ...]]\n"
+"	+ whatis		[modulefile [modulefile ...]]\n"
+"	+ apropos|keyword	string\n"
+"	+ bootstrap\n"
+"	+ initadd		modulefile [modulefile ...]\n"
+"	+ initprepend		modulefile [modulefile ...]\n"
+"	+ initrm		modulefile [modulefile ...]\n"
+"	+ initswitch		modulefile1 modulefile2\n"
+"	+ initlist\n"
+"	+ initclear\n\n");
+
+} /** End of 'module_usage' **/
 
 /*++++
  ** ** Function-Header ***************************************************** **
@@ -398,9 +475,10 @@ int Tcl_AppInit(Tcl_Interp *interp)
  **			    --userlvl, -u	Change the user level	     **
  **			    --icase, -i		Ignore case of modulefile    **
  **						names			     **
+ **			    --help, -H		Helpful usage info	     **
  **			    --version, -V	Report version only	     **
  ** 									     **
- **   First Edition:	95/12/20					     **
+ **   First Edition:	1995/12/20					     **
  ** 									     **
  **   Parameters:	int	*argc		Number of parameters	     **
  **			char	*argv[]		Command line arguments	     **
@@ -442,6 +520,7 @@ static int	Check_Switches( int *argc, char *argv[])
 	{ "icase", no_argument, NULL, 'i' },
 	{ "userlvl", required_argument, NULL, 'u'},
 	{ "append", no_argument, NULL, 'a' },
+	{ "help", no_argument, NULL, 'H' },
 	{ "version", no_argument, NULL, 'V' },
 	{ NULL, no_argument, NULL, 0 }
     };
@@ -457,7 +536,7 @@ static int	Check_Switches( int *argc, char *argv[])
 
     if( *argc > 1) {
 
-	while( EOF != (c = getopt_long( *argc-1, &argv[1], "hpftlvsciu:aV",
+	while( EOF != (c = getopt_long( *argc-1, &argv[1], "hpftlvsciu:aHV",
 	    longopts, NULL))) {
 
 	    switch( c) {
@@ -537,8 +616,12 @@ static int	Check_Switches( int *argc, char *argv[])
 		    append_flag = 1;
 		    break;
 
+		case 'H':			/* helpful info */
+		    module_usage(stderr);
+		    return ~TCL_OK;
+
 		case 'V':			/* version */
-		    fprintf(stderr, "%s\n", version_string);
+		    version(stderr);
 		    return ~TCL_OK;
 
 		/**
@@ -644,4 +727,52 @@ int dup2( int old, int new)
     return( fd);
 }
 #endif
+
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
+ **   Function:		version						     **
+ ** 									     **
+ **   Description:	Outputs the Modules version and features	     **
+ ** 									     **
+ **   First Edition:	2002/06/13					     **
+ ** 									     **
+ **   Parameters:	FILE *	output		All input is from defined    **
+ **						macros			     **
+ **									     **
+ **   Result:		void			no return value		     **
+ **						All output is to output	     **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
 
+#define str(a) #a
+#define isdefined(a,b)	{if (strcmp(str(a),b)) x=str(a); else x="undef"; \
+			fprintf(output,format,b,x);}
+
+static void version (FILE *output) {
+	char	*x,
+		*format = "%s=%s\n";
+
+	fprintf(output, format, "VERSION", version_string);
+	fprintf(output, "\n");
+	isdefined(AUTOLOADPATH,str(AUTOLOADPATH));
+	isdefined(BEGINENV,str(BEGINENV));
+	isdefined(CACHE_AVAIL,str(CACHE_AVAIL));
+	isdefined(DOT_EXT,str(DOT_EXT));
+	isdefined(EVAL_ALIAS,str(EVAL_ALIAS));
+	isdefined(HAS_BOURNE_FUNCS,str(HAS_BOURNE_FUNCS));
+	isdefined(LMSPLIT_SIZE,str(LMSPLIT_SIZE));
+	isdefined(MODULEPATH,str(MODULEPATH));
+	isdefined(MODULES_INIT_DIR,str(MODULES_INIT_DIR));
+	isdefined(PREFIX,str(PREFIX));
+	isdefined(TMP_DIR,str(TMP_DIR));
+	isdefined(USE_FREE,str(USE_FREE));
+	isdefined(VERSION_MAGIC,str(VERSION_MAGIC));
+	isdefined(VERSIONPATH,str(VERSIONPATH));
+	isdefined(WANTS_VERSIONING,str(WANTS_VERSIONING));
+	isdefined(WITH_DEBUG_INFO,str(WITH_DEBUG_INFO));
+}
+
+#undef str
+#undef isdefined

@@ -1,16 +1,19 @@
 dnl
 dnl File:        configure.in
-dnl Revision:    $Id: configure.ac,v 1.12 2004/10/22 01:33:30 harlan Exp $
+dnl Revision:    $Id: configure.ac,v 1.7 2002/06/17 05:58:43 rkowen Exp $
+dnl Created:     94/06/18
+dnl Author:      Leif Hedstrom<hedstrom@inf.ethz.ch>
+dnl		 Martin S. Utesch <wstd@hl.siemens.de>
+dnl 		 Peter W. Osel <pwo@GUUG.DE>
 dnl
 dnl Process this file with autoconf to produce a configure script
 dnl You need autoconf 2.52 or better!
 dnl
 dnl ---------------------------------------------------------------------------
-AC_INIT(modules,3.2,modules_dev@kooz.sj.ca.us)
+AC_INIT
 AC_CONFIG_AUX_DIR(config)
 AM_INIT_AUTOMAKE(modules,3.2)
 AC_CONFIG_SRCDIR([version.c])
-AC_CONFIG_SUBDIRS(lib)
 AM_CONFIG_HEADER(config.h)
 AC_PROG_MAKE_SET
 AC_PREREQ(2.52)
@@ -159,8 +162,6 @@ dnl Some standard autoconfig stuff
 dnl Checks for programs
 dnl ---------------------------------------------------------------------------
 AC_PROG_CC
-dnl force CFLAGS=-g
-CFLAGS=-g
 AC_PROG_CPP
 AC_PROG_GCC_TRADITIONAL
 AC_PROG_INSTALL
@@ -178,7 +179,6 @@ HAS_X11LIBS:
 This symbol, if defined, indicates that the C program can use X11
 directly.])dnl
 	AC_DEFINE(HAS_X11LIBS)dnl
-LDFLAGS="$LDFLAGS -L$x_libraries"
 	AC_CHECK_LIB(X11, XMaxRequestSize)dnl
 	AC_CHECK_LIB(Xmu, XmuGetHostname)dnl
 fi
@@ -239,9 +239,9 @@ Last resort to get the hostname, if uname() and gethostname()
 are not available.])dnl
 AC_PATH_PROG([_PHOST],[hostname],[""])dnl
 test "$_PHOST" != ""  && AC_DEFINE_UNQUOTED(PHOSTNAME, "$_PHOST")
-#AC_PATH_PROG(RUNTEST, runtest, "./not_installed")dnl
-#test "$RUNTEST" = "" && echo "Install DEJAGNU and rerun configure if you \
-#want to run the testsuite"
+AC_PATH_PROG(RUNTEST, runtest, "./not_installed")dnl
+test "$RUNTEST" = "" && echo "Install DEJAGNU and rerun configure if you \
+want to run the testsuite"
 
 dnl
 dnl Here we define some --with & --enable things:
@@ -282,12 +282,6 @@ AH_VERBATIM([FORCE_PATH],[
 #define FORCE_PATH_SACRED  NULL
 #define FORCE_LD_LIBRARY_PATH_SACRED NULL
 ])dnl
-AC_ARG_WITH(file-collate,
-	AC_HELP_STRING([[--with-file-collate={string or number}]],[how lists collate     [[string]]]),
-	if test "$withval" = "number"; then
-		AC_DEFINE(DEF_COLLATE_BY_NUMBER, 1,
-		[Default collate lists numerically?])
-	fi)
 AC_ARG_WITH(force-path,
 	AC_HELP_STRING([--with-force-path=<path>],[use force path=<path> [[no]]]),
 	if test "$withval" != "no"; then
@@ -696,7 +690,7 @@ AC_ARG_WITH(module-path,
 	AC_HELP_STRING([--with-module-path=<path>],[use module path=<path> [[EPREFIX/Modules/modulefiles]]]),
 	MODULEPATH="$withval"
 	AC_MSG_RESULT([MODULEPATH = $with_module_path])
-	AC_DEFINE_UNQUOTED(MODULEPATH, "$withval", [module path])dnl
+	AC_DEFINE_UNQUOTED(MODULEPATH, "$withval")dnl
 	,
 dnl 	AC_MSG_WARN([if using '--with-module-path': need to specify a path!])
 	withval="$BASEPREFIX/Modules/modulefiles"
@@ -811,25 +805,11 @@ AC_ARG_WITH(dot-ext,
 	EXTDIR="etc"
 )
 dnl ---------------------------------------------------------------------------
-dnl MEMDEBUG		Whether to use the memory debug routines
-dnl
-AC_SUBST(MEMDEBUG)dnl
-AH_TEMPLATE([MEMDEBUG],[
-MEMDEBUG:
-Set this to enable the memory debug routines
-])dnl
-AC_ARG_ENABLE(memdebug,
-	AC_HELP_STRING([--enable-memdebug],[enable memory debugging    [[no]]]),
-	if test "$enableval" = "yes"; then
-		AC_DEFINE(MEMDEBUG)
-	fi
-)dnl
-dnl ---------------------------------------------------------------------------
 dnl helpful configure --help comments
 m4_divert_once([HELP_WITH],[[
 
 The default value or disposition is listed in the square brackets above.
-Beware of new defaults for use-cache and beginenv.
+Beware of new defaults for use-cache, beginenv.
 
 Depending on the above configuration options  the files are approximately
 placed in the following directory structure :
@@ -847,10 +827,6 @@ PREFIX/Modules/
 System modulefiles can safely be placed in:
 PREFIX/Modules/modulefiles
 ]])dnl
-dnl ---------------------------------------------------------------------------
-dnl want to statically link to the modules library
-dnl ---------------------------------------------------------------------------
-LIBS="$LIBS -lmodules"
 dnl ---------------------------------------------------------------------------
 dnl Now put it all out!
 dnl ---------------------------------------------------------------------------

@@ -6,25 +6,26 @@
 #
 #   File:		setenv/%M%
 #   Revision:		%I%
-#   First Edition:	2001/07/06
+#   First Edition:	2002/05/02
 #   Last Mod.:		%U%, %G%
 #
 #   Authors:		R.K. Owen, rk@owen.sj.ca.us
 #
 #   Description:	Testuite modulefile
 #   Command:
-#   Sub-Command:	use
+#   Sub-Command:	setenv
 #
 #   Invocation:		load @M@
 #   Result:	%R{
 #			setenv	_LMFILES_ 	${_LMFILES_}:@M@/@V@
 #			setenv	LOADEDMODULES	${LOADEDMODULES}:@P@/@M@/@V@
+#			setenv	pathelogical	...
 #		}R%
 #   Comment:	%C{
-#			Check the 'use' command
+#			Check the 'setenv' command for escaped chars
 #		}C%
 #			
 ##############################################################################
 
-module use --append @THISDIR@/testsuite/modulefiles.other
+setenv pathelogical	"abc :	{}|<>!#$^&'\"()@x%y\\z:sh*"
 

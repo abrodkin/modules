@@ -62,11 +62,19 @@ set lm4 "setenv LOADEDMODULES $module4;"
 #  The tests
 #
 
-if { @WITH_LOGGING@ } {
+if { [info exists config_file] } {
+    if { ![catch { exec grep "#define WITH_LOGGING" $config_file } ] } {
+	
 	test_cmd "csh" "load $module1" "$lmf1$lm1"
 	test_cmd "csh" "load $module2" "$lmf2$lm2"
 	test_cmd "csh" "load $module3" "$lmf3$lm3"
 	test_cmd "csh" "load $module4" "$lmf4$lm4"
+	
+    } else {
+	send_user "Skipping Syslog tests, since they were not compiled\n"
+    }
+} else {
+    send_user "ERROR: config_file wasn't set"
 }
 
 #

@@ -54,11 +54,11 @@ set env(LOADEDMODULES) "$module"
 set module "$mod12:$mod21:$mod31"
 set modulefile "$mod12p:$mod21p:$mod31p"
 
-set lmf_sh "_LMFILES_='$modulefile';export _LMFILES_;"
-set lm_sh "LOADEDMODULES='$module';export LOADEDMODULES;"
+set lmf_sh "_LMFILES_=$modulefile ;export _LMFILES_;"
+set lm_sh "LOADEDMODULES=$module ;export LOADEDMODULES;"
 
-set lmf_csh "setenv _LMFILES_ '$modulefile';"
-set lm_csh "setenv LOADEDMODULES '$module';"
+set lmf_csh "setenv _LMFILES_ $modulefile ;"
+set lm_csh "setenv LOADEDMODULES $module ;"
 
 set lmf_perl "\$ENV{'_LMFILES_'} = '$modulefile';"
 set lm_perl "\$ENV{'LOADEDMODULES'} = '$module';"
@@ -82,11 +82,11 @@ test_cmd "perl" "swap $mod11 $mod12" "$lmf_perl$lm_perl"
 set module "$mod11:$mod22:$mod31"
 set modulefile "$mod11p:$mod22p:$mod31p"
 
-set lmf_sh "_LMFILES_='$modulefile';export _LMFILES_;"
-set lm_sh "LOADEDMODULES='$module';export LOADEDMODULES;"
+set lmf_sh "_LMFILES_=$modulefile ;export _LMFILES_;"
+set lm_sh "LOADEDMODULES=$module ;export LOADEDMODULES;"
 
-set lmf_csh "setenv _LMFILES_ '$modulefile';"
-set lm_csh "setenv LOADEDMODULES '$module';"
+set lmf_csh "setenv _LMFILES_ $modulefile ;"
+set lm_csh "setenv LOADEDMODULES $module ;"
 
 set lmf_perl "\$ENV{'_LMFILES_'} = '$modulefile';"
 set lm_perl "\$ENV{'LOADEDMODULES'} = '$module';"
@@ -110,11 +110,11 @@ test_cmd "perl" "swap $mod21 $mod22" "$lmf_perl$lm_perl"
 set module "$mod11:$mod21:$mod32"
 set modulefile "$mod11p:$mod21p:$mod32p"
 
-set lmf_sh "_LMFILES_='$modulefile';export _LMFILES_;"
-set lm_sh "LOADEDMODULES='$module';export LOADEDMODULES;"
+set lmf_sh "_LMFILES_=$modulefile ;export _LMFILES_;"
+set lm_sh "LOADEDMODULES=$module ;export LOADEDMODULES;"
 
-set lmf_csh "setenv _LMFILES_ '$modulefile';"
-set lm_csh "setenv LOADEDMODULES '$module';"
+set lmf_csh "setenv _LMFILES_ $modulefile ;"
+set lm_csh "setenv LOADEDMODULES $module ;"
 
 set lmf_perl "\$ENV{'_LMFILES_'} = '$modulefile';"
 set lm_perl "\$ENV{'LOADEDMODULES'} = '$module';"
@@ -129,6 +129,17 @@ test_cmd "zsh" "swap $mod31 $mod32" "$lmf_sh$lm_sh"
 test_cmd "csh" "swap $mod31 $mod32" "$lmf_csh$lm_csh"
 test_cmd "tcsh" "swap $mod31 $mod32" "$lmf_csh$lm_csh"
 test_cmd "perl" "swap $mod31 $mod32" "$lmf_perl$lm_perl"
+
+#
+#  Test the one argument form.
+#
+
+test_cmd "sh" "swap $mod32" "$lmf_sh$lm_sh"
+test_cmd "ksh" "swap $mod32" "$lmf_sh$lm_sh"
+test_cmd "zsh" "swap $mod32" "$lmf_sh$lm_sh"
+test_cmd "csh" "swap $mod32" "$lmf_csh$lm_csh"
+test_cmd "tcsh" "swap $mod32" "$lmf_csh$lm_csh"
+test_cmd "perl" "swap $mod32" "$lmf_perl$lm_perl"
 
 #
 #  Cleanup

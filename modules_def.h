@@ -35,6 +35,7 @@
 /** ************************************************************************ **/
 
 #include <stdio.h>
+#include <stdarg.h>
 #include <tcl.h>
 #include "config.h"
 
@@ -113,6 +114,10 @@
 extern	int	  errno;
 #endif
 
+#ifdef MEMDEBUG
+#  include <librko.h>
+#endif
+
 /** ************************************************************************ **/
 /** 				  LOCAL DATATYPES			     **/
 /** ************************************************************************ **/
@@ -175,6 +180,7 @@ typedef	enum	{
 	ERR_UNAME,			/** Uname failed		     **/
 	ERR_GETHOSTNAME,		/** gethostname failed		     **/
 	ERR_GETDOMAINNAME,		/** getdomainname failed	     **/
+	ERR_STRING,			/** string error		     **/
 	ERR_DISPLAY = 90,		/** cannot open display	    	     **/
 	ERR_IN_MODULEFILE = 100,	/** modulefile related errors	     **/
 	ERR_PARSE,			/** Parse error (modulefile)	     **/
@@ -196,6 +202,7 @@ typedef	enum	{
 	ERR_DUP_ALIAS,			/** Duplicate alias		     **/
 	ERR_CACHE_INVAL,		/** Invalid cache version	     **/
 	ERR_CACHE_LOAD,			/** Cannot load cache properly	     **/
+	ERR_BEGINENV,			/** No update if no .modulesbeginenv **/
 	ERR_INIT_TCL,			/** Cannot initialize TCL	     **/
 	ERR_INIT_TCLX,			/** Cannot initialize extended TCL   **/
 	ERR_INIT_ALPATH,		/** Cannot set up autoload path      **/
@@ -210,7 +217,8 @@ typedef	enum	{
 	ERR_INTERRL,			/** Error logger internal error	     **/
 	ERR_INVAL,			/** Invalid parameter to the error   **/
 	ERR_INVWGHT,			/** logger			     **/
-	ERR_INVFAC			/** Invalid error facility	     **/
+	ERR_INVFAC,			/** Invalid error facility	     **/
+        ERR_ENVVAR,                     /** environment variables are inconsistent **/ 
 } ErrType;
 
 /**
@@ -234,15 +242,8 @@ typedef	enum	{
 /** 				     CONSTANTS				     **/
 /** ************************************************************************ **/
 
-/**
- **   VERSION of MODULE
- **/
-
 #define      MODULES_MAGIC_COOKIE         "#%Module"
 #define      MODULES_MAGIC_COOKIE_LENGTH  8
-
-#define      MODULES_RELEASE       "3.0RKO"
-#define      MODULES_PATCHLEVEL    "0"
 
 /**
  **  User level
@@ -418,18 +419,20 @@ typedef	enum	{
 /** ************************************************************************ **/
 
 /**
- **  I'm going to remove all of the calls to free( ) since they arn't
- **    very necessary for Modules.  Since the modulecmd program is only run for
+ **  I'm going to remove all of the calls to free( ) since they are not
+ **    necessary for Modules.  Since the modulecmd program is only run for
  **    a very short time ( usually <1sec) it's faster to not clutter the heap
  **    by freeing up memory.
  **
  **  If you disagree with this decision, or have some problems with this
  **    behavior on your system, configure with --enable-free
+ **
+ **  Note that all memory deallocations should go through null_free()
  **/
 
 #ifndef USE_FREE
-#define  free( x)  
-#define  FreeList( x, y)  
+#  define  free( x)  
+#  define  FreeList( x, y)  
 #endif
 
 /** 
@@ -461,9 +464,10 @@ extern	char	**environ;
 extern	char	 *version_string;
 extern	char	 *g_current_module;
 extern	char	 *specified_module;
-extern	char	**shell_startups;
-extern	char	  shell_name[];
-extern	char	  shell_derelict[];
+extern	char	 *shell_name;
+extern	char	 *shell_derelict;
+extern	char	 *shell_init;
+extern	char	 *shell_cmd_separator;
 extern	int	  g_flags;
 extern	int	  append_flag;
 extern	char	 *line;
@@ -488,6 +492,7 @@ extern	char	*updateRE;
 extern	char	*purgeRE;
 extern	char	*clearRE;
 extern	char	*whatisRE;
+extern  char    *bootstrapRE;
 extern	char	*aproposRE;
 
 extern	Tcl_HashTable	*setenvHashTable;
@@ -536,6 +541,9 @@ extern	int	  SourceRC( Tcl_Interp *interp, char *path, char *name);
 #ifdef USE_FREE
 extern	void	  FreeList( char**, int);
 #endif
+
+/**  main.c  **/
+extern  void	  module_usage(FILE *output);
 
 /**  ModuleCmd_Avail.c  **/
 extern	int	  ModuleCmd_Avail( Tcl_Interp*, int, char*[]);
@@ -658,7 +666,7 @@ extern	char	 *ExpandVersions( char*);
 extern	int	  Initialize_Tcl( Tcl_Interp**, int, char*[], char*[]);
 extern	int	  InitializeModuleCommands( Tcl_Interp*);
 extern	int	  Setup_Environment( Tcl_Interp*);
-extern	int	  SetStartupFiles( void);
+extern	char	**SetStartupFiles( char *shell_name);
 extern	int	  TieStdout( void);
 extern	int	  UnTieStdout( int);
 
@@ -674,7 +682,6 @@ extern	void	  Delete_Hash_Tables( Tcl_HashTable**);
 extern	Tcl_HashTable** Copy_Hash_Tables( void);
 extern	int	  Unwind_Modulefile_Changes( Tcl_Interp*, Tcl_HashTable**);
 extern	int	  Output_Modulefile_Changes( Tcl_Interp*);
-extern	char	 *set_derelict( const char*);
 extern	int	  store_env( void);
 extern	int	  free_stored_env( void);
 extern	void	  set_marked_entry( Tcl_HashTable*, char*, int);
@@ -691,6 +698,9 @@ extern	void	  chk4spch( char*);
 extern	void	  cleanse_path( const char*, char*, int);
 extern	char	 *xdup(char const *);
 extern	char	 *xgetenv(char const *);
+extern  int       tmpfile_mod(char** filename, FILE** file);
+extern	char	 *stringer(char *, int, ...);
+extern	void	  null_free(void **);
 
 #ifndef HAVE_STRDUP
 extern	char	 * strdup( char*);
