@@ -1,16 +1,16 @@
 dnl
 dnl File:        configure.in
-dnl Revision:    $Id: configure.ac,v 1.12 2004/10/22 01:33:30 harlan Exp $
+dnl Revision:    $Id: configure.ac,v 1.12.2.1 2005/04/11 17:32:06 rkowen Exp $
 dnl
 dnl Process this file with autoconf to produce a configure script
 dnl You need autoconf 2.52 or better!
 dnl
 dnl ---------------------------------------------------------------------------
-AC_INIT(modules,3.2,modules_dev@kooz.sj.ca.us)
+AC_INIT(modules,@VERSION@,modules_dev@kooz.sj.ca.us)
 AC_CONFIG_AUX_DIR(config)
-AM_INIT_AUTOMAKE(modules,3.2)
+AM_INIT_AUTOMAKE(modules,3.1.7)
 AC_CONFIG_SRCDIR([version.c])
-AC_CONFIG_SUBDIRS(lib)
+dnl AC_CONFIG_SUBDIRS(lib)
 AM_CONFIG_HEADER(config.h)
 AC_PROG_MAKE_SET
 AC_PREREQ(2.52)
@@ -221,8 +221,8 @@ CPPSTDIN:
 This symbol contains the first part of the string which will invoke
 the C preprocessor on the standard input and produce to standard
 output.	 Typical value of "cc -E" or "/lib/cpp".])dnl
-EM_PATH_PROG_SEARCH(_CPPSTDIN, cpp, /lib /usr/lib /usr/lang \
-	/usr/local/lang /usr/ccs/lib, [${CC} -E])
+EM_PATH_PROG_SEARCH(_CPPSTDIN, cpp, /lib /usr/lib /usr/lang /usr/bin \
+	/usr/local/lang /usr/ccs/lib, [${CC} -E])dnl
 AC_DEFINE_UNQUOTED(CPPSTDIN, "$_CPPSTDIN")dnl
 dnl
 AH_TEMPLATE([CPPMINUS],[
@@ -696,7 +696,7 @@ AC_ARG_WITH(module-path,
 	AC_HELP_STRING([--with-module-path=<path>],[use module path=<path> [[EPREFIX/Modules/modulefiles]]]),
 	MODULEPATH="$withval"
 	AC_MSG_RESULT([MODULEPATH = $with_module_path])
-	AC_DEFINE_UNQUOTED(MODULEPATH, "$withval", [module path])dnl
+	AC_DEFINE_UNQUOTED(MODULEPATH, "$withval")dnl
 	,
 dnl 	AC_MSG_WARN([if using '--with-module-path': need to specify a path!])
 	withval="$BASEPREFIX/Modules/modulefiles"
@@ -850,7 +850,7 @@ PREFIX/Modules/modulefiles
 dnl ---------------------------------------------------------------------------
 dnl want to statically link to the modules library
 dnl ---------------------------------------------------------------------------
-LIBS="$LIBS -lmodules"
+LIBS="$LIBS"
 dnl ---------------------------------------------------------------------------
 dnl Now put it all out!
 dnl ---------------------------------------------------------------------------

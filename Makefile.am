@@ -1,7 +1,7 @@
 ###########################################################################
 ##
 ## File:        ./Makefile.am
-## Versions:    $Id: Makefile.am,v 1.11 2004/10/22 01:31:59 harlan Exp $
+## Versions:    $Id: Makefile.am,v 1.11.2.1 2005/04/11 17:32:02 rkowen Exp $
 ## Created:     2002/06/14
 ##
 ###########################################################################
@@ -16,23 +16,23 @@ AUTOMAKE_OPTIONS=foreign dejagnu no-installinfo
 
 ACLOCAL_AMFLAGS= -I config
 
-SUBDIRS = lib . init modulefiles @EXTDIR@
-INCLUDES = -I$(srcdir)/lib -I$(srcdir)
+SUBDIRS = . init modulefiles @EXTDIR@
+INCLUDES = -I$(srcdir)
 
 man_MANS = doc/module.1 doc/modulefile.4
 bin_PROGRAMS = modulecmd
 # bin_SCRIPTS = etc/mkroot etc/add.modules ext/add.ext
 modulecmd_CFLAGS = ${X_CFLAGS} ${TCL_INCLUDES}
-modulecmd_LDFLAGS=-Llib @TCL_LIB_SPEC@ @TCLX_LIB_SPEC@ @X_LIBS@ @X_EXTRA_LIBS@
+modulecmd_LDFLAGS=@TCL_LIB_SPEC@ @TCLX_LIB_SPEC@ @X_LIBS@ @X_EXTRA_LIBS@
 modulecmd_SOURCES = \
-	ModuleCmd_Avail.c ModuleCmd_Bootstrap.c \
+	ModuleCmd_Avail.c \
         ModuleCmd_Clear.c ModuleCmd_Display.c ModuleCmd_Help.c \
 	ModuleCmd_Init.c ModuleCmd_List.c ModuleCmd_Load.c ModuleCmd_Purge.c \
 	ModuleCmd_Switch.c ModuleCmd_Update.c ModuleCmd_Use.c \
 	ModuleCmd_Whatis.c \
-	cmdAlias.c cmdConflict.c cmdIsLoaded.c cmdInfo.c cmdMisc.c \
-	cmdModule.c cmdPath.c cmdSetenv.c cmdUname.c cmdXResource.c cmdUlvl.c \
-	cmdLog.c cmdTrace.c cmdVersion.c cmdVerbose.c cmdWhatis.c \
+	cmdAlias.c cmdConflict.c cmdIsLoaded.c cmdInfo.c cmdMisc.c cmdModule.c\
+	cmdPath.c cmdSetenv.c cmdUname.c cmdXResource.c cmdUlvl.c cmdLog.c \
+	cmdTrace.c cmdVersion.c cmdVerbose.c cmdWhatis.c	\
 	init.c locate_module.c utility.c main.c error.c getopt.c version.c
 
 #aclocal.m4 : acinclude.m4
@@ -47,7 +47,14 @@ modulecmd_SOURCES = \
 test: check-local
 
 check-local:	modulecmd
-	MODULEVERSION=@VERSION@; export MODULEVERSION; TESTSUITEDIR=$(srcdir)/testsuite; export TESTSUITEDIR; $(RUNTEST) --srcdir $$TESTSUITEDIR $(RUNTESTFLAGS) --tool=modules
+	MODULEVERSION=@VERSION@; export MODULEVERSION; \
+	TESTSUITEDIR=$(srcdir)/testsuite; export TESTSUITEDIR; \
+	$(RUNTEST) --srcdir $$TESTSUITEDIR \
+	$(AM_RUNTESTFLAGS) $(RUNTESTFLAGS) --tool=modules
+
+ctags:	CTAGS
+CTAGS:	$(modulecmd_SOURCES)
+	ctags $(modulecmd_SOURCES)
 
 cxref:
 	cxref $(modulecmd_SOURCES)
@@ -55,11 +62,11 @@ cxref:
 	@echo "You may need to run this twice!"
 	@echo "==============================="
 
-dist: distgz distbz2
+xxx_dist: xxx_distgz xxx_distbz2
 
-distgz : ${DISTNAME}.tar.gz
+xxx_distgz : ${DISTNAME}.tar.gz
 
-distbz2 : ${DISTNAME}.tar.bz2
+xxx_distbz2 : ${DISTNAME}.tar.bz2
 
 ${DISTNAME}.tar.gz : $(srcdir)/configure 
 	@echo "checking out ${DISTNAME} into directory modules"
@@ -97,7 +104,7 @@ patch: $(srcdir)/configure
 tag:
 	@echo "CVS tagging - TAG = "\
 	  `${SED} -n -e 's/^.*NEW TAG.*"\(.*\)".*$$/\1/p' ${srcdir}/version.c`
-	${CVS} rtag -F \
+	${CVS} rtag -b -F \
 	  `${SED} -n -e 's/^.*NEW TAG.*"\(.*\)".*$$/\1/p' ${srcdir}/version.c` \
 	  modules
 
