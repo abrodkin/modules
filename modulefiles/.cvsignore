@@ -1,9 +1,8 @@
 Makefile
-Makefile.in
 dot
 module-cvs
-module-info
 modules
+modules-info
 null
 use.own
 version
