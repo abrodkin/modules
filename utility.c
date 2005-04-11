@@ -50,7 +50,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.5 2001/07/09 18:21:37 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.5.6.1 2005/04/11 17:32:07 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -741,6 +741,7 @@ static	int Output_Modulefile_Aliases( Tcl_Interp *interp)
     char		*val = NULL,	/** Stored value (is a pointer!)     **/
 			*key;		/** Tcl hash key		     **/
     int			 i;		/** Loop counter		     **/
+    int                 fd;
     char		*sourceCommand; /** Command used to source the alias **/
 
     /**
@@ -760,6 +761,10 @@ static	int Output_Modulefile_Aliases( Tcl_Interp *interp)
      **  The default for aliasfile, if no shell sourcing is used, is stdout.
      **/
 
+#ifdef HAVE_MKSTEMP
+    char             aliasfilename[] = "/tmp/M_od_.XXXXXX";
+    fd               =  mkstemp(aliasfilename);
+#else
 #ifdef HAVE_TEMPNAM
     char*            aliasfilename = (char *)tempnam(NULL, "M_od_");
 #else
@@ -770,6 +775,7 @@ static	int Output_Modulefile_Aliases( Tcl_Interp *interp)
     char*            aliasfilename = "M_od_temp";
 #endif /* not HAVE_TMPNAM */
 #endif /* not HAVE_TEMPNAM */
+#endif /* not HAVE_MKSTEMP */
 #endif /* not EVAL_ALIAS */
 
     table[0] = aliasSetHashTable;
@@ -803,9 +809,15 @@ static	int Output_Modulefile_Aliases( Tcl_Interp *interp)
 	 **  Open the file ...
 	 **/
 
+#ifdef HAVE_MKSTEMP
+	if( !( aliasfile = fdopen(fd, "w+"))) {
+	    if( OK != ErrorLogger( ERR_OPEN, LOC, aliasfilename, "append", NULL))
+		return( TCL_ERROR);	/** -------- EXIT (FAILURE) -------> **/
+#else
 	if( !( aliasfile = fopen((char *) aliasfilename, "w+"))) {
 	    if( OK != ErrorLogger( ERR_OPEN, LOC, aliasfilename, "append", NULL))
 		return( TCL_ERROR);	/** -------- EXIT (FAILURE) -------> **/
+#endif
 
 	} else {
 
