@@ -83,8 +83,8 @@ set expadv	"$lmf1 ;$lm1 ;$wrn_colon.*"
 #
 
 test_cmd "csh" "--user=exp load $module trace/disptrac" "$exp"
-testerr_cmd_re "csh" "--user=nov load $module" "$expnov"
-testerr_cmd_re "csh" "--user=adv load $module" "$expadv"
+testouterr_cmd_re "csh" "--user=nov load $module" "" "$expnov"
+testouterr_cmd_re "csh" "--user=adv load $module" "$lmf1 ;$lm1 ;" "$wrn_colon.*"
 
 #
 #  Cleanup

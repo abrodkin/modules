@@ -58,9 +58,9 @@ set ts_csh_1_exp "setenv testsuite loc_sym/2.0 ;"
 #  The tests
 #
 
-testerr_cmd_re "csh" "-u nov load $module_1 $mod_alias4" "$ts_csh_1_adv$lmf_csh_1$lm_csh_1$warn_dup"
-testerr_cmd_re "csh" "-u adv load $module_1 $mod_alias4" "$ts_csh_1_adv$lmf_csh_1$lm_csh_1$warn_dup"
-testerr_cmd_re "csh" "-u exp load $module_1 $mod_alias4" "$ts_csh_1_adv$lmf_csh_1$lm_csh_1$warn_dup"
+testouterr_cmd_re "csh" "-u nov load $module_1 $mod_alias4" "$ts_csh_1_adv$lmf_csh_1$lm_csh_1" "$warn_dup"
+testouterr_cmd_re "csh" "-u adv load $module_1 $mod_alias4" "$ts_csh_1_adv$lmf_csh_1$lm_csh_1" "$warn_dup"
+testouterr_cmd_re "csh" "-u exp load $module_1 $mod_alias4" "$ts_csh_1_adv$lmf_csh_1$lm_csh_1" "$warn_dup"
 
 #
 #  Cleanup

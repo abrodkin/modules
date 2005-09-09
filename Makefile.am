@@ -1,7 +1,7 @@
 ###########################################################################
 ##
 ## File:        ./Makefile.am
-## Versions:    $Id: Makefile.am,v 1.6 2002/06/14 21:57:03 rkowen Exp $
+## Versions:    $Id: Makefile.am,v 1.6.4.1 2005/09/09 02:35:14 rkowen Exp $
 ## Created:     2002/06/14
 ##
 ###########################################################################
@@ -45,7 +45,14 @@ modulecmd_SOURCES = \
 test: check-local
 
 check-local:	modulecmd
-	MODULEVERSION=@VERSION@; export MODULEVERSION; TESTSUITEDIR=$(srcdir)/testsuite; export TESTSUITEDIR; $(RUNTEST) --srcdir $$TESTSUITEDIR $(RUNTESTFLAGS) --tool=modules
+	MODULEVERSION=@VERSION@; export MODULEVERSION; \
+	TESTSUITEDIR=$(srcdir)/testsuite; export TESTSUITEDIR; \
+	$(RUNTEST) --srcdir $$TESTSUITEDIR \
+	$(AM_RUNTESTFLAGS) $(RUNTESTFLAGS) --tool=modules
+
+ctags:	CTAGS
+CTAGS:	$(modulecmd_SOURCES)
+	ctags:	$(modulecmd_SOURCES)
 
 cxref:
 	cxref $(SRCS)
@@ -53,11 +60,11 @@ cxref:
 	@echo "You may need to run this twice!"
 	@echo "==============================="
 
-dist: distgz distbz2
+xxx_dist: xxx_distgz xxx_distbz2
 
-distgz : ${DISTNAME}.tar.gz
+xxx_distgz : ${DISTNAME}.tar.gz
 
-distbz2 : ${DISTNAME}.tar.bz2
+xxx_distbz2 : ${DISTNAME}.tar.bz2
 
 ${DISTNAME}.tar.gz : $(srcdir)/configure 
 	@echo "checking out ${DISTNAME} into directory modules"

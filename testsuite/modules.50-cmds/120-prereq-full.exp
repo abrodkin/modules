@@ -60,8 +60,8 @@ set err_exec "$error_msgs: Tcl command execution failed: prereq\ttrace/all_on\n"
 #  The tests
 #
 
-testerr_cmd_re "csh" "load $module" "$err_prereq$err_exec"
-testerr_cmd_re "csh" "load $module_troff $module" "$lm_csh_troff$lmf_csh_troff$err_prereq$err_exec"
+testouterr_cmd_re "csh" "load $module" "" "$err_prereq$err_exec"
+testouterr_cmd_re "csh" "load $module_troff $module" "$lm_csh_troff$lmf_csh_troff" "$err_prereq$err_exec"
 test_cmd "csh" "load $module_tron $module" "$ts_csh$lmf_csh_tron$lm_csh_tron"
 
 #

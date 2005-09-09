@@ -91,7 +91,7 @@ test_cmd "csh" "load $module_2" "$lmf_csh_2$lm_csh_2$ts_csh_2"
 test_cmd "csh" "load $module_3" "$lmf_csh_3$lm_csh_3$ts_csh_3"
 test_cmd "csh" "-u exp load $module_4" "$lmf_csh_4$lm_csh_4$ts_csh_4_exp"
 testerr_cmd_re "csh" "-u nov load $module_4" "$ts_csh_4_nov"
-testerr_cmd_re "csh" "-u adv load $module_4" "$lmf_csh_4$lm_csh_4$ts_csh_4_exp.*$warn_dup"
+testouterr_cmd_re "csh" "-u adv load $module_4" "$lmf_csh_4$lm_csh_4$ts_csh_4_exp" "$warn_dup"
 test_cmd "csh" "load $module_5" "$lmf_csh_5$lm_csh_5$ts_csh_5"
 test_cmd "csh" "load $module_6" "$lmf_csh_6$lm_csh_6$ts_csh_6"
 
