@@ -1,7 +1,7 @@
 ###########################################################################
 ##
 ## File:        ./Makefile.am
-## Versions:    $Id: Makefile.am,v 1.6.4.1 2005/09/09 02:35:14 rkowen Exp $
+## Versions:    $Id: Makefile.am,v 1.6.4.2 2005/09/19 22:19:04 rkowen Exp $
 ## Created:     2002/06/14
 ##
 ###########################################################################
@@ -23,7 +23,7 @@ bin_PROGRAMS = modulecmd
 modulecmd_CFLAGS=
 modulecmd_LDFLAGS= @TCL_LIB_SPEC@ @TCLX_LIB_SPEC@ @X_LIBS@ @X_EXTRA_LIBS@ @LIBS@
 modulecmd_SOURCES = \
-	ModuleCmd_Avail.c ModuleCmd_Bootstrap.c \
+	ModuleCmd_Avail.c \
         ModuleCmd_Clear.c ModuleCmd_Display.c ModuleCmd_Help.c \
 	ModuleCmd_Init.c ModuleCmd_List.c ModuleCmd_Load.c ModuleCmd_Purge.c \
 	ModuleCmd_Switch.c ModuleCmd_Update.c ModuleCmd_Use.c \

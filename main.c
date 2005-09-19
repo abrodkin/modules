@@ -29,7 +29,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: main.c,v 1.8 2002/06/17 05:58:43 rkowen Exp $";
+static char Id[] = "@(#)$Id: main.c,v 1.8.2.1 2005/09/19 22:19:04 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -106,7 +106,6 @@ char
     *purgeRE    = "^purge",			/** 'module purge'	     **/
     *clearRE    = "^clear",			/** 'module clear'	     **/
     *whatisRE   = "^wh",			/** 'module whatis'	     **/
-    *bootstrapRE= "^boot",			/** 'module bootstrap'	     **/
     *aproposRE  = "^(apr|key)";			/** 'module apropos'	     **/
 
 /**
@@ -411,7 +410,6 @@ void module_usage(FILE *output)
 "	+ help			[modulefile [modulefile ...]]\n"
 "	+ whatis		[modulefile [modulefile ...]]\n"
 "	+ apropos|keyword	string\n"
-"	+ bootstrap\n"
 "	+ initadd		modulefile [modulefile ...]\n"
 "	+ initprepend		modulefile [modulefile ...]\n"
 "	+ initrm		modulefile [modulefile ...]\n"

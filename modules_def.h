@@ -492,7 +492,6 @@ extern	char	*updateRE;
 extern	char	*purgeRE;
 extern	char	*clearRE;
 extern	char	*whatisRE;
-extern  char    *bootstrapRE;
 extern	char	*aproposRE;
 
 extern	Tcl_HashTable	*setenvHashTable;

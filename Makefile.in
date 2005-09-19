@@ -134,7 +134,7 @@ bin_PROGRAMS = modulecmd
 modulecmd_CFLAGS = 
 modulecmd_LDFLAGS = @TCL_LIB_SPEC@ @TCLX_LIB_SPEC@ @X_LIBS@ @X_EXTRA_LIBS@ @LIBS@
 modulecmd_SOURCES = \
-	ModuleCmd_Avail.c ModuleCmd_Bootstrap.c \
+	ModuleCmd_Avail.c \
         ModuleCmd_Clear.c ModuleCmd_Display.c ModuleCmd_Help.c \
 	ModuleCmd_Init.c ModuleCmd_List.c ModuleCmd_Load.c ModuleCmd_Purge.c \
 	ModuleCmd_Switch.c ModuleCmd_Update.c ModuleCmd_Use.c \
@@ -158,7 +158,6 @@ bin_PROGRAMS = modulecmd$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
 
 am_modulecmd_OBJECTS = modulecmd-ModuleCmd_Avail.$(OBJEXT) \
-	modulecmd-ModuleCmd_Bootstrap.$(OBJEXT) \
 	modulecmd-ModuleCmd_Clear.$(OBJEXT) \
 	modulecmd-ModuleCmd_Display.$(OBJEXT) \
 	modulecmd-ModuleCmd_Help.$(OBJEXT) \
@@ -194,7 +193,6 @@ LIBS = @LIBS@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/modulecmd-ModuleCmd_Avail.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/modulecmd-ModuleCmd_Bootstrap.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/modulecmd-ModuleCmd_Clear.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/modulecmd-ModuleCmd_Display.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/modulecmd-ModuleCmd_Help.Po \
@@ -351,7 +349,6 @@ uninstall-binPROGRAMS:
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
 modulecmd-ModuleCmd_Avail.$(OBJEXT): ModuleCmd_Avail.c
-modulecmd-ModuleCmd_Bootstrap.$(OBJEXT): ModuleCmd_Bootstrap.c
 modulecmd-ModuleCmd_Clear.$(OBJEXT): ModuleCmd_Clear.c
 modulecmd-ModuleCmd_Display.$(OBJEXT): ModuleCmd_Display.c
 modulecmd-ModuleCmd_Help.$(OBJEXT): ModuleCmd_Help.c
@@ -397,7 +394,6 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/modulecmd-ModuleCmd_Avail.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/modulecmd-ModuleCmd_Bootstrap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/modulecmd-ModuleCmd_Clear.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/modulecmd-ModuleCmd_Display.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/modulecmd-ModuleCmd_Help.Po@am__quote@
@@ -459,18 +455,6 @@ modulecmd-ModuleCmd_Avail.obj: ModuleCmd_Avail.c
 @AMDEP_TRUE@	depfile='$(DEPDIR)/modulecmd-ModuleCmd_Avail.Po' tmpdepfile='$(DEPDIR)/modulecmd-ModuleCmd_Avail.TPo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(modulecmd_CFLAGS) $(CFLAGS) -c -o modulecmd-ModuleCmd_Avail.obj `cygpath -w ModuleCmd_Avail.c`
-
-modulecmd-ModuleCmd_Bootstrap.o: ModuleCmd_Bootstrap.c
-@AMDEP_TRUE@	source='ModuleCmd_Bootstrap.c' object='modulecmd-ModuleCmd_Bootstrap.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/modulecmd-ModuleCmd_Bootstrap.Po' tmpdepfile='$(DEPDIR)/modulecmd-ModuleCmd_Bootstrap.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(modulecmd_CFLAGS) $(CFLAGS) -c -o modulecmd-ModuleCmd_Bootstrap.o `test -f 'ModuleCmd_Bootstrap.c' || echo '$(srcdir)/'`ModuleCmd_Bootstrap.c
-
-modulecmd-ModuleCmd_Bootstrap.obj: ModuleCmd_Bootstrap.c
-@AMDEP_TRUE@	source='ModuleCmd_Bootstrap.c' object='modulecmd-ModuleCmd_Bootstrap.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@	depfile='$(DEPDIR)/modulecmd-ModuleCmd_Bootstrap.Po' tmpdepfile='$(DEPDIR)/modulecmd-ModuleCmd_Bootstrap.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(modulecmd_CFLAGS) $(CFLAGS) -c -o modulecmd-ModuleCmd_Bootstrap.obj `cygpath -w ModuleCmd_Bootstrap.c`
 
 modulecmd-ModuleCmd_Clear.o: ModuleCmd_Clear.c
 @AMDEP_TRUE@	source='ModuleCmd_Clear.c' object='modulecmd-ModuleCmd_Clear.o' libtool=no @AMDEPBACKSLASH@
