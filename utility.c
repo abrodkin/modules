@@ -34,7 +34,8 @@
  **			xdup						     **
  **			xgetenv						     **
  **			stringer					     **
- **			null_clean					     **
+ **			null_free					     **
+ **			countTclHash					     **
  **									     **
  **			strdup		if not defined by the system libs.   **
  **			strtok		if not defined by the system libs.   **
@@ -51,7 +52,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.10 2002/06/12 20:07:57 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.10.2.1 2005/09/19 22:10:16 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -610,6 +611,10 @@ int Unwind_Modulefile_Changes(	Tcl_Interp	 *interp,
 
 } /** End of 'Unwind_Modulefile_Changes' **/
 
+static int keycmp(const void *a, const void *b) {
+	return strcmp(*(const char **) a, *(const char **) b);
+}
+                                                                                
 /*++++
  ** ** Function-Header ***************************************************** **
  ** 									     **
@@ -636,11 +641,13 @@ int Unwind_Modulefile_Changes(	Tcl_Interp	 *interp,
 
 int Output_Modulefile_Changes(	Tcl_Interp	*interp)
 {
-    Tcl_HashSearch	 searchPtr;	/** Tcl hash search handle	     **/
-    Tcl_HashEntry	*hashEntry;	/** Result from Tcl hash search      **/
-    char		*val = NULL,	/** Stored value (is a pointer!)     **/
-			*key;		/** Tcl hash key		     **/
-    int			 i;		/** Loop counter		     **/
+    Tcl_HashSearch	  searchPtr;	/** Tcl hash search handle	     **/
+    Tcl_HashEntry	 *hashEntry;	/** Result from Tcl hash search      **/
+    char		 *val = NULL,	/** Stored value (is a pointer!)     **/
+			 *key,		/** Tcl hash key		     **/
+			**list;		/** list of keys		     **/
+    int			  i,k;		/** Loop counter		     **/
+    size_t		  hcnt;		/** count of hash entries	     **/
 
     /**
      **  The following hash tables do contain all changes to be made on
@@ -659,30 +666,49 @@ int Output_Modulefile_Changes(	Tcl_Interp	*interp)
     aliasfile = stdout;
 
     /**
-     **  Scan both table that are of interest for shell variables
+     **  Scan both tables that are of interest for shell variables
      **/
 
     for(i = 0; i < 2; i++) {
-	if( hashEntry = Tcl_FirstHashEntry( table[i], &searchPtr)) {
+	/* count hash */
+	hcnt = countTclHash(table[i]);
 
-	    do {
-		key = (char*) Tcl_GetHashKey( table[i], hashEntry);
+	/* allocate array for keys */
+	if( !(list = (char **) malloc(hcnt * sizeof(char *)))) {
+		if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
+	    		return(TCL_ERROR);/** ------- EXIT (FAILURE) ------> **/
+	}
 
+	/* collect keys */
+	k = 0;
+	if( hashEntry = Tcl_FirstHashEntry( table[i], &searchPtr))
+		do {
+			key = (char*) Tcl_GetHashKey( table[i], hashEntry);
+			list[k++] = strdup(key);
+		} while( hashEntry = Tcl_NextHashEntry( &searchPtr));
+	/* sort hash */
+	if (hcnt > 1)
+		qsort((void *) list, hcnt, sizeof(char *), keycmp);
+
+	/* output key/values */
+	for (k = 0; k < hcnt; ++k) {
+		key = list[k];
+    		hashEntry = Tcl_FindHashEntry( table[i], key);
 		/**
 		 **  The table list indicator is used in order to differ
 		 **  between the setenv and unsetenv operation
 		 **/
-
 		if( i == 1) {
-		    output_unset_variable( (char*) key);
+			output_unset_variable( (char*) key);
 		} else {
-		    if( val = Tcl_GetVar2( interp, "env", key, TCL_GLOBAL_ONLY))
-			output_set_variable( interp, (char*) key, val);
+			if(val=Tcl_GetVar2(interp,"env",key,TCL_GLOBAL_ONLY))
+				output_set_variable(interp, (char*) key, val);
 		}
-
-	    } while( hashEntry = Tcl_NextHashEntry( &searchPtr));
-
-	} /** if **/
+	} /** for **/
+	/* delloc list */
+	for (k = 0; k < hcnt; ++k)
+		free(list[k]);
+	free(list);
     } /** for **/
 
     if( EOF == fflush( stdout))
@@ -692,8 +718,8 @@ int Output_Modulefile_Changes(	Tcl_Interp	*interp)
     Output_Modulefile_Aliases( interp);
   
     /**
-     ** Delete and reset the hash tables now that the current contents have been
-     ** flushed.
+     **  Delete and reset the hash tables since the current contents have been
+     **  flushed.
      **/
 
     Clear_Global_Hash_Tables();
@@ -2848,3 +2874,36 @@ void null_free(void ** var) {
 
 } /** End of 'null_free' **/
 
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
+ **   Function:		countTclHash					     **
+ ** 									     **
+ **   Description:	returns the number of hash entries in a TclHash	     **
+ ** 									     **
+ **   first edition:	2005/09/01	r.k.owen <rk@owen.sj.ca.us>	     **
+ ** 									     **
+ **   Parameters:	Tcl_HashTable	*table	Hash to count		     **
+ ** 									     **
+ **   Result:		size_t			Count of Hash Entries	     **
+ ** 									     **
+ **   Attached Globals:	-						     **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
+
+
+size_t countTclHash(Tcl_HashTable *table) {
+	size_t result = 0;
+	Tcl_HashSearch	 searchPtr;	/** Tcl hash search handle	     **/
+
+	if(Tcl_FirstHashEntry(table, &searchPtr)) {
+
+	    do {
+		result++;
+	    } while(Tcl_NextHashEntry( &searchPtr));
+
+	} /** if **/
+
+	return result;
+} /** End of 'countHashTable' **/

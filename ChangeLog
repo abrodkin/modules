@@ -6,7 +6,7 @@
   or spelling correction your name will probably not be listed.)
 
 ****************************   Release 3.2 ******************************
-Modules XXXXX
+Modules 3.2.0
 	* Made the .modulesbeginenv facility optional (default is
 	  not to have it)
 	* default for cache is now "no"
@@ -26,14 +26,13 @@ Modules XXXXX
 	  the --help or -H option (same as help)
 	* --version now gives most of the optional configure parameters
 	  for easy debugging of problems
-	* Fixed bootstrap to just source the appropriate init script
+	* Made the output deterministic (sorted) and reworked tests also
 
-	Main Contributor:
+	Contributor:
 	 	Mark Lakata  		<lakata@mips.com>
 	* removed configure *.in files from testsuite and added envvars to
 	  allow running the testsuite from another directory
 	* other fixes to testsuite
-	* added the 'bootstrap' initialization command
 	* allowed one argument for 'switch', i.e. "module switch foo/1.3"
 	  is the same as "module switch foo foo/1.3"
 	* bug fix in cmdXResources regarding parsing the XRDB
