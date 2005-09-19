@@ -26,7 +26,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdUlvl.c,v 1.2 2001/06/09 09:48:46 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdUlvl.c,v 1.2.8.1 2005/09/19 23:02:08 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -182,8 +182,10 @@ int	cmdModuleUser_sub(	char	*user_level)
 
     len_arg = strlen( user_level);
     s = user_level;
-    while( s && *s)
-	*s++ = tolower( *s);
+    while( s && *s) {
+	*s = tolower( *s);
+	s++;
+    }
 
     if( !strncmp( user_level, _str_ul_novice, len_arg)) {
 	sw_userlvl = UL_NOVICE;

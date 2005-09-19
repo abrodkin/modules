@@ -27,6 +27,7 @@ Modules 3.2.0
 	* --version now gives most of the optional configure parameters
 	  for easy debugging of problems
 	* Made the output deterministic (sorted) and reworked tests also
+	* Fixed the UserLevel check code (which failed when optimized)
 
 	Contributor:
 	 	Mark Lakata  		<lakata@mips.com>
