@@ -56,7 +56,11 @@ set ts_perl "$warn_msgs: Shell 'perl': cannot source alias tempfile - No aliases
 #  The tests
 #
 
-test_alias "sh" "load $module" "$lm_sh$lmf_sh$ts_sh" "$fil_cmd_sh"
+if { [ version_test "HAS_BOURNE_FUNCS=1" ] } {
+	test_alias "sh" "load $module" "$lm_sh$lmf_sh$ts_sh" "$fil_cmd_sh"
+} else {
+	send_user "skipping sh alias test\n"
+}
 test_alias "ksh" "load $module" "$lm_sh$lmf_sh$ts_sh" "$fil_cmd_ksh"
 test_alias "zsh" "load $module" "$lm_sh$lmf_sh$ts_sh" "$fil_cmd_ksh"
 test_alias "csh" "load $module" "$lm_csh$lmf_csh$ts_csh" "$fil_cmd_csh"

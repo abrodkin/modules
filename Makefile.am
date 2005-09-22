@@ -1,7 +1,7 @@
 ###########################################################################
 ##
 ## File:        ./Makefile.am
-## Versions:    $Id: Makefile.am,v 1.6.4.2 2005/09/19 22:19:04 rkowen Exp $
+## Versions:    $Id: Makefile.am,v 1.6.4.3 2005/09/22 21:19:27 rkowen Exp $
 ## Created:     2002/06/14
 ##
 ###########################################################################
@@ -11,8 +11,6 @@
 ##	configure.ac >  Makefile.in
 ##	aclocal.m4  /
 ##
-
-AUTOMAKE_OPTIONS=foreign dejagnu no-installinfo
 
 ACLOCAL_AMFLAGS= -I config
 
@@ -32,15 +30,6 @@ modulecmd_SOURCES = \
 	cmdPath.c cmdSetenv.c cmdUname.c cmdXResource.c cmdUlvl.c cmdLog.c \
 	cmdTrace.c cmdVersion.c cmdVerbose.c cmdWhatis.c		\
 	init.c locate_module.c utility.c main.c error.c getopt.c version.c
-
-#aclocal.m4 : acinclude.m4
-#	aclocal -I config
-
-#Makefile.in : Makefile.am aclocal.m4
-# 	automake --foreign --add-missing
-
-#config.h.in : acconfig.h
-#	autoheader
 
 test: check-local
 

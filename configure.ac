@@ -1,18 +1,19 @@
 dnl
 dnl File:        configure.in
-dnl Revision:    $Id: configure.ac,v 1.7 2002/06/17 05:58:43 rkowen Exp $
-dnl Created:     94/06/18
+dnl Revision:    $Id: configure.ac,v 1.7.4.1 2005/09/22 21:19:27 rkowen Exp $
+dnl Created:     1994/06/18
 dnl Author:      Leif Hedstrom<hedstrom@inf.ethz.ch>
 dnl		 Martin S. Utesch <wstd@hl.siemens.de>
 dnl 		 Peter W. Osel <pwo@GUUG.DE>
+dnl 		 R.K. Owen <rk@owen.sj.ca.us>
 dnl
 dnl Process this file with autoconf to produce a configure script
 dnl You need autoconf 2.52 or better!
 dnl
 dnl ---------------------------------------------------------------------------
-AC_INIT
+AC_INIT(modules,3.2)
 AC_CONFIG_AUX_DIR(config)
-AM_INIT_AUTOMAKE(modules,3.2)
+AM_INIT_AUTOMAKE(foreign dejagnu no-installinfo)
 AC_CONFIG_SRCDIR([version.c])
 AM_CONFIG_HEADER(config.h)
 AC_PROG_MAKE_SET
@@ -313,10 +314,8 @@ AC_ARG_WITH(static,
 dnl ---------------------------------------------------------------------------
 AH_TEMPLATE([HAS_BOURNE_FUNCS],[
 HAS_BOURNE_FUNCS:
-This symbol, if defined, indicates that Modules should ask the shell
-to evaluate aliases via stdout like other environment changes instead
-of opening a file and then asking the shell to source the file and
-then remove it.])dnl
+This symbol, if defined, indicates that the Bourne shell can define aliases
+as shell functions.])dnl
 AC_ARG_ENABLE(shell-funcs,
 	AC_HELP_STRING([--enable-shell-funcs],[use sh functions [[yes]]]),
 	if test "$enableval" = "yes"; then

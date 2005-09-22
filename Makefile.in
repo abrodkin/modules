@@ -293,7 +293,6 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-AUTOMAKE_OPTIONS = foreign dejagnu no-installinfo
 ACLOCAL_AMFLAGS = -I config
 man_MANS = doc/module.1 doc/modulefile.4
 SUBDIRS = . init modulefiles @EXTDIR@

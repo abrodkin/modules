@@ -72,10 +72,8 @@
 #define FORCE_LD_LIBRARY_PATH_SACRED NULL
 
 
-/* HAS_BOURNE_FUNCS: This symbol, if defined, indicates that Modules should
-   ask the shell to evaluate aliases via stdout like other environment changes
-   instead of opening a file and then asking the shell to source the file and
-   then remove it. */
+/* HAS_BOURNE_FUNCS: This symbol, if defined, indicates that the Bourne shell
+   can define aliases as shell functions. */
 #undef HAS_BOURNE_FUNCS
 
 /* HAS_TCLXLIBS: This symbol, if defined, indicates that Modules should

@@ -52,7 +52,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.10.2.1 2005/09/19 22:10:16 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.10.2.2 2005/09/22 21:19:27 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -1277,7 +1277,7 @@ static	int	output_set_alias(	const char	*alias,
     } else if( !strcmp(shell_derelict, "sh")) {
 
 	/**
-	 **  The bourne shell itsself
+	 **  The bourne shell itself
          **  need to write a function unless this sh doesn't support
 	 **  functions
 	 **/
@@ -1289,7 +1289,7 @@ static	int	output_set_alias(	const char	*alias,
 #endif
 
 	/**
-	 **  Shells supportig extended bourne shell syntax ....
+	 **  Shells supporting extended bourne shell syntax ....
 	 **/
         } else if( !strcmp( shell_name, "bash") ||
                    !strcmp( shell_name, "zsh" ) ||
