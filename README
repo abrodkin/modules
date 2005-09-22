@@ -43,10 +43,19 @@ The ./doc directory contains both the paper and man pages describing the
 user's and the module writer's usage.
 Look at ChangeLog for detailed information regarding changes.
 
+Big changes to 3.2:
+    o  Using the automake/autoconf mechanism for creating the configure script.
+
+    o  Lots of code clean-up.
+
+    o  Made the tests more conditional on configure options.
+
+    o  Handle silent changes in Tcl 8.4
+
 Big changes to 3.1:
     o  Changed the license to GPL
 
-    O  Source code cross-referencing documented in ./xref/*.html files.
+    o  Source code cross-referencing documented in ./xref/*.html files.
 
 Big changes since 3.0 prior to 3.1:
     o  Ported to Linux.

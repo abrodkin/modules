@@ -30,7 +30,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdPath.c,v 1.6 2002/04/29 21:16:48 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdPath.c,v 1.6.2.1 2005/09/22 19:06:25 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -329,8 +329,6 @@ int	cmdSetPath(	ClientData	 client_data,
 
 	} /** if( marker) **/
 
-	null_free((void*) &markexpPtr);
-
     } /** if( strcmp) **/
 
     /**
@@ -480,7 +478,7 @@ unwind0:
  **   Description:	This function actually does the work of removing     **
  **			the item from the path.  It is done this way to      **
  **			support multiple items (often directories)	     **
- **			seperated by colons in the variable value.	     **
+ **			separated by colons in the variable value.	     **
  ** 									     **
  **   First Edition:	2001/08/08					     **
  ** 									     **
