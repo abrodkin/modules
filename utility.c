@@ -52,7 +52,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.10.2.2 2005/09/22 21:19:27 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.10.2.3 2005/09/25 20:16:03 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -740,7 +740,7 @@ int Output_Modulefile_Changes(	Tcl_Interp	*interp)
  **			the /tmp dotfile and then have the shell remove the  **
  **			/tmp dotfile.					     **
  ** 									     **
- **   First Edition:	91/10/23					     **
+ **   First Edition:	1991/10/23					     **
  ** 									     **
  **   Parameters:	Tcl_Interp	*interp		The attached Tcl in- **
  **							terpreter	     **
@@ -1128,7 +1128,7 @@ static	int	output_unset_variable( const char* var)
  **			this routine just output the alias information to be **
  **			eval'd by the shell.				     **
  ** 									     **
- **   First Edition:	91/10/23					     **
+ **   First Edition:	1991/10/23					     **
  ** 									     **
  **   Parameters:	const char	*var	Name of the alias to be set  **
  **			const char	*val	Value to be assigned	     **
@@ -1154,8 +1154,9 @@ static	void	output_function(	const char	*var,
 
     /**
      **  This opens a function ...
-     **/
     fprintf( aliasfile, "%s() {%c", var, alias_separator);
+     **/
+    fprintf( aliasfile, "%s() { ", var);
 
     /**
      **  ... now print the value. Print it as a single line and remove any
@@ -1180,7 +1181,7 @@ static	void	output_function(	const char	*var,
     /**
      **  Finally close the function
      **/
-    fprintf( aliasfile, ";%c}%c", alias_separator,alias_separator);
+    fprintf( aliasfile, "%c }%c", alias_separator,alias_separator);
 
 } /** End of 'output_function' **/
 
@@ -1192,14 +1193,14 @@ static	void	output_function(	const char	*var,
  **   Description:	Flush the commands required to set shell aliases de- **
  **			pending on the current invoking shell		     **
  ** 									     **
- **   First Edition:	91/10/23					     **
+ **   First Edition:	1991/10/23					     **
  ** 									     **
  **   Parameters:	const char	*alias		Name of the alias    **
  **			const char	*val		Value to be assigned **
  ** 									     **
  **   Result:		int	TCL_OK		Operation successfull	     **
  ** 									     **
- **   Attached Globals:	aliasfile, 	The alias command is writte out to   **
+ **   Attached Globals:	aliasfile, 	The alias command is written out to  **
  **			alias_separator Defined the command separator	     **
  **			shell_derelict	to determine the shell family	     **
  **			shell_name	to determine the real shell type     **
@@ -1210,7 +1211,7 @@ static	void	output_function(	const char	*var,
 static	int	output_set_alias(	const char	*alias,
                			  	const char	*val)
 {
-    int nobackslash = 1;		/** Controls wether backslashes are  **/
+    int nobackslash = 1;		/** Controls whether backslashes are **/
 					/** to be print			     **/
     const char *cptr = val;		/** Scan the value char by char	     **/
         
@@ -1219,7 +1220,7 @@ static	int	output_set_alias(	const char	*alias,
 #endif
 
     /**
-     **  Check fot the shell family
+     **  Check for the shell family
      **  CSHs need to switch $* to \!* and $n to \!\!:n unless the $ has a
      **  backslash before it
      **/
@@ -1265,8 +1266,8 @@ static	int	output_set_alias(	const char	*alias,
         } /** while **/
  
 	/**
-	 **  Now close up the command using the alias command terinator as
-	 **  defined in the according global variable
+	 **  Now close up the command using the alias command terminator as
+	 **  defined in the global variable
 	 **/
         fprintf( aliasfile, "'%c", alias_separator);
 
@@ -1306,10 +1307,10 @@ static	int	output_set_alias(	const char	*alias,
 			nobackslash = 0;
 		    }
 		} else {
-	    if( *cptr == '$') {
+	    	   if( *cptr == '$') {
 			if( nobackslash) {
-		output_function( alias, val);
-		return TCL_OK;
+				output_function( alias, val);
+				return TCL_OK;
 			}
 		    }
 		    nobackslash = 1;
@@ -1342,7 +1343,7 @@ static	int	output_set_alias(	const char	*alias,
 	    fprintf( aliasfile, "'%c", alias_separator);
 
         } /** if( bash, zsh, ksh) **/
-	/** ??? Unknwn derelict ??? **/
+	/** ??? Unknown derelict ??? **/
 
     } /** if( !csh ) **/
 

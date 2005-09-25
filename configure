@@ -856,7 +856,7 @@ Optional Features:
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
   --enable-shell-funcs    use sh functions [yes]
-  --enable-shell-eval     use shell alias eval [no]
+  --enable-shell-eval     use shell alias eval [yes]
   --enable-free           use free() calls [no]
   --enable-cache          use directory cache [no]
   --enable-version-magic  set .version magic requirement [yes]
@@ -6871,6 +6871,11 @@ if test "${enable_shell_eval+set}" = set; then
 _ACEOF
 
 	fi
+else
+  cat >>confdefs.h <<\_ACEOF
+#define EVAL_ALIAS 1
+_ACEOF
+
 fi;
 # Check whether --enable-free or --disable-free was given.
 if test "${enable_free+set}" = set; then

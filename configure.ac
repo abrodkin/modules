@@ -1,6 +1,6 @@
 dnl
 dnl File:        configure.in
-dnl Revision:    $Id: configure.ac,v 1.7.4.1 2005/09/22 21:19:27 rkowen Exp $
+dnl Revision:    $Id: configure.ac,v 1.7.4.2 2005/09/25 20:16:03 rkowen Exp $
 dnl Created:     1994/06/18
 dnl Author:      Leif Hedstrom<hedstrom@inf.ethz.ch>
 dnl		 Martin S. Utesch <wstd@hl.siemens.de>
@@ -17,7 +17,7 @@ AM_INIT_AUTOMAKE(foreign dejagnu no-installinfo)
 AC_CONFIG_SRCDIR([version.c])
 AM_CONFIG_HEADER(config.h)
 AC_PROG_MAKE_SET
-AC_PREREQ(2.52)
+AC_PREREQ(2.58)
 
 dnl ---------------------------------------------------------------------------
 dnl Autoheader "templates" (was acconfig.h)
@@ -329,10 +329,10 @@ to evaluate aliases via stdout like other environment changes instead
 of opening a file and then asking the shell to source the file and
 then remove it.])dnl
 AC_ARG_ENABLE(shell-eval,
-	AC_HELP_STRING([--enable-shell-eval],[use shell alias eval [[no]]]),
+	AC_HELP_STRING([--enable-shell-eval],[use shell alias eval [[yes]]]),
 	if test "$enableval" = "yes"; then
 	    AC_DEFINE(EVAL_ALIAS)
-	fi)dnl
+	fi, AC_DEFINE(EVAL_ALIAS))dnl
 dnl ---------------------------------------------------------------------------
 AH_TEMPLATE([USE_FREE],[
 USE_FREE:

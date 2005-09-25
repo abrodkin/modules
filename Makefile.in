@@ -1519,15 +1519,6 @@ uninstall-man: uninstall-man1 uninstall-man4
 	uninstall-man uninstall-man1 uninstall-man4
 
 
-#aclocal.m4 : acinclude.m4
-#	aclocal -I config
-
-#Makefile.in : Makefile.am aclocal.m4
-# 	automake --foreign --add-missing
-
-#config.h.in : acconfig.h
-#	autoheader
-
 test: check-local
 
 check-local:	modulecmd

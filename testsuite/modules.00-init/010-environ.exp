@@ -22,7 +22,7 @@
 ##############################################################################
 
 if { $verbose > 0 } {
-    send_user "\tInitializing the modulecmd environment ..."
+    send_user "\tInitializing the modulecmd environment ...\n"
 }
 
 catch {unset env(MODULEPATH)}

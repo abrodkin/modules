@@ -131,8 +131,10 @@ proc modulecmd_start {command} {
 #   (same as above but no verbose output)
 
 proc modulecmd__ {command} {
+	global shell
 	global no_verbose
 
+	set shell "sh"
 	set no_verbose 1
 	modulecmd_xxx_ "$command"
 	unset no_verbose
@@ -148,7 +150,7 @@ proc modulecmd_version {} {
     global comp_output
     global comp_error
 
-    default_shell 
+    set shell "sh"
     default_modulecmd
 
     modulecmd_start help

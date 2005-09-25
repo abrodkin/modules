@@ -45,7 +45,7 @@ proc version_test {which} {
 
     modulecmd__ "--version"
 
-    if { ![regexp ".*$which.*" $comp_output] } {
+    if { ![regexp ".*$which.*" $comp_error] } {
 	if { $verbose > 1 } {
 	    send_user "version_test: 0\n"
 	}
