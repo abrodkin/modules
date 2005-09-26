@@ -72,6 +72,10 @@
 #define FORCE_LD_LIBRARY_PATH_SACRED NULL
 
 
+/* HAS_BOURNE_ALIAS: This symbol, if defined, indicates that the Bourne shell
+   can define aliases (in other words not a "true" Bourne shell). */
+#undef HAS_BOURNE_ALIAS
+
 /* HAS_BOURNE_FUNCS: This symbol, if defined, indicates that the Bourne shell
    can define aliases as shell functions. */
 #undef HAS_BOURNE_FUNCS
@@ -257,8 +261,8 @@
 /* Define to 1 if your <sys/time.h> declares `struct tm'. */
 #undef TM_IN_SYS_TIME
 
-/* USE_FREE: By default, we will not call free() for any dynamic data. This
-   define enables these calls again. */
+/* USE_FREE: By default, Modules will not call free() for any dynamic data.
+   This define enables these calls again. */
 #undef USE_FREE
 
 /* Version number of package */

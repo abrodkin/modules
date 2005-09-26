@@ -855,7 +855,8 @@ Optional Features:
   --enable-use-default    use DEFAULTPATH in init scripts [yes]
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
-  --enable-shell-funcs    use sh functions [yes]
+  --enable-shell-funcs    use sh functions [test]
+  --enable-shell-alias    use sh functions [test]
   --enable-shell-eval     use shell alias eval [yes]
   --enable-free           use free() calls [no]
   --enable-cache          use directory cache [no]
@@ -6847,20 +6848,115 @@ fi
 fi;
 
 
+echo "$as_me:$LINENO: checking if /bin/sh supports functions" >&5
+echo $ECHO_N "checking if /bin/sh supports functions... $ECHO_C" >&6
+
+if test "$cross_compiling" = "yes"; then
+	em_bourne_funcs="cross"
+{ echo "$as_me:$LINENO: WARNING: You must specify --enable-shell-funcs or --enable-shell-funcs
+when cross compiling ... configure can not guess whether the target system
+Bourne shell can handle shell functions or not." >&5
+echo "$as_me: WARNING: You must specify --enable-shell-funcs or --enable-shell-funcs
+when cross compiling ... configure can not guess whether the target system
+Bourne shell can handle shell functions or not." >&2;}
+elif (
+	cat <<_EMEOF | /bin/sh 2> /dev/null
+if (xxx() { ls; }) > /dev/null 2>&1; then
+	(exit 0); exit 0
+else
+	(exit 42); exit 42
+fi
+_EMEOF
+
+	if test $? = 0 ; then
+		(exit 0); exit 0
+	else
+		(exit 42); exit 42
+	fi
+) ; then
+	em_bourne_funcs="yes"
+else
+	em_bourne_funcs="no"
+fi
+echo "$as_me:$LINENO: result: $em_bourne_funcs" >&5
+echo "${ECHO_T}$em_bourne_funcs" >&6
 # Check whether --enable-shell-funcs or --disable-shell-funcs was given.
 if test "${enable_shell_funcs+set}" = set; then
   enableval="$enable_shell_funcs"
-  if test "$enableval" = "yes"; then
+  if test "$enableval" = "yes" ; then
 	    cat >>confdefs.h <<\_ACEOF
 #define HAS_BOURNE_FUNCS 1
 _ACEOF
 
 	fi
 else
-  cat >>confdefs.h <<\_ACEOF
+  if test "$em_bourne_funcs" = "cross" ; then
+{ { echo "$as_me:$LINENO: error: You did not --enable-shell-funcs or --disable-shell-funcs
+when cross compiling ... aborting!" >&5
+echo "$as_me: error: You did not --enable-shell-funcs or --disable-shell-funcs
+when cross compiling ... aborting!" >&2;}
+   { (exit 1); exit 1; }; }
+	elif test "$em_bourne_funcs" = "yes" ; then
+	    cat >>confdefs.h <<\_ACEOF
 #define HAS_BOURNE_FUNCS 1
 _ACEOF
 
+	fi
+fi;
+echo "$as_me:$LINENO: checking if /bin/sh supports aliases" >&5
+echo $ECHO_N "checking if /bin/sh supports aliases... $ECHO_C" >&6
+
+if test "$cross_compiling" = "yes"; then
+	em_bourne_alias="cross"
+{ echo "$as_me:$LINENO: WARNING: You must specify --enable-shell-alias or --disable-shell-alias
+when cross compiling ... configure can not guess whether the target system
+Bourne shell can handle shell aliases or not." >&5
+echo "$as_me: WARNING: You must specify --enable-shell-alias or --disable-shell-alias
+when cross compiling ... configure can not guess whether the target system
+Bourne shell can handle shell aliases or not." >&2;}
+elif (
+	cat <<_EMEOF | /bin/sh 2> /dev/null
+if (xxx() { ls; }) > /dev/null 2>&1; then
+	(exit 0); exit 0
+else
+	(exit 42); exit 42
+fi
+_EMEOF
+
+	if test $? = 0 ; then
+		(exit 0); exit 0
+	else
+		(exit 42); exit 42
+	fi
+) ; then
+	em_bourne_alias="yes"
+else
+	em_bourne_alias="no"
+fi
+echo "$as_me:$LINENO: result: $em_bourne_alias" >&5
+echo "${ECHO_T}$em_bourne_alias" >&6
+# Check whether --enable-shell-alias or --disable-shell-alias was given.
+if test "${enable_shell_alias+set}" = set; then
+  enableval="$enable_shell_alias"
+  if test "$enableval" = "yes" ; then
+	    cat >>confdefs.h <<\_ACEOF
+#define HAS_BOURNE_ALIAS 1
+_ACEOF
+
+	fi
+else
+  if test "$em_bourne_alias" = "cross" ; then
+{ { echo "$as_me:$LINENO: error: You did not --enable-shell-alias or --enable-shell-alias
+when cross compiling ... aborting!" >&5
+echo "$as_me: error: You did not --enable-shell-alias or --enable-shell-alias
+when cross compiling ... aborting!" >&2;}
+   { (exit 1); exit 1; }; }
+	elif test "$em_bourne_alias" = "yes" ; then
+	    cat >>confdefs.h <<\_ACEOF
+#define HAS_BOURNE_ALIAS 1
+_ACEOF
+
+	fi
 fi;
 # Check whether --enable-shell-eval or --disable-shell-eval was given.
 if test "${enable_shell_eval+set}" = set; then

@@ -1,6 +1,6 @@
 dnl
 dnl File:        configure.in
-dnl Revision:    $Id: configure.ac,v 1.7.4.2 2005/09/25 20:16:03 rkowen Exp $
+dnl Revision:    $Id: configure.ac,v 1.7.4.3 2005/09/26 18:44:08 rkowen Exp $
 dnl Created:     1994/06/18
 dnl Author:      Leif Hedstrom<hedstrom@inf.ethz.ch>
 dnl		 Martin S. Utesch <wstd@hl.siemens.de>
@@ -316,11 +316,87 @@ AH_TEMPLATE([HAS_BOURNE_FUNCS],[
 HAS_BOURNE_FUNCS:
 This symbol, if defined, indicates that the Bourne shell can define aliases
 as shell functions.])dnl
+AC_MSG_CHECKING([if /bin/sh supports functions])
+
+if test "$cross_compiling" = "yes"; then
+	em_bourne_funcs="cross"
+AC_MSG_WARN([You must specify --enable-shell-funcs or --enable-shell-funcs
+when cross compiling ... configure can not guess whether the target system
+Bourne shell can handle shell functions or not.])
+elif (
+	cat <<_EMEOF | /bin/sh 2> /dev/null
+if (xxx() { ls; }) > /dev/null 2>&1; then
+	(exit 0); exit 0
+else
+	(exit 42); exit 42
+fi
+_EMEOF
+	 
+	if test $? = 0 ; then
+		(exit 0); exit 0
+	else
+		(exit 42); exit 42
+	fi
+) ; then
+	em_bourne_funcs="yes"
+else
+	em_bourne_funcs="no"
+fi
+AC_MSG_RESULT([$em_bourne_funcs])
 AC_ARG_ENABLE(shell-funcs,
-	AC_HELP_STRING([--enable-shell-funcs],[use sh functions [[yes]]]),
-	if test "$enableval" = "yes"; then
+	AC_HELP_STRING([--enable-shell-funcs],[use sh functions [[test]]]),
+	if test "$enableval" = "yes" ; then
 	    AC_DEFINE(HAS_BOURNE_FUNCS)
-	fi, AC_DEFINE(HAS_BOURNE_FUNCS))dnl
+	fi,
+	if test "$em_bourne_funcs" = "cross" ; then
+AC_MSG_ERROR([You did not --enable-shell-funcs or --disable-shell-funcs
+when cross compiling ... aborting!])
+	elif test "$em_bourne_funcs" = "yes" ; then
+	    AC_DEFINE(HAS_BOURNE_FUNCS)
+	fi)dnl
+dnl ---------------------------------------------------------------------------
+AH_TEMPLATE([HAS_BOURNE_ALIAS],[
+HAS_BOURNE_ALIAS:
+This symbol, if defined, indicates that the Bourne shell can define aliases
+(in other words not a "true" Bourne shell).])dnl
+AC_MSG_CHECKING([if /bin/sh supports aliases])
+
+if test "$cross_compiling" = "yes"; then
+	em_bourne_alias="cross"
+AC_MSG_WARN([You must specify --enable-shell-alias or --disable-shell-alias
+when cross compiling ... configure can not guess whether the target system
+Bourne shell can handle shell aliases or not.])
+elif (
+	cat <<_EMEOF | /bin/sh 2> /dev/null
+if (xxx() { ls; }) > /dev/null 2>&1; then
+	(exit 0); exit 0
+else
+	(exit 42); exit 42
+fi
+_EMEOF
+	 
+	if test $? = 0 ; then
+		(exit 0); exit 0
+	else
+		(exit 42); exit 42
+	fi
+) ; then
+	em_bourne_alias="yes"
+else
+	em_bourne_alias="no"
+fi
+AC_MSG_RESULT([$em_bourne_alias])
+AC_ARG_ENABLE(shell-alias,
+	AC_HELP_STRING([--enable-shell-alias],[use sh functions [[test]]]),
+	if test "$enableval" = "yes" ; then
+	    AC_DEFINE(HAS_BOURNE_ALIAS)
+	fi,
+	if test "$em_bourne_alias" = "cross" ; then
+AC_MSG_ERROR([You did not --enable-shell-alias or --enable-shell-alias
+when cross compiling ... aborting!])
+	elif test "$em_bourne_alias" = "yes" ; then
+	    AC_DEFINE(HAS_BOURNE_ALIAS)
+	fi)dnl
 dnl ---------------------------------------------------------------------------
 AH_TEMPLATE([EVAL_ALIAS],[
 EVAL_ALIAS:
@@ -336,7 +412,7 @@ AC_ARG_ENABLE(shell-eval,
 dnl ---------------------------------------------------------------------------
 AH_TEMPLATE([USE_FREE],[
 USE_FREE:
-By default, we will not call free() for any dynamic data. This
+By default, Modules will not call free() for any dynamic data. This
 define enables these calls again.])dnl
 AC_ARG_ENABLE(free,
 	AC_HELP_STRING([--enable-free],[use free() calls [[no]]]),
