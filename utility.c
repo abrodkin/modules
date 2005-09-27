@@ -52,7 +52,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.10.2.3 2005/09/25 20:16:03 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.10.2.4 2005/09/27 05:15:16 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -113,7 +113,29 @@ static	char	_proc_chop[] = "chop";
 #endif
 
 static	FILE *aliasfile;		/** Temporary file to write aliases  **/
+static	char *aliasfilename;		/** Temporary file name		     **/
 static	char  alias_separator = ';';	/** Alias command separator	     **/
+static	const int   eval_alias = 	/** EVAL_ALIAS macro		     **/
+#ifdef EVAL_ALIAS
+	1
+#else
+	0
+#endif
+;
+static	const int   bourne_funcs = 	/** HAS_BOURNE_FUNCS macro	     **/
+#ifdef HAS_BOURNE_FUNCS
+	1
+#else
+	0
+#endif
+;
+static	const int   bourne_alias = 	/** HAS_BOURNE_FUNCS macro	     **/
+#ifdef HAS_BOURNE_FUNCS
+	1
+#else
+	0
+#endif
+;
 
 /** ************************************************************************ **/
 /**				    PROTOTYPES				     **/
@@ -730,6 +752,47 @@ int Output_Modulefile_Changes(	Tcl_Interp	*interp)
 /*++++
  ** ** Function-Header ***************************************************** **
  ** 									     **
+ **   Function:		Open_Aliasfile					     **
+ ** 									     **
+ **   Description:	Creates/opens or closes temporary file for sourcing  **
+ **			or aliases.					     **
+ **			Passes back the filehandle and filename in global    **
+ ** 			variables.					     **
+ ** 									     **
+ **   First Edition:	2005/09/26	R.K.Owen <rk@owen.sj.ca.us>	     **
+ ** 									     **
+ **   Parameters:	int	action		if != 0 to open else close   **
+ ** 									     **
+ **   Result:		int	TCL_OK		Successful operation	     **
+ ** 									     **
+ **   Attached Globals: aliasfile					     **
+ **			aliasfilename					     **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
+
+static	int Open_Aliasfile(int action)
+{
+
+    if (action) {
+	/**
+	 **  Open the file ...
+	 **/
+	if( tmpfile_mod(&aliasfilename,&aliasfile))
+	    if(OK != ErrorLogger( ERR_OPEN, LOC, aliasfilename, "append", NULL))
+		return( TCL_ERROR);	/** -------- EXIT (FAILURE) -------> **/
+    } else {
+	if( EOF == fclose( aliasfile))
+	    if( OK != ErrorLogger( ERR_CLOSE, LOC, aliasfile, NULL))
+		return( TCL_ERROR);	/** -------- EXIT (FAILURE) -------> **/
+    }
+
+    return( TCL_OK);
+
+} /** End of 'Open_Aliasfile' **/
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
  **   Function:		Output_Modulefile_Aliases			     **
  ** 									     **
  **   Description:	Is used to flush out the changes to the aliases of   **
@@ -759,7 +822,8 @@ static	int Output_Modulefile_Aliases( Tcl_Interp *interp)
     Tcl_HashEntry	*hashEntry;	/** Result from Tcl hash search      **/
     char		*val = NULL,	/** Stored value (is a pointer!)     **/
 			*key;		/** Tcl hash key		     **/
-    int			 i;		/** Loop counter		     **/
+    int			 i,		/** Loop counter		     **/
+			 openfile = 0;	/** whether using a file or not	     **/
     char		*sourceCommand; /** Command used to source the alias **/
 
     /**
@@ -768,7 +832,8 @@ static	int Output_Modulefile_Aliases( Tcl_Interp *interp)
      **/
     Tcl_HashTable	*table[2];
 
-#ifndef EVAL_ALIAS
+    table[0] = aliasSetHashTable;
+    table[1] = aliasUnsetHashTable;
 
     /**
      **  If configured so, all changes to aliases are written into a temporary
@@ -778,24 +843,28 @@ static	int Output_Modulefile_Aliases( Tcl_Interp *interp)
      **  The default for aliasfile, if no shell sourcing is used, is stdout.
      **/
 
-    char* aliasfilename; /* this is malloc'ed by tmpfile_mod() below */
-
-#endif /* not EVAL_ALIAS */
-
-    table[0] = aliasSetHashTable;
-    table[1] = aliasUnsetHashTable;
-
 #if WITH_DEBUGGING_UTIL_2
     ErrorLogger( NO_ERR_START, LOC, _proc_Output_Modulefile_Aliases, NULL);
 #endif
 
-#ifndef EVAL_ALIAS
     /**
      **  We only need to output stuff into a temporary file if we're setting
      **  stuff.  We can unset variables and aliases by just using eval.
      **/
     if( hashEntry = Tcl_FirstHashEntry( aliasSetHashTable, &searchPtr)) {
 
+	/**
+	 **  We must use an aliasfile if EVAL_ALIAS is not defined
+	 **  or the sh shell does not do aliases (HAS_BOURNE_ALIAS)
+	 **  and that the sh shell does do functions (HAS_BOURNE_FUNCS)
+	 **/
+	if (!eval_alias
+	|| (!strcmp(shell_name,"sh") && !bourne_alias && bourne_funcs)) {
+	    if (OK != Open_Aliasfile(1))
+		if(OK != ErrorLogger(ERR_OPEN,LOC,aliasfilename,"append",NULL))
+		    return( TCL_ERROR);	/** -------- EXIT (FAILURE) -------> **/
+	    openfile = 1;
+	}
 	/**
 	 **  We only support sh and csh variants for aliases.  If not either
 	 **  sh or csh print warning message and return
@@ -808,16 +877,7 @@ static	int Output_Modulefile_Aliases( Tcl_Interp *interp)
 	    return( TCL_ERROR);	/** -------- EXIT (FAILURE) -------> **/
 	}
 
-	/**
-	 **  Open the file ...
-	 **/
-
-	if( tmpfile_mod(&aliasfilename,&aliasfile)) {
-	    if(OK != ErrorLogger( ERR_OPEN, LOC, aliasfilename, "append", NULL))
-		return( TCL_ERROR);	/** -------- EXIT (FAILURE) -------> **/
-
-	} else {
-
+	if (openfile) {
 	    /**
 	     **  Only the source command has to be flushed to stdout. After
 	     **  sourcing the alias definition (temporary) file, the source
@@ -828,13 +888,9 @@ static	int Output_Modulefile_Aliases( Tcl_Interp *interp)
 	    fprintf( stdout, sourceCommand, aliasfilename, shell_cmd_separator);
 	    fprintf( stdout, "/bin/rm -f %s%s",
 		aliasfilename, shell_cmd_separator);
-	} /** if( fopen) **/
+	} /** openfile **/
     } /** if( alias to set) **/
 
-    /* null_free((void *) &aliasfilename); *//* generally not malloc'd space */
-
-#endif /* EVAL_ALIAS */
-  
     /**
      **  Scan the hash tables involved in changing aliases
      **/
@@ -862,11 +918,14 @@ static	int Output_Modulefile_Aliases( Tcl_Interp *interp)
 	} /** if **/
     } /** for **/
 
-#ifndef EVAL_ALIAS
-    if( EOF == fclose( aliasfile))
-	if( OK != ErrorLogger( ERR_CLOSE, LOC, aliasfile, NULL))
-	    return( TCL_ERROR);		/** -------- EXIT (FAILURE) -------> **/
-#endif
+
+    if(openfile) {
+	if( OK == Open_Aliasfile(0))
+	    if( OK != ErrorLogger( ERR_CLOSE, LOC, aliasfile, NULL))
+		return( TCL_ERROR);	/** -------- EXIT (FAILURE) -------> **/
+
+	null_free((void *) &aliasfilename);
+    }
 
     return( TCL_OK);
 
@@ -1276,26 +1335,13 @@ static	int	output_set_alias(	const char	*alias,
      **  function using the function call 'output_function'
      **/
     } else if( !strcmp(shell_derelict, "sh")) {
-
-	/**
-	 **  The bourne shell itself
-         **  need to write a function unless this sh doesn't support
-	 **  functions
-	 **/
-        if( !strcmp( shell_name, "sh")) {
-#ifdef HAS_BOURNE_FUNCS
-            output_function(alias, val);
-#else
-	    /** ??? Print an error message ??? **/
-#endif
-
 	/**
 	 **  Shells supporting extended bourne shell syntax ....
 	 **/
-        } else if( !strcmp( shell_name, "bash") ||
-                   !strcmp( shell_name, "zsh" ) ||
-                   !strcmp( shell_name, "ksh")) {
-
+	if( (!strcmp( shell_name, "sh") && bourne_alias)
+		||  !strcmp( shell_name, "bash")
+                ||  !strcmp( shell_name, "zsh" )
+                ||  !strcmp( shell_name, "ksh")) {
 	    /**
 	     **  in this case we only have to write a function if the alias
 	     **  take arguments. This is the case if the value has somewhere
@@ -1342,10 +1388,18 @@ static	int	output_set_alias(	const char	*alias,
 
 	    fprintf( aliasfile, "'%c", alias_separator);
 
-        } /** if( bash, zsh, ksh) **/
+        } else if( !strcmp( shell_name, "sh")
+		&&   bourne_funcs) {
+	/**
+	 **  The bourne shell itself
+         **  need to write a function unless this sh doesn't support
+	 **  functions (then just punt)
+	 **/
+            output_function(alias, val);
+        }
 	/** ??? Unknown derelict ??? **/
 
-    } /** if( !csh ) **/
+    } /** if( sh ) **/
 
     return( TCL_OK);
 
@@ -1400,8 +1454,11 @@ static	int	output_unset_alias(	const char	*alias,
     } else if( !strcmp( shell_derelict, "sh")) {
 
         if( !strcmp( shell_name, "sh")) {
-            fprintf( aliasfile, "unset -f %s%c", alias, alias_separator);
-
+	    if (bourne_alias) {
+		fprintf(aliasfile, "unalias %s%c", alias, alias_separator);
+	    } else if (bourne_funcs) {
+        	fprintf(aliasfile,"unset -f %s%c", alias, alias_separator);
+	    } /* else do nothing */
 	/**
 	 **  BASH
 	 **/
