@@ -29,6 +29,11 @@ Modules 3.2.0
 	* Made the output deterministic (sorted) and reworked tests also
 	* Fixed the UserLevel check code (which failed when optimized)
 	* Fixed bug in "Switch" command when --enable-free was set
+	* Added or Fine-tuned the --enable-shell-funcs, --enable-shell-alias
+	  and --enable-shell-eval configure options.  The configure script
+	  will test for the existence of the first two properties in /bin/sh
+	  where the options can override the tested values.  Made the
+	  associated tests conditional on the existence of these properties.
 
 	Contributor:
 	 	Mark Lakata  		<lakata@mips.com>

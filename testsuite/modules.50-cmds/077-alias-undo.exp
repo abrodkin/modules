@@ -58,8 +58,13 @@ set lm_perl "delete \$ENV{'LOADEDMODULES'};"
 #
 #  The tests
 #
-
-test_cmd "sh" "unload $module" "$lm_sh$lmf_sh$ts_sh"
+if { [ version_test "HAS_BOURNE_ALIAS=1" ] } {
+	test_cmd "sh" "unload $module" "$lm_sh$lmf_sh$ts_alias"
+} elseif { [ version_test "HAS_BOURNE_FUNCS=1" ] } {
+	test_cmd "sh" "unload $module" "$lm_sh$lmf_sh$ts_sh"
+} else {
+	send_user "skipping sh unalias test\n";
+}
 test_cmd "ksh" "unload $module" "$lm_sh$lmf_sh$ts_alias$ts_sh"
 test_cmd "zsh" "unload $module" "$lm_sh$lmf_sh$ts_alias"
 test_cmd "csh" "unload $module" "$lm_csh$lmf_csh$ts_alias"

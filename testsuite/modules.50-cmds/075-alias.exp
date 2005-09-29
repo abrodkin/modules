@@ -36,7 +36,7 @@ set alias "ps -auxww | grep modulecmd"
 #
 
 set tfnam_pat "/\[a-zA-Z_0-9_/\\.\\-\]+modulesource_\[a-zA-Z_0-9\\.\\-\]+"
-set fil_cmd_sh "alias testsuite='$alias'"
+set fil_cmd_sh "testsuite() {\n$alias\n}"
 set fil_cmd_ksh "alias testsuite='$alias'"
 set fil_cmd_csh "alias testsuite '$alias'"
 
@@ -57,7 +57,11 @@ set ts_perl "$warn_msgs: Shell 'perl': cannot source alias tempfile - No aliases
 #
 
 if { [ version_test "HAS_BOURNE_ALIAS=1" ] } {
-	test_alias "sh" "load $module" "$lm_sh$lmf_sh$ts_sh" "$fil_cmd_sh"
+	test_alias "sh" "load $module" "$lm_sh$lmf_sh$ts_sh" "$fil_cmd_ksh"
+} elseif { [ version_test "HAS_BOURNE_FUNCS=1" ] } {
+	set shell "sh"
+	modulecmd_start "load $module"
+	_test_alias_fn "load $module" "$lm_sh$lmf_sh$ts_sh" "$fil_cmd_sh"
 } else {
 	send_user "skipping sh alias test\n"
 }

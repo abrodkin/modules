@@ -52,7 +52,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.10.2.4 2005/09/27 05:15:16 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.10.2.5 2005/09/29 20:12:12 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -130,7 +130,7 @@ static	const int   bourne_funcs = 	/** HAS_BOURNE_FUNCS macro	     **/
 #endif
 ;
 static	const int   bourne_alias = 	/** HAS_BOURNE_FUNCS macro	     **/
-#ifdef HAS_BOURNE_FUNCS
+#ifdef HAS_BOURNE_ALIAS
 	1
 #else
 	0
@@ -1213,9 +1213,8 @@ static	void	output_function(	const char	*var,
 
     /**
      **  This opens a function ...
-    fprintf( aliasfile, "%s() {%c", var, alias_separator);
      **/
-    fprintf( aliasfile, "%s() { ", var);
+    fprintf( aliasfile, "%s() {%c", var, alias_separator);
 
     /**
      **  ... now print the value. Print it as a single line and remove any
@@ -1240,7 +1239,7 @@ static	void	output_function(	const char	*var,
     /**
      **  Finally close the function
      **/
-    fprintf( aliasfile, "%c }%c", alias_separator,alias_separator);
+    fprintf( aliasfile, "%c}%c", alias_separator,alias_separator);
 
 } /** End of 'output_function' **/
 
