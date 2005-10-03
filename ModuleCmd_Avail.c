@@ -34,7 +34,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Avail.c,v 1.5.2.1 2005/10/03 23:14:56 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Avail.c,v 1.5.2.2 2005/10/03 23:19:58 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -848,6 +848,7 @@ fi_ent	*get_dir(	char	*dir,
 			/* does not have a .version file */
 			continue;
 		} else {
+			/* has a .version file ... assume to be module dir */
 			fclose(fi);
 		}
 	    }
