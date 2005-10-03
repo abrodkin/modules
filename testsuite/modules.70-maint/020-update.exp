@@ -4,7 +4,7 @@
 #
 #   File:		modules.70-maint/%M%
 #   Revision:		%I%
-#   First Edition:	95/12/06
+#   First Edition:	1995/12/06
 #   Last Mod.:		%U%, %G%
 #
 #   Authors:		Jens Hamisch, Jens.Hamisch@Strawberry.COM
@@ -28,19 +28,20 @@
 
 set module "setenv/1.0"
 set modulefile "$env(MODULEPATH)/$module"
-set err_update "$warn_msgs: Invalid update subcommand - no .modulesbeginenv"
+set err_update "$warn_msgs: Invalid update subcommand - .modulesbeginenv not supported"
+
 # this allows the test to pass, but don't know why update needs to
 # set the path again
-set setpath "setenv MODULEPATH $env(MODULEPATH) ;"
+set setpath "setenv MODULEPATH $env(MODULEPATH)"
 
 #
-#  Check this only fo the /bin/csh
+#  Check this only for /bin/csh
 #
 
-set ts_csh "setenv testsuite yes ;$setpath"
+set ts_csh "$setpath ;setenv testsuite yes ;"
 
 #
-#  Set up the environment pointing to the single module file being load
+#  Set up the environment pointing to the single module file being loaded
 #
 
 set env(_LMFILES_) $modulefile

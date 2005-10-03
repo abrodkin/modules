@@ -36,7 +36,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: init.c,v 1.6 2002/06/17 05:58:43 rkowen Exp $";
+static char Id[] = "@(#)$Id: init.c,v 1.6.2.1 2005/10/03 19:41:39 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -347,7 +347,7 @@ int Initialize_Tcl(	Tcl_Interp	**interp,
     Tcl_InitHashTable( markAliasHashTable, TCL_STRING_KEYS);
 
     /**
-     **  What I'm going to do here is check for the existance of the
+     **  What I'm going to do here is check for the existence of the
      **  environment variable "_MODULESBEGINENV_".  If it is set, then I will do
      **  nothing, otherwise, I will store every environment variable into
      **  ~/.modulesbeginenv.  This will be used to store the environment
