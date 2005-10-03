@@ -34,7 +34,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Avail.c,v 1.5 2002/06/17 05:58:43 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Avail.c,v 1.5.2.1 2005/10/03 23:14:56 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -676,6 +676,9 @@ static	int	check_cache( char *dir)
 #endif
 
 
+static int	test_version_dir(	struct dirent	*dp)
+{
+}
 /*++++
  ** ** Function-Header ***************************************************** **
  ** 									     **
@@ -683,8 +686,11 @@ static	int	check_cache( char *dir)
  ** 									     **
  **   Description:	Read in the passed directory and save every interes- **
  **			ting item in the directory list			     **
+ **			skipping known version control directories:	     **
+ **				CVS RCS .svn				     **
+ **			unless they contain .version files		     **
  ** 									     **
- **   First Edition:	91/10/23					     **
+ **   First Edition:	1991/10/23					     **
  ** 									     **
  **   Parameters:	char	*dir		Directory to be read	     **
  **			char	*prefix		Directory prefix (path)	     **
@@ -750,15 +756,15 @@ fi_ent	*get_dir(	char	*dir,
     dirlst_last = dirlst_head + DIREST;
   
     /**
-     **  Read in the  contents of the directory. Ignore dotfiles.
+     **  Read in the  contents of the directory. Ignore dotfiles
+     **		and version directories.
      **/
 
     for( count = 0,  dp = readdir( dirptr); dp != NULL; dp = readdir( dirptr)) {
-        if( *dp->d_name == '.')
-	    continue;
+        if( *dp->d_name == '.') continue;
 
 	/**
-	 **  Conditionally double up the space allocated foe reading the direc-
+	 **  Conditionally double up the space allocated for reading the direc-
 	 **  tory
 	 **/
 
@@ -827,10 +833,30 @@ fi_ent	*get_dir(	char	*dir,
 	    }
 
 	    /**
+	     **  What if it's a known version control directory
+	     **  check if it has a .version file
+	     **/
+	    if (!strcmp("CVS",dp->d_name)
+	    ||  !strcmp("RCS",dp->d_name)
+	    ||  !strcmp(".svn",dp->d_name)) {
+    		FILE	*fi;
+		if( (char *) NULL == stringer(namebuf, MOD_BUFSIZE,
+		    tmp, "/.version", NULL))
+		    if( OK != ErrorLogger( ERR_STRING, LOC, NULL))
+			goto unwind1;
+		if( NULL == (fi = fopen( namebuf, "r"))) {
+			/* does not have a .version file */
+			continue;
+		} else {
+			fclose(fi);
+		}
+	    }
+
+	    /**
 	     **  The recursion itself ...
 	     **/
 
-            dirlst_cur->fi_subdir = get_dir( ndir, np,&dirlst_cur->fi_listcount,
+            dirlst_cur->fi_subdir = get_dir( ndir,np,&dirlst_cur->fi_listcount,
 		&tmpcount);
 
             /**

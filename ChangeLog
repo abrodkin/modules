@@ -36,6 +36,9 @@ Modules 3.2.0
 	  associated tests conditional on the existence of these properties.
 	* Fixed the tests to work when --enable-beginenv ... also changed
 	  the error message when disabled.
+	* Have the caching skip version control directories (CVS, RCS, .svn)
+	  unless they have a .version file then assume the directory is
+	  a genuine modulefiles directory.
 
 	Contributor:
 	 	Mark Lakata  		<lakata@mips.com>
