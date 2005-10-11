@@ -203,6 +203,7 @@ typedef	enum	{
 	ERR_CACHE_INVAL,		/** Invalid cache version	     **/
 	ERR_CACHE_LOAD,			/** Cannot load cache properly	     **/
 	ERR_BEGINENV,			/** No update if no .modulesbeginenv **/
+	ERR_BEGINENVX,			/** No MODULESBEGINENV env.var.      **/
 	ERR_INIT_TCL,			/** Cannot initialize TCL	     **/
 	ERR_INIT_TCLX,			/** Cannot initialize extended TCL   **/
 	ERR_INIT_ALPATH,		/** Cannot set up autoload path      **/

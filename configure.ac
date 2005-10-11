@@ -1,6 +1,6 @@
 dnl
 dnl File:        configure.in
-dnl Revision:    $Id: configure.ac,v 1.7.4.3 2005/09/26 18:44:08 rkowen Exp $
+dnl Revision:    $Id: configure.ac,v 1.7.4.4 2005/10/11 22:57:38 rkowen Exp $
 dnl Created:     1994/06/18
 dnl Author:      Leif Hedstrom<hedstrom@inf.ethz.ch>
 dnl		 Martin S. Utesch <wstd@hl.siemens.de>
@@ -248,31 +248,34 @@ dnl
 dnl Here we define some --with & --enable things:
 dnl
 dnl --with-force-path=<path>	With force path=<path>
-dnl --without-force-path	Without  - " -		[DEF]
+dnl --without-force-path	Without  - " -			[DEF]
 dnl
 dnl --with-split-size[=<size>]	With split size=<size>
-dnl --without-split-size	Without  - " -		[DEF]
+dnl --without-split-size	Without  - " -			[DEF]
 dnl
-dnl --enable-cache		With directory cache	[DEF]
-dnl --disable-cache		Without  - " -
+dnl --enable-cache		With directory cache
+dnl --disable-cache		Without  - " -			[DEF]
 dnl
-dnl --enable-shell-funcs	With sh functions	[DEF]
+dnl --enable-shell-funcs	With sh functions		[TEST]
 dnl --disable-shell-funcs	Without  - " -
 dnl
+dnl --enable-shell-alias	With sh aliases			[TEST]
+dnl --disable-shell-alias	Without  - " -
+dnl
 dnl --enable-shell-eval		With shell alias eval
-dnl --disable-shell-eval	Without  - " -		[DEF]
+dnl --disable-shell-eval	Without  - " -			[DEF]
 dnl
 dnl --enable-free		With free() calls
-dnl --disable-free		Without  - " -		[DEF]
+dnl --disable-free		Without  - " -			[DEF]
 dnl
 dnl --with-debug[=<option>]	Set up debugging level
-dnl --without-debug		Without  - " -		[DEF]
+dnl --without-debug		Without  - " -			[DEF]
 dnl
-dnl --enable-version-magic      Set .version magic requirement [DEF]
+dnl --enable-version-magic      Set .version magic requirement	[DEF]
 dnl --disable-version-magic     .version need not have magic cookie
 dnl
 dnl --enable-beginenv		Use .modulesbeginenv for initial env.
-dnl --disable-beginenv		Do not use .modulesbeginenv [DEF]
+dnl --disable-beginenv		Do not use .modulesbeginenv	[DEF]
 dnl
 dnl ---------------------------------------------------------------------------
 AH_VERBATIM([FORCE_PATH],[
@@ -466,12 +469,17 @@ AH_TEMPLATE([BEGINENV],[
 BEGINENV:
 Modules can save the initial user environment in the .modulesbeginenv
 when the first module is loaded.  If enabled then the module update
-subcommand will work.])dnl
+subcommand will work.  If set to test, then this essentially enables
+this feature, but will only work if the MODULESBEGINENV env.var is
+set to a file name (e.g. '$HOME/.modulesbeginenv.$$'- modules will
+do one-level of variable expansion.)])dnl
 AC_ARG_ENABLE(beginenv,
-	AC_HELP_STRING([--enable-beginenv],[use .modulesbeginenv for initial env [[no]]]),
-	if test "$enableval" != "no"; then
+	AC_HELP_STRING([--enable-beginenv],[use .modulesbeginenv for initial env [[test]]]),
+	if test "$enableval" = "yes"; then
 		AC_DEFINE(BEGINENV,1)dnl
-	fi)dnl
+	elif test "$enableval" = "test"; then
+		AC_DEFINE(BEGINENV,99)dnl
+	fi, AC_DEFINE(BEGINENV,99))dnl
 dnl ---------------------------------------------------------------------------
 dnl  Logging
 dnl  The following option allow switching logging on and off

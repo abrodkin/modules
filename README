@@ -253,8 +253,8 @@ particular for setting paths.  The one of interest is @VERSION@ for
 using the current module version. e.g.  --prefix=/usr/local/Modules/@VERSION@
 
 ------------------------------------------------------------------------
-    --with-etc-path=<path>      use etc path=<path>           [/etc]
-    --with-skel-path=<path>     use skel path=<path>          [/etc/skel]
+    --with-etc-path=<path>      use etc path=<path>		[/etc]
+    --with-skel-path=<path>     use skel path=<path>		[/etc/skel]
 
   o Place to find the csh.modules * profile.modules files and where
     the new user dot files are (both are needed by add.modules script).
@@ -263,14 +263,14 @@ using the current module version. e.g.  --prefix=/usr/local/Modules/@VERSION@
 
 ------------------------------------------------------------------------
     --with-force-path=<path>	With force path=<path>
-    --without-force-path	Without  - " -		[DEF]
+    --without-force-path	Without  - " -			[DEF]
 
   o The force-path option allows you to specify a path that should be kept
       at the end of the PATH environment variable.
 
 ------------------------------------------------------------------------
     --with-split-size=<size>	With split size=<size>
-    --without-split-size	Without  - " -		[DEF]
+    --without-split-size	Without  - " -			[DEF]
 
   o Some C Shell implementations have a size requirement on the length of
       the line which can be evaluated.  If you run into very long
@@ -279,32 +279,36 @@ using the current module version. e.g.  --prefix=/usr/local/Modules/@VERSION@
       are around 1024.
 
 ------------------------------------------------------------------------
-    --enable-cache		With directory cache	[DEF]
-    --disable-cache		Without  - " -
-
-  o Modules will maintain a cache of the available modulefiles for each
-      directory in the modulefile search path.  The cache greatly
-      accelerates how long it takes to determine the list of available
-      modulefiles.
-
-------------------------------------------------------------------------
-    --enable-shell-funcs	With sh functions	[DEF]
+    --enable-shell-funcs	With sh functions		[TEST]
     --disable-shell-funcs	Without  - " -
 
   o Does your Bourne Shell support functions?  If so, then the modulefile
       set-alias will work properly.  If not, aliases will not be available
       when using the Bourne Shell.
+      The default is to test your /bin/sh when configuring build.
 
 ------------------------------------------------------------------------
-    --enable-shell-eval		With shell alias eval
-    --disable-shell-eval	Without  - " -		[DEF]
+    --enable-shell-alias	With sh functions		[TEST]
+    --disable-shell-alias	Without  - " -
 
-  o This specifies whether aliases will be evaulated by the C Shell or
-      sourced from a temporary file.  Some C Shells can't handle the
+  o Does your Bourne Shell support aliases?  A true Bourne Shell doesn't
+      but most are just a link to some other Bourne-like shell.  If so,
+      then modules will use the alias mechanism when using set-alias.
+      If not, aliases will not be available unless sh functions are
+      supported when using the Bourne Shell.
+      The default is to test your /bin/sh when configuring build.
+
+------------------------------------------------------------------------
+    --enable-shell-eval		With shell alias eval		[DEF]
+    --disable-shell-eval	Without  - " -
+
+  o This specifies whether aliases will be evaluated by the shell or
+      sourced from a temporary file.  Some shells can't handle the
       specification of aliases in the eval line very well.  To get around
       this problem, when aliases are set by a modulefile, a temporary file
-      is created and then sourced into the C Shell.  This guarentees the
-      aliases are evaluated correctly.
+      is created and then sourced into the shell.  This guarentees the
+      aliases are evaluated correctly, but may leave lots of cruft
+      in the /tmp directory, and is generally not a good idea.
  
 ------------------------------------------------------------------------
     --enable-free		With free() calls
@@ -314,6 +318,16 @@ using the current module version. e.g.  --prefix=/usr/local/Modules/@VERSION@
       some small performance enhancement since the memory usage is low and
       the program will exit rapidly.  If you want the calls to free() back
       in for some reason, set this option.
+
+------------------------------------------------------------------------
+    --enable-cache		With directory cache
+    --disable-cache		Without  - " -			[DEF]
+
+  o Modules will maintain a cache of the available modulefiles for each
+      directory in the modulefile search path.  The cache greatly
+      accelerates how long it takes to determine the list of available
+      modulefiles, but for automatic cache updates this requires a
+      world writeable file.
 
 ------------------------------------------------------------------------
     --with-cache-umask=<umask> With cache files umask=<umask>
@@ -328,7 +342,7 @@ using the current module version. e.g.  --prefix=/usr/local/Modules/@VERSION@
 
 ------------------------------------------------------------------------
      --with-static		Link static (don't use dynamic libraries)
-     --without-static		Use dynamic libraries	[DEF]
+     --without-static		Use dynamic libraries		[DEF]
 
   o A note.  I've found that at least the X11 libraries should be linked
       statically.  If you encounter problems, e.g. getting some warnings
@@ -341,7 +355,7 @@ using the current module version. e.g.  --prefix=/usr/local/Modules/@VERSION@
 
 ------------------------------------------------------------------------
      --with-tclx		With extended TCL (tclX) commands
-     --without-tclx		Without  - " -		[DEF]
+     --without-tclx		Without  - " -			[DEF]
 
   o Extended Tcl is a superset of standard Tcl and is built alongside
       the standard Tcl sources.  It adds many new commands to standard
@@ -478,7 +492,7 @@ NO LONGER AVAILABLE
 
 
 
-I have provided a number of example modulefile in the example-modulefiles
+A number of example modulefiles have been provided  in the example-modulefiles
 directory.  This should help provide you with some idea on how to write
 modulefiles.
 
@@ -498,16 +512,18 @@ Finally, type 'make install' and 'modulecmd' along with the initfiles will be
 installed.
 
 
-4. modules-interest@eng.auburn.edu
-__________________________________
+4. modules-interest@lists.sourceforge.net
+_________________________________________
 
 As of release 2.0, I have worked with Richard Elling to create a
 Modules interest alias for discussion about Modules and other
 Modules-related packages such as Richard's user-setup.
 
-If you would like to be added to the modules-interest alias, mail
-majordomo@eng.auburn.edu with "subscribe modules-interest address" in the
-body of the message where "address" is your Internet e-mail address.
+The email list was moved from eng.auburn.edu to SourceForge.net with
+version 3.0.  If you would like to be added to the modules-interest alias,
+email majordomo@lists.sourceforge.net with "subscribe modules-interest
+address" in the body of the message where "address" is your Internet
+e-mail address.
 
 
 5. Miscellaneous

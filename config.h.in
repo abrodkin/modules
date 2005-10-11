@@ -30,7 +30,10 @@
 
 /* BEGINENV: Modules can save the initial user environment in the
    .modulesbeginenv when the first module is loaded. If enabled then the
-   module update subcommand will work. */
+   module update subcommand will work. If set to test, then this essentially
+   enables this feature, but will only work if the MODULESBEGINENV env.var is
+   set to a file name (e.g. '$HOME/.modulesbeginenv.$$'- modules will do
+   one-level of variable expansion.) */
 #undef BEGINENV
 
 /* CACHE_AVAIL: This symbol, if defined, indicates that Modules should cache

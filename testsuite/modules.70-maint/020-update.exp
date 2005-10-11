@@ -46,14 +46,25 @@ set ts_csh "$setpath ;setenv testsuite yes ;"
 
 set env(_LMFILES_) $modulefile
 set env(LOADEDMODULES) $module
-set save_begenv $env(_MODULESBEGINENV_)
-set env(_MODULESBEGINENV_) "$env(TESTSUITEDIR)/.modulesbeginenv"
+if { [ version_test "BEGINENV=1" ] } {
+	set save_begenv $env(_MODULESBEGINENV_)
+} elseif { [ version_test "BEGINENV=99" ] } {
+	set save_begenv $env(_MODULESBEGINENV_)
+	set save_begenvx $env(MODULESBEGINENV)
+}
 
 #
 #  The tests
 #
 
 if { [ version_test "BEGINENV=1" ] } {
+	set env(_MODULESBEGINENV_) "$env(TESTSUITEDIR)/.modulesbeginenv"
+	test_cmd_re "csh" "update" "$ts_csh"
+} elseif { [ version_test "BEGINENV=99" ] } {
+	set env(_MODULESBEGINENV_) "$env(TESTSUITEDIR)/.modulesbeginenv.yyy"
+	testerr_cmd_re "csh" "update" ".*Cannot open file.*"
+	set env(MODULESBEGINENV) "$env(TESTSUITEDIR)/.modulesbeginenv.xxx"
+	set env(_MODULESBEGINENV_) "$env(TESTSUITEDIR)/.modulesbeginenv.xxx"
 	test_cmd_re "csh" "update" "$ts_csh"
 } else {
 	testerr_cmd_re "csh" "update" "$err_update"
@@ -65,7 +76,12 @@ if { [ version_test "BEGINENV=1" ] } {
 
 unset env(LOADEDMODULES)
 unset env(_LMFILES_)
-set env(_MODULESBEGINENV_) $save_begenv
+if { [ version_test "BEGINENV=1" ] } {
+	set env(_MODULESBEGINENV_) $save_begenv
+} elseif { [ version_test "BEGINENV=99" ] } {
+	set env(_MODULESBEGINENV_) $save_begenv
+	set env(MODULESBEGINENV) $save_begenvx
+}
 
 unset ts_csh
 

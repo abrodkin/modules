@@ -861,7 +861,7 @@ Optional Features:
   --enable-free           use free() calls [no]
   --enable-cache          use directory cache [no]
   --enable-version-magic  set .version magic requirement [yes]
-  --enable-beginenv       use .modulesbeginenv for initial env [no]
+  --enable-beginenv       use .modulesbeginenv for initial env [test]
   --enable-logging        turn logging on [no]
 
 Optional Packages:
@@ -7038,11 +7038,20 @@ fi;
 # Check whether --enable-beginenv or --disable-beginenv was given.
 if test "${enable_beginenv+set}" = set; then
   enableval="$enable_beginenv"
-  if test "$enableval" != "no"; then
+  if test "$enableval" = "yes"; then
 		cat >>confdefs.h <<\_ACEOF
 #define BEGINENV 1
 _ACEOF
+	elif test "$enableval" = "test"; then
+		cat >>confdefs.h <<\_ACEOF
+#define BEGINENV 99
+_ACEOF
 	fi
+else
+  cat >>confdefs.h <<\_ACEOF
+#define BEGINENV 99
+_ACEOF
+
 fi;
 
 

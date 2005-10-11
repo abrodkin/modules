@@ -36,6 +36,10 @@ Modules 3.2.0
 	  associated tests conditional on the existence of these properties.
 	* Fixed the tests to work when --enable-beginenv ... also changed
 	  the error message when disabled.
+	* Added and set the default for --enable-beginenv=test, which means
+	  that this feature is enabled by the user by setting the
+	  MODULESBEGINENV env.var. for a file name (allows one level
+	  of variable expansion).
 	* Have the caching skip version control directories (CVS, RCS, .svn)
 	  unless they have a .version file then assume the directory is
 	  a genuine modulefiles directory.

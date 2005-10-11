@@ -43,7 +43,6 @@ set ts_csh "unsetenv testsuite;"
 
 set env(_LMFILES_) $modulefile
 set env(LOADEDMODULES) $module
-set save_begenv $env(_MODULESBEGINENV_)
 
 #
 #  The tests

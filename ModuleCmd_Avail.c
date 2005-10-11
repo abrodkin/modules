@@ -4,7 +4,7 @@
  **   Modules Revision 3.0						     **
  **   Providing a flexible user environment				     **
  ** 									     **
- **   File:		ModuleCmd_Avail.c				     **
+ **   File:		Modulate_Avail.c				     **
  **   First Edition:	91/10/23					     **
  ** 									     **
  **   Authors:	John Furlan, jlf@behere.com				     **
@@ -34,7 +34,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Avail.c,v 1.5.2.2 2005/10/03 23:19:58 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Avail.c,v 1.5.2.3 2005/10/11 22:57:38 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -90,8 +90,9 @@ typedef struct _subdir_node {
 #ifdef CACHE_AVAIL
 static	char	*namebuf = NULL;
 #endif
+static	char	 buffer[MOD_BUFSIZE];
 static	char	 buf[ LINELENGTH];
-static	char	module_name[] = "ModuleCmd_Avail.c";	/** File name of this module **/
+static	char	 module_name[] = "ModuleCmd_Avail.c";	/** File name of this module **/
 
 #if WITH_DEBUGGING_MODULECMD
 static	char	_proc_ModuleCmd_Avail[] = "ModuleCmd_Avail";
@@ -840,11 +841,11 @@ fi_ent	*get_dir(	char	*dir,
 	    ||  !strcmp("RCS",dp->d_name)
 	    ||  !strcmp(".svn",dp->d_name)) {
     		FILE	*fi;
-		if( (char *) NULL == stringer(namebuf, MOD_BUFSIZE,
+		if( (char *) NULL == stringer(buffer, MOD_BUFSIZE,
 		    tmp, "/.version", NULL))
 		    if( OK != ErrorLogger( ERR_STRING, LOC, NULL))
 			goto unwind1;
-		if( NULL == (fi = fopen( namebuf, "r"))) {
+		if( NULL == (fi = fopen( buffer, "r"))) {
 			/* does not have a .version file */
 			continue;
 		} else {
