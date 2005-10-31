@@ -1,7 +1,7 @@
 ###########################################################################
 ##
 ## File:        ./Makefile.am
-## Versions:    $Id: Makefile.am,v 1.6.4.3 2005/09/22 21:19:27 rkowen Exp $
+## Versions:    $Id: Makefile.am,v 1.6.4.4 2005/10/31 22:38:58 rkowen Exp $
 ## Created:     2002/06/14
 ##
 ###########################################################################
@@ -15,7 +15,12 @@
 ACLOCAL_AMFLAGS= -I config
 
 man_MANS = doc/module.1 doc/modulefile.4
-SUBDIRS =. init modulefiles @EXTDIR@
+SUBDIRS = . init modulefiles @EXTDIR@
+DIST_SUBDIRS = . init modulefiles etc ext
+EXTRA_DIST = modules_def.h getopt.h testsuite				\
+	init/filter init/bash.in init/sh.in init/zsh.in			\
+	init/csh.in init/ksh.in init/perl.in init/python.in
+
 bin_PROGRAMS = modulecmd
 # bin_SCRIPTS = etc/mkroot etc/add.modules ext/add.ext
 modulecmd_CFLAGS=
@@ -41,39 +46,13 @@ check-local:	modulecmd
 
 ctags:	CTAGS
 CTAGS:	$(modulecmd_SOURCES)
-	ctags:	$(modulecmd_SOURCES)
+	ctags	$(modulecmd_SOURCES)
 
 cxref:
 	cxref $(SRCS)
 	@echo "==============================="
 	@echo "You may need to run this twice!"
 	@echo "==============================="
-
-xxx_dist: xxx_distgz xxx_distbz2
-
-xxx_distgz : ${DISTNAME}.tar.gz
-
-xxx_distbz2 : ${DISTNAME}.tar.bz2
-
-${DISTNAME}.tar.gz : $(srcdir)/configure 
-	@echo "checking out ${DISTNAME} into directory modules"
-	${CVS} -f checkout -r \
-	 `${SED} -n -e 's/^.*NEW TAG.*"\(.*\)".*$$/\1/p' ${srcdir}/version.c` \
-	 modules
-	@echo "renaming directory to ${DISTNAME}"
-	mv modules ${DISTNAME}
-	@echo "cleaning out unnecessary directories in ${DISTNAME}"
-	${FIND} ${DISTNAME} -type d -name CVS -print | ${XARGS} ${RM} -rf
-# need this CVS to pass testsuite for distribution build
-	mkdir ${DISTNAME}/testsuite/modulefiles/trace/CVS
-	@echo "Creating ${DISTNAME}.tar.gz"
-	${TAR} chf - ${DISTNAME} | ${GZIP} -c --best >${DISTNAME}.tar.gz
-	@echo "removing directory ${DISTNAME}"
-	${RM} -r ${DISTNAME}
-
-${DISTNAME}.tar.bz2 : ${DISTNAME}.tar.gz
-	@echo "Creating ${DISTNAME}.tar.bz2"
-	${GZIP} -d -c ${DISTNAME}.tar.gz | ${BZIP2} > ${DISTNAME}.tar.bz2
 
 patch: $(srcdir)/configure
 	@echo "Creating patch file -- do this after CVS tagging"

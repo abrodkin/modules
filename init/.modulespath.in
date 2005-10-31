@@ -13,6 +13,6 @@
 #     limited by the variable size of your shell.
 #
 @VERSIONING@@VERSIONPATH@				# location of version files
-@VERSIONING@@BASEPREFIX@/$MODULE_VERSION/modulefiles	# Module pkg modulefiles
+@VERSIONING@@BASEPREFIX@/Modules/$MODULE_VERSION/modulefiles	# Module pkg modulefiles
 @MODULEPATH@					# General module files
 # @prefix@/your_contribs			# Edit for your requirements

@@ -167,7 +167,6 @@ CTAGS = ctags
 DEJATOOL = $(PACKAGE)
 RUNTESTDEFAULTFLAGS = --tool $$tool --srcdir $$srcdir
 EXPECT = expect
-DIST_SUBDIRS = $(SUBDIRS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -296,6 +295,11 @@ target_alias = @target_alias@
 ACLOCAL_AMFLAGS = -I config
 man_MANS = doc/module.1 doc/modulefile.4
 SUBDIRS = . init modulefiles @EXTDIR@
+DIST_SUBDIRS = . init modulefiles etc ext
+EXTRA_DIST = modules_def.h getopt.h testsuite				\
+	init/filter init/bash.in init/sh.in init/zsh.in			\
+	init/csh.in init/ksh.in init/perl.in init/python.in
+
 # bin_SCRIPTS = etc/mkroot etc/add.modules ext/add.ext
 modulecmd_CFLAGS = 
 modulecmd_LDFLAGS = @TCL_LIB_SPEC@ @TCLX_LIB_SPEC@ @X_LIBS@ @X_EXTRA_LIBS@ @LIBS@
@@ -1301,7 +1305,7 @@ distdir: $(DISTFILES)
 	    || exit 1; \
 	  fi; \
 	done
-	list='$(SUBDIRS)'; for subdir in $$list; do \
+	list='$(DIST_SUBDIRS)'; for subdir in $$list; do \
 	  if test "$$subdir" = .; then :; else \
 	    test -d "$(distdir)/$$subdir" \
 	    || mkdir "$(distdir)/$$subdir" \
@@ -1529,7 +1533,7 @@ check-local:	modulecmd
 
 ctags:	CTAGS
 CTAGS:	$(modulecmd_SOURCES)
-	ctags:	$(modulecmd_SOURCES)
+	ctags	$(modulecmd_SOURCES)
 
 cxref:
 	cxref $(SRCS)

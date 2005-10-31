@@ -52,7 +52,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.10.2.5 2005/09/29 20:12:12 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.10.2.6 2005/10/31 22:38:58 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -2569,11 +2569,13 @@ char *xdup(char const *string) {
 	} else {
 	/** found something **/
 		char const *envvar;
-		char buffer[MOD_BUFSIZE];
-		char oldbuffer[MOD_BUFSIZE];
+		char  buffer[MOD_BUFSIZE];
+		char  oldbuffer[MOD_BUFSIZE];
 		size_t blen = 0;	/** running buffer length	**/
 		char *slashptr = result;/** where to continue parsing	**/
-		char  slashchr;		/** store slash char		**/ int brace;		/** flag if ${name}		**/
+		char  slashchr;		/** store slash char		**/
+		int   brace;		/** flag if ${name}		**/
+		pid_t pid;		/** the process id		**/
 
 		/** zero out buffers */
 		memset(   buffer, '\0', MOD_BUFSIZE);
@@ -2592,6 +2594,8 @@ char *xdup(char const *string) {
 			if (*(dollarptr + 1) == '{') {
 				brace = 1;
 				slashptr = strchr(dollarptr + 1, '}');
+			} else if (*(dollarptr + 1) == '$') {
+				slashptr = dollarptr + 2;
 			} else {
 				slashptr = dollarptr + 1
 					+ strcspn(dollarptr + 1,"/:$\\");
@@ -2611,13 +2615,18 @@ char *xdup(char const *string) {
 				if(brace)
 					strncat(buffer,"}",MOD_BUFSIZE-blen-1);
 			} else {
-				/** get env.var. value **/
-				envvar = getenv(dollarptr + 1 +brace);
+				if (! strcmp(dollarptr + 1 + brace, "$")) {
+					/** put in the process pid **/
+					pid = getpid();
+					sprintf(buffer + blen,"%ld",(long)pid);
+				} else {
+					/** get env.var. value **/
+					envvar = getenv(dollarptr + 1 + brace);
 
-				/** cat env.var. value to rest of string **/
-				if (envvar)
-					strncat(buffer,envvar,
-					MOD_BUFSIZE-blen-1);
+					/** cat value to rest of string **/
+					if (envvar) strncat(buffer,envvar,
+						MOD_BUFSIZE-blen-1);
+				}
 			}
 			blen = strlen(buffer);
 

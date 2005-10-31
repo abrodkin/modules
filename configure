@@ -930,7 +930,7 @@ Optional Packages:
   --with-tclx             directory containing tclx configuration (tclxConfig.sh)
   --with-module-path=<path>
                           use module path=<path>
-                          [EPREFIX/Modules/modulefiles]
+                          [PREFIX/Modules/modulefiles]
   --with-version-path=<path>
                           use version path=<path> [PREFIX/Modules/versions]
   --with-tmp-dir=<dir>    use <dir> as a temporary dir [/tmp]
@@ -1928,6 +1928,17 @@ DEFAULTPATH=default
 
 
 
+if test "$exec_prefix" != "NONE" ; then
+  EPREFIX=$exec_prefix
+# can not have versioning if specifying exec-prefix
+  if test "$WANTS_VERSIONING" -eq 1 ; then
+     { { echo "$as_me:$LINENO: error: You can not have versioning if --exec-prefix is specified
+must disable with --disable-versioning " >&5
+echo "$as_me: error: You can not have versioning if --exec-prefix is specified
+must disable with --disable-versioning " >&2;}
+   { (exit 1); exit 1; }; }
+  fi
+fi
 if test "$prefix" != "NONE" ; then
   if test "$WANTS_VERSIONING" -eq 1 ; then
     DEFAULTPATH=$prefix/Modules/default
@@ -1961,6 +1972,11 @@ else
   MODULES_INIT_DIR=$ac_default_prefix/init
   PREFIX=$ac_default_prefix
 fi
+if test "$exec_prefix" != "NONE" ; then
+  EPREFIX=$exec_prefix
+else
+  EPREFIX=$PREFIX
+fi
 cat >>confdefs.h <<_ACEOF
 #define MODULES_INIT_DIR "$MODULES_INIT_DIR"
 _ACEOF
@@ -1978,6 +1994,8 @@ echo "$as_me:$LINENO: result: BASEPREFIX = $BASEPREFIX" >&5
 echo "${ECHO_T}BASEPREFIX = $BASEPREFIX" >&6
 echo "$as_me:$LINENO: result: PREFIX = $PREFIX" >&5
 echo "${ECHO_T}PREFIX = $PREFIX" >&6
+echo "$as_me:$LINENO: result: EPREFIX = $EPREFIX" >&5
+echo "${ECHO_T}EPREFIX = $EPREFIX" >&6
 cat >>confdefs.h <<_ACEOF
 #define BASEPREFIX "$BASEPREFIX"
 _ACEOF
@@ -6853,10 +6871,10 @@ echo $ECHO_N "checking if /bin/sh supports functions... $ECHO_C" >&6
 
 if test "$cross_compiling" = "yes"; then
 	em_bourne_funcs="cross"
-{ echo "$as_me:$LINENO: WARNING: You must specify --enable-shell-funcs or --enable-shell-funcs
+{ echo "$as_me:$LINENO: WARNING: You must specify --enable-shell-funcs or --disable-shell-funcs
 when cross compiling ... configure can not guess whether the target system
 Bourne shell can handle shell functions or not." >&5
-echo "$as_me: WARNING: You must specify --enable-shell-funcs or --enable-shell-funcs
+echo "$as_me: WARNING: You must specify --enable-shell-funcs or --disable-shell-funcs
 when cross compiling ... configure can not guess whether the target system
 Bourne shell can handle shell functions or not." >&2;}
 elif (
@@ -6946,9 +6964,9 @@ _ACEOF
 	fi
 else
   if test "$em_bourne_alias" = "cross" ; then
-{ { echo "$as_me:$LINENO: error: You did not --enable-shell-alias or --enable-shell-alias
+{ { echo "$as_me:$LINENO: error: You did not --enable-shell-alias or --disable-shell-alias
 when cross compiling ... aborting!" >&5
-echo "$as_me: error: You did not --enable-shell-alias or --enable-shell-alias
+echo "$as_me: error: You did not --enable-shell-alias or --disable-shell-alias
 when cross compiling ... aborting!" >&2;}
    { (exit 1); exit 1; }; }
 	elif test "$em_bourne_alias" = "yes" ; then
@@ -7987,7 +8005,8 @@ _ACEOF
 
 
 else
-  	withval="$BASEPREFIX/Modules/versions"
+  if test "$WANTS_VERSIONING" -eq 1 ; then
+	withval="$BASEPREFIX/Modules/versions"
 	{ echo "$as_me:$LINENO: WARNING: will use VERSIONPATH=$withval : rerun configure using --with-version-path to override default" >&5
 echo "$as_me: WARNING: will use VERSIONPATH=$withval : rerun configure using --with-version-path to override default" >&2;}
 	VERSIONPATH="$withval"
@@ -7995,6 +8014,7 @@ echo "$as_me: WARNING: will use VERSIONPATH=$withval : rerun configure using --w
 #define VERSIONPATH "$withval"
 _ACEOF
 
+fi
 fi;
 
 # Check whether --with-tmp-dir or --without-tmp-dir was given.

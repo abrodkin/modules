@@ -43,6 +43,11 @@ Modules 3.2.0
 	* Have the caching skip version control directories (CVS, RCS, .svn)
 	  unless they have a .version file then assume the directory is
 	  a genuine modulefiles directory.
+	* Expand '$$' to the current process id when performing one
+	  level of variable expansion for the MODULESBEGINENV env.var
+	* Fixed up the automake/autoconf scripts to create a workable
+	  distribution tarball
+	* Fixed the configuration behavior if --exec-prefix is given
 
 	Contributor:
 	 	Mark Lakata  		<lakata@mips.com>

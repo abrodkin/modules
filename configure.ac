@@ -1,6 +1,6 @@
 dnl
 dnl File:        configure.in
-dnl Revision:    $Id: configure.ac,v 1.7.4.4 2005/10/11 22:57:38 rkowen Exp $
+dnl Revision:    $Id: configure.ac,v 1.7.4.5 2005/10/31 22:38:58 rkowen Exp $
 dnl Created:     1994/06/18
 dnl Author:      Leif Hedstrom<hedstrom@inf.ethz.ch>
 dnl		 Martin S. Utesch <wstd@hl.siemens.de>
@@ -106,6 +106,14 @@ PREFIX: Usually equivalent to /usr/local/Modules[/version_number]])dnl
 AH_TEMPLATE([MODULES_INIT_DIR],[
 MODULES_INIT_DIR: Directory that contains the modules init files.])dnl
 
+if test "$exec_prefix" != "NONE" ; then
+  EPREFIX=$exec_prefix
+# can not have versioning if specifying exec-prefix
+  if test "$WANTS_VERSIONING" -eq 1 ; then
+     AC_MSG_ERROR([You can not have versioning if --exec-prefix is specified
+must disable with --disable-versioning ])
+  fi
+fi
 if test "$prefix" != "NONE" ; then
   if test "$WANTS_VERSIONING" -eq 1 ; then
     DEFAULTPATH=$prefix/Modules/default
@@ -139,6 +147,11 @@ else
   MODULES_INIT_DIR=$ac_default_prefix/init
   PREFIX=$ac_default_prefix
 fi
+if test "$exec_prefix" != "NONE" ; then
+  EPREFIX=$exec_prefix
+else
+  EPREFIX=$PREFIX
+fi
 dnl ---------------------------------------------------------------------------
 dnl --enable-use-default        Use PREFIX/default/ in init scripts [DEF]
 dnl --disable-use-default       Use PREFIX/VERSION/ in init scripts
@@ -152,6 +165,7 @@ AC_ARG_ENABLE(use-default,
 AC_MSG_RESULT([DEFAULTPATH = $DEFAULTPATH])
 AC_MSG_RESULT([BASEPREFIX = $BASEPREFIX])
 AC_MSG_RESULT([PREFIX = $PREFIX])
+AC_MSG_RESULT([EPREFIX = $EPREFIX])
 AC_DEFINE_UNQUOTED(BASEPREFIX, "$BASEPREFIX")
 AC_DEFINE_UNQUOTED(PREFIX, "$PREFIX")
 export DEFAULTPATH
@@ -274,8 +288,8 @@ dnl
 dnl --enable-version-magic      Set .version magic requirement	[DEF]
 dnl --disable-version-magic     .version need not have magic cookie
 dnl
-dnl --enable-beginenv		Use .modulesbeginenv for initial env.
-dnl --disable-beginenv		Do not use .modulesbeginenv	[DEF]
+dnl --enable-beginenv		Use .modulesbeginenv for initial env.	[TEST]
+dnl --disable-beginenv		Do not use .modulesbeginenv
 dnl
 dnl ---------------------------------------------------------------------------
 AH_VERBATIM([FORCE_PATH],[
@@ -323,7 +337,7 @@ AC_MSG_CHECKING([if /bin/sh supports functions])
 
 if test "$cross_compiling" = "yes"; then
 	em_bourne_funcs="cross"
-AC_MSG_WARN([You must specify --enable-shell-funcs or --enable-shell-funcs
+AC_MSG_WARN([You must specify --enable-shell-funcs or --disable-shell-funcs
 when cross compiling ... configure can not guess whether the target system
 Bourne shell can handle shell functions or not.])
 elif (
@@ -395,7 +409,7 @@ AC_ARG_ENABLE(shell-alias,
 	    AC_DEFINE(HAS_BOURNE_ALIAS)
 	fi,
 	if test "$em_bourne_alias" = "cross" ; then
-AC_MSG_ERROR([You did not --enable-shell-alias or --enable-shell-alias
+AC_MSG_ERROR([You did not --enable-shell-alias or --disable-shell-alias
 when cross compiling ... aborting!])
 	elif test "$em_bourne_alias" = "yes" ; then
 	    AC_DEFINE(HAS_BOURNE_ALIAS)
@@ -770,7 +784,7 @@ AC_SUBST(MODULEPATH)dnl
 AH_TEMPLATE([MODULEPATH],[
 MODULEPATH: Directory that contains all the module files])dnl
 AC_ARG_WITH(module-path,
-	AC_HELP_STRING([--with-module-path=<path>],[use module path=<path> [[EPREFIX/Modules/modulefiles]]]),
+	AC_HELP_STRING([--with-module-path=<path>],[use module path=<path> [[PREFIX/Modules/modulefiles]]]),
 	MODULEPATH="$withval"
 	AC_MSG_RESULT([MODULEPATH = $with_module_path])
 	AC_DEFINE_UNQUOTED(MODULEPATH, "$withval")dnl
@@ -792,11 +806,13 @@ AC_ARG_WITH(version-path,
 	AC_MSG_RESULT([VERSIONPATH = $with_version_path])
 	AC_DEFINE_UNQUOTED(VERSIONPATH, "$withval")
 	,
+if test "$WANTS_VERSIONING" -eq 1 ; then
 dnl AC_MSG_WARN([if using '--with-version-path': need to specify a path!])
 	withval="$BASEPREFIX/Modules/versions"
 	AC_MSG_WARN([will use VERSIONPATH=$withval : rerun configure using --with-version-path to override default])
 	VERSIONPATH="$withval"
-	AC_DEFINE_UNQUOTED(VERSIONPATH, "$withval"))dnl
+	AC_DEFINE_UNQUOTED(VERSIONPATH, "$withval")
+fi)dnl
 dnl ---------------------------------------------------------------------------
 AH_TEMPLATE([TMP_DIR],[TMP_DIR: tmp directory name])dnl
 AC_ARG_WITH(tmp-dir,
@@ -928,6 +944,7 @@ AC_CONFIG_FILES([Makefile modules.lsm .spec doc/Makefile
 	modulefiles/module-cvs modulefiles/module-info modulefiles/null
 	modulefiles/use.own modulefiles/dot modulefiles/version
 	])
+dnl We want these to be recreated for each install
 dnl	init/bash init/csh init/ksh init/perl init/python init/sh init/zsh
 AC_CONFIG_COMMANDS([default],[[date > stamp-h]],[[]])
 AC_OUTPUT
