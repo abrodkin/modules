@@ -253,7 +253,7 @@ exec 6>&1
 #
 ac_default_prefix=/usr/local
 ac_config_libobj_dir=.
-cross_compiling=no
+cross_compiling=yes
 subdirs=
 MFLAGS=
 MAKEFLAGS=
@@ -870,8 +870,8 @@ Optional Packages:
   --with-x                use the X Window System
   --with-force-path=<path>
                           use force path=<path> [no]
-  --without-split-size=<size>
-                          use split size=<size> [no]
+  --with-split-size=<size>
+                          use split size=<size> [test]
   --with-static=<option> use static linking [no]
   --with-cache-umask=<umask>
                           use cache files umask=<umask> [000]
@@ -6815,16 +6815,75 @@ _ACEOF
 
 	fi
 fi;
+echo "$as_me:$LINENO: checking if /bin/csh supports large environment variables" >&5
+echo $ECHO_N "checking if /bin/csh supports large environment variables... $ECHO_C" >&6
+#
+# test to see how many chars can be set in the C-shell env.var.
+#
+em_split_size_total=0
+if test -x /bin/csh ; then
+cat  >_EMEOF.$$ <<'_EMEOF'
+cat <<'!' | /bin/csh 2> /dev/null | tail -1
+setenv X	""
+setenv ZZZ	"0"
+@ num=2
+while ( $num < 10000 )
+	setenv X	$X$ZZZ
+	echo $num
+	@ num++
+end
+'!'
+_EMEOF
+em_split_size_total=`/bin/sh _EMEOF.$$`
+rm _EMEOF.$$
+fi
+if test "$cross_compiling" = "yes"; then
+	em_split_size="cross"
+{ echo "$as_me:$LINENO: WARNING: You must specify --with-split-size=<size>
+when cross compiling ... configure can not guess whether the target system
+C-shell can handle large environment variables or not." >&5
+echo "$as_me: WARNING: You must specify --with-split-size=<size>
+when cross compiling ... configure can not guess whether the target system
+C-shell can handle large environment variables or not." >&2;}
+elif test $em_split_size_total -gt 8000 ; then
+	em_split_size="no"
+	echo "$as_me:$LINENO: result: yes - $em_split_size_total > 4000" >&5
+echo "${ECHO_T}yes - $em_split_size_total > 4000" >&6
+else
+	# set split-size a little less
+	em_split_size=`expr $em_split_size_total - 20`
+	echo "$as_me:$LINENO: result: no - $em_split_size_total < 4000 - splitting at $em_split_size" >&5
+echo "${ECHO_T}no - $em_split_size_total < 4000 - splitting at $em_split_size" >&6
+fi
 
 # Check whether --with-split-size or --without-split-size was given.
 if test "${with_split_size+set}" = set; then
   withval="$with_split_size"
-  if test "$withval" != "no"; then
-		test "$withval" = "yes" && withval=900
+  if test "${withval+set}" = "set" -a "$withval" != "no"; then
+		if test "$withval" = "yes"; then
+			withval=1000
+		fi
+		{ echo "$as_me:$LINENO: csh split-size set to $withval" >&5
+echo "$as_me: csh split-size set to $withval" >&6;}
 		cat >>confdefs.h <<_ACEOF
 #define LMSPLIT_SIZE ${withval}
 _ACEOF
 
+	else
+		{ echo "$as_me:$LINENO: csh split-size not set" >&5
+echo "$as_me: csh split-size not set" >&6;}
+	fi
+else
+  if test "$em_split_size" != "no" -a "$em_split_size" != "cross" ; then
+		{ echo "$as_me:$LINENO: csh split-size set to $em_split_size" >&5
+echo "$as_me: csh split-size set to $em_split_size" >&6;}
+		cat >>confdefs.h <<_ACEOF
+#define LMSPLIT_SIZE ${em_split_size}
+_ACEOF
+
+	else
+		{ echo "$as_me:$LINENO: csh split-size not set" >&5
+echo "$as_me: csh split-size not set" >&6;}
 	fi
 fi;
 # Check whether --with-static or --without-static was given.

@@ -215,7 +215,7 @@
 #undef HAVE_VARARGS_H
 
 /* LMSPLIT_SIZE: This symbol, if defined, will force the environment variable
-   _LM_FILES to be split into smaller "chunks". */
+   _LM_FILES_ to be split into smaller "chunks". */
 #undef LMSPLIT_SIZE
 
 /* MODULEPATH: Directory that contains all the module files */

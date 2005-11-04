@@ -1,6 +1,6 @@
 dnl
 dnl File:        configure.in
-dnl Revision:    $Id: configure.ac,v 1.7.4.5 2005/10/31 22:38:58 rkowen Exp $
+dnl Revision:    $Id: configure.ac,v 1.7.4.6 2005/11/04 16:43:48 rkowen Exp $
 dnl Created:     1994/06/18
 dnl Author:      Leif Hedstrom<hedstrom@inf.ethz.ch>
 dnl		 Martin S. Utesch <wstd@hl.siemens.de>
@@ -264,8 +264,8 @@ dnl
 dnl --with-force-path=<path>	With force path=<path>
 dnl --without-force-path	Without  - " -			[DEF]
 dnl
-dnl --with-split-size[=<size>]	With split size=<size>
-dnl --without-split-size	Without  - " -			[DEF]
+dnl --with-split-size[=<size>]	With split size=<size>		[TEST]
+dnl --without-split-size	Without  - " -
 dnl
 dnl --enable-cache		With directory cache
 dnl --disable-cache		Without  - " -			[DEF]
@@ -310,12 +310,57 @@ dnl ---------------------------------------------------------------------------
 AH_TEMPLATE([LMSPLIT_SIZE],[
 LMSPLIT_SIZE:
 This symbol, if defined, will force the environment variable
-_LM_FILES to be split into smaller "chunks".])dnl
+_LM_FILES_ to be split into smaller "chunks".])dnl
+AC_MSG_CHECKING([if /bin/csh supports large environment variables])
+#
+# test to see how many chars can be set in the C-shell env.var.
+#
+em_split_size_total=0
+if test -x /bin/csh ; then
+cat  >_EMEOF.$$ <<'_EMEOF'
+cat <<'!' | /bin/csh 2> /dev/null | tail -1
+setenv X	""
+setenv ZZZ	"0"
+@ num=2
+while ( $num < 10000 )
+	setenv X	$X$ZZZ
+	echo $num
+	@ num++
+end
+'!'
+_EMEOF
+em_split_size_total=`/bin/sh _EMEOF.$$`
+rm _EMEOF.$$
+fi
+if test "$cross_compiling" = "yes"; then
+	em_split_size="cross"
+AC_MSG_WARN([You must specify --with-split-size[=<size>]
+when cross compiling ... configure can not guess whether the target system
+C-shell can handle large environment variables or not.])
+elif test $em_split_size_total -gt 4000 ; then
+	em_split_size="no"
+	AC_MSG_RESULT([yes - $em_split_size_total > 4000])
+else
+	# set split-size a little less
+	em_split_size=`expr $em_split_size_total - 20`
+	AC_MSG_RESULT([no - $em_split_size_total < 4000 - splitting at $em_split_size])
+fi
 AC_ARG_WITH(split-size,
-	AC_HELP_STRING([--without-split-size[=<size>]],[use split size=<size> [[no]]]),
-	if test "$withval" != "no"; then
-		test "$withval" = "yes" && withval=900
+	AC_HELP_STRING([--with-split-size[=<size>]],[use split size=<size> [[test]]]),
+	if test "${withval+set}" = "set" -a "$withval" != "no"; then
+		if test "$withval" = "yes"; then
+			withval=1000
+		fi
+		AC_MSG_NOTICE([csh split-size set to $withval])
 		AC_DEFINE_UNQUOTED(LMSPLIT_SIZE, ${withval})
+	else
+		AC_MSG_NOTICE([csh split-size not set])
+	fi,
+	if test "$em_split_size" != "no" -a "$em_split_size" != "cross" ; then
+		AC_MSG_NOTICE([csh split-size set to $em_split_size])
+		AC_DEFINE_UNQUOTED(LMSPLIT_SIZE, ${em_split_size})
+	else
+		AC_MSG_NOTICE([csh split-size not set])
 	fi)dnl
 dnl ---------------------------------------------------------------------------
 dnl --with-static[=<option>]	With static linking
