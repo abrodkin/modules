@@ -1,6 +1,6 @@
 dnl
 dnl File:        configure.in
-dnl Revision:    $Id: configure.ac,v 1.7.4.6 2005/11/04 16:43:48 rkowen Exp $
+dnl Revision:    $Id: configure.ac,v 1.7.4.7 2005/11/11 22:51:08 rkowen Exp $
 dnl Created:     1994/06/18
 dnl Author:      Leif Hedstrom<hedstrom@inf.ethz.ch>
 dnl		 Martin S. Utesch <wstd@hl.siemens.de>
@@ -798,11 +798,10 @@ dnl--------------------------------------------------------------------
 
 SC_PATH_TCLCONFIG
 SC_LOAD_TCLCONFIG
-SC_PUBLIC_TCL_HEADERS
 
 dnl--------------------------------------------------------------------
 dnl Load the tclxConfig.sh file
-dnl search for tclx after tcl, not before to benefit from tcl_includes and
+dnl search for tclx after tcl, not before, to benefit from tcl_includes
 dnl--------------------------------------------------------------------
 
 EM_PATH_TCLXCONFIG

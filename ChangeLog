@@ -51,6 +51,7 @@ Modules 3.2.0
 	* Fixed up the automake/autoconf scripts to create a workable
 	  distribution tarball
 	* Fixed the configuration behavior if --exec-prefix is given
+	* Updated the config/tcl.m4 (used by configure)
 
 	Contributor:
 	 	Mark Lakata  		<lakata@mips.com>
