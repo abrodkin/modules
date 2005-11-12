@@ -1,15 +1,15 @@
 /*****
  ** ** Module Header ******************************************************* **
  ** 									     **
- **   Modules Revision 3.0						     **
+ **   Modules Revision 3.2						     **
  **   Providing a flexible user environment				     **
  ** 									     **
  **   File:		modules_def.h					     **
- **   Revision:		1.21						     **
- **   First Edition:	91/10/23					     **
+ **   First Edition:	1991/10/23					     **
  ** 									     **
  **   Authors:	John Furlan, jlf@behere.com				     **
  **		Jens Hamisch, jens@Strawberry.COM			     **
+ **		R.K. Owen, rk@owen.sj.ca.us				     **
  ** 									     **
  **   Description:							     **
  ** 									     **
@@ -701,13 +701,14 @@ extern	char	 *xgetenv(char const *);
 extern  int       tmpfile_mod(char** filename, FILE** file);
 extern	char	 *stringer(char *, int, ...);
 extern	void	  null_free(void **);
+extern	size_t	  countTclHash(Tcl_HashTable *table);
 
 #ifndef HAVE_STRDUP
 extern	char	 * strdup( char*);
 #endif
 
 #ifndef HAVE_STRTOK
-extern	char *strtok( char *, const char *);
+extern	char	 *strtok( char *, const char *);
 #endif
 
 /** error.c **/
