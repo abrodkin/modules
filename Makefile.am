@@ -1,7 +1,7 @@
 ###########################################################################
 ##
 ## File:        ./Makefile.am
-## Versions:    $Id: Makefile.am,v 1.6.4.5 2005/11/11 22:51:08 rkowen Exp $
+## Versions:    $Id: Makefile.am,v 1.6.4.6 2005/11/12 01:33:54 rkowen Exp $
 ## Created:     2002/06/14
 ##
 ###########################################################################
@@ -138,7 +138,7 @@ disthelp:
 	@echo "make cxref     - makes the xref HTML files - needs cxref"
 	@echo "================ requires CVS access ======================="
 	@echo "make tag       - does a CVS rtag"
-	@echo "make dist      - creates a distribution tarball after tagging"
+	@echo "make dist      - creates a distribution tarball"
 	@echo "make patch     - creates a patch file after tagging"
 	@echo "================ maintainers only =========================="
 	@echo "make lsm       - send off to the Linux Software Map"
