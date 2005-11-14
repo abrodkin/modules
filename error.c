@@ -30,7 +30,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: error.c,v 1.5.2.2 2005/10/11 22:57:38 rkowen Exp $";
+static char Id[] = "@(#)$Id: error.c,v 1.5.2.3 2005/11/14 19:07:56 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -1187,7 +1187,7 @@ unwind0:
  **   Description:	Scan the passed facility names table for the given   **
  **			string and pass back the assigned token		     **
  ** 									     **
- **   First Edition:	95/12/21					     **
+ **   First Edition:	1995/12/21					     **
  ** 									     **
  **   Parameters:	char		*s	String to be checked	     **
  **			FacilityNames	*table	Table of valid names and     **
@@ -1212,10 +1212,12 @@ static	int	scan_facility( char *s, FacilityNames *table, int size)
 	int x;			/** Have to use this, because strcmp will    **/
 				/** not return -1 and 1 on Solaris 2.x	     **/
 	save = mid;
-	mid = low + ((high -low) / 2);
+	mid = low + ((high - low) / 2);
 	if( save == mid)
 	    low = mid = high;			/** To prevent endless loops **/
 
+	if (mid == high)
+		return -1;
 	x = strcmp( mid->name, s);
 
 	if( x < 0 )
