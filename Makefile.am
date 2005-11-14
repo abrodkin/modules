@@ -1,7 +1,7 @@
 ###########################################################################
 ##
 ## File:        ./Makefile.am
-## Versions:    $Id: Makefile.am,v 1.6.4.6 2005/11/12 01:33:54 rkowen Exp $
+## Versions:    $Id: Makefile.am,v 1.6.4.7 2005/11/14 17:22:12 rkowen Exp $
 ## Created:     2002/06/14
 ##
 ###########################################################################
@@ -23,7 +23,7 @@ EXTRA_DIST = modules_def.h getopt.h testsuite				\
 
 bin_PROGRAMS = modulecmd
 # bin_SCRIPTS = etc/mkroot etc/add.modules ext/add.ext
-modulecmd_CFLAGS= @TCL_INCLUDE_SPEC@
+modulecmd_CFLAGS= @TCL_INCLUDE_SPEC@ @X_CFLAGS@
 modulecmd_LDFLAGS= @TCL_LIB_SPEC@ @TCLX_LIB_SPEC@ @X_LIBS@ @X_EXTRA_LIBS@ @LIBS@
 modulecmd_SOURCES = \
 	ModuleCmd_Avail.c \

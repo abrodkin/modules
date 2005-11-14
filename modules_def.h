@@ -698,13 +698,14 @@ extern	void	  chk4spch( char*);
 extern	void	  cleanse_path( const char*, char*, int);
 extern	char	 *xdup(char const *);
 extern	char	 *xgetenv(char const *);
-extern  int       tmpfile_mod(char** filename, FILE** file);
+extern  int       tmpfile_mod(char** filename, FILE**);
 extern	char	 *stringer(char *, int, ...);
 extern	void	  null_free(void **);
-extern	size_t	  countTclHash(Tcl_HashTable *table);
+extern	size_t	  countTclHash(Tcl_HashTable *);
 
 #ifndef HAVE_STRDUP
-extern	char	 * strdup( char*);
+#  undef strdup
+extern	char	 *strdup( char*);
 #endif
 
 #ifndef HAVE_STRTOK

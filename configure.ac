@@ -1,6 +1,6 @@
 dnl
 dnl File:        configure.in
-dnl Revision:    $Id: configure.ac,v 1.7.4.7 2005/11/11 22:51:08 rkowen Exp $
+dnl Revision:    $Id: configure.ac,v 1.7.4.8 2005/11/14 17:22:12 rkowen Exp $
 dnl Created:     1994/06/18
 dnl Author:      Leif Hedstrom<hedstrom@inf.ethz.ch>
 dnl		 Martin S. Utesch <wstd@hl.siemens.de>
@@ -185,19 +185,6 @@ AC_AIX
 AC_ISC_POSIX
 AC_PATH_PROG([UNAME],[uname],[""])
 dnl ---------------------------------------------------------------------------
-AC_PATH_X
-AC_PATH_XTRA
-if test "$no_x" != "yes"; then
-
-	AH_TEMPLATE([HAS_X11LIBS],[
-HAS_X11LIBS:
-This symbol, if defined, indicates that the C program can use X11
-directly.])dnl
-	AC_DEFINE(HAS_X11LIBS)dnl
-	AC_CHECK_LIB(X11, XMaxRequestSize)dnl
-	AC_CHECK_LIB(Xmu, XmuGetHostname)dnl
-fi
-dnl ---------------------------------------------------------------------------
 dnl Checks for header files
 dnl ---------------------------------------------------------------------------
 
@@ -218,7 +205,7 @@ dnl ---------------------------------------------------------------------------
 dnl Checks for libraries
 dnl ---------------------------------------------------------------------------
 dnl Solaris 2.x: This requires -lnsl and -lsocket. If AC_PATH_XTRA
-dnl              did not search for these, search them explicitely.
+dnl              did not search for these, search them explicitly.
 dnl              MUST be done BEFORE AC_PATH_XTRA!
 dnl ---------------------------------------------------------------------------
 AC_CHECK_LIB(socket, socket)
@@ -230,6 +217,24 @@ dnl ---------------------------------------------------------------------------
 AC_CHECK_FUNCS([strdup strtok uname gethostname getdomainname \
 	mktemp tmpnam tempnam \
 	syslog dup2])
+dnl ---------------------------------------------------------------------------
+dnl Check for X11 things
+dnl ---------------------------------------------------------------------------
+AC_PATH_X
+AC_PATH_XTRA
+if test "$no_x" != "yes"; then
+
+	AH_TEMPLATE([HAS_X11LIBS],[
+HAS_X11LIBS:
+This symbol, if defined, indicates that the C program can use X11
+directly.])dnl
+	AC_DEFINE(HAS_X11LIBS)dnl
+	AC_CHECK_LIB(X11, XMaxRequestSize,,,
+		[-I $ac_x_includes -L $ac_x_libraries])dnl
+	AC_CHECK_LIB(Xmu, XmuGetHostname,,,
+		[-I $ac_x_includes -L $ac_x_libraries])dnl
+
+fi
 dnl ---------------------------------------------------------------------------
 AH_TEMPLATE([CPPSTDIN],[
 CPPSTDIN:
