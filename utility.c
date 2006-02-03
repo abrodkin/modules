@@ -50,7 +50,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.19 2006/01/17 22:58:29 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.19.2.1 2006/02/03 22:36:42 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -2626,6 +2626,7 @@ void EscapeCshString(const char* in,
 	*in == '<' ||
 	*in == '>' ||
 	*in == '!' ||
+	*in == ';' ||
 	*in == '#' ||
 	*in == '$' ||
 	*in == '^' ||
@@ -2655,6 +2656,7 @@ void EscapeShString(const char* in,
 	*in == '<' ||
 	*in == '>' ||
 	*in == '!' ||
+	*in == ';' ||
 	*in == '#' ||
 	*in == '$' ||
 	*in == '^' ||
@@ -2676,6 +2678,7 @@ void EscapePerlString(const char* in,
   
   for(;*in;in++) {
     if (*in == '\\'||
+	*in == ';' ||
 	*in == '\'') {
       *out++ = '\\';
     }
