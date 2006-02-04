@@ -36,7 +36,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: init.c,v 1.9 2005/11/29 04:26:30 rkowen Exp $";
+static char Id[] = "@(#)$Id: init.c,v 1.9.6.1 2006/02/04 21:06:35 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -501,8 +501,11 @@ int InitializeModuleCommands( Tcl_Interp* interp)
     /**
      ** Extend autoload path
      **/
-    if( TCL_OK != Tcl_VarEval( interp, "set auto_path [linsert $auto_path 0 ",
-	AUTOLOADPATH, "]", (char *) NULL))
+    if( TCL_OK != Tcl_Eval( interp,
+	"if [info exists auto_path] { "
+		"set auto_path [linsert $auto_path 0 " AUTOLOADPATH
+	"]} else {"
+		"set auto_path \"" AUTOLOADPATH "\" }"))
 	if( OK != ErrorLogger( ERR_INIT_ALPATH, LOC, NULL))
 	    goto unwind0;
 
