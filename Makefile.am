@@ -1,7 +1,7 @@
 ###########################################################################
 ##
 ## File:        ./Makefile.am
-## Versions:    $Id: Makefile.am,v 1.21.2.2 2006/02/04 00:11:35 rkowen Exp $
+## Versions:    $Id: Makefile.am,v 1.21.2.3 2006/02/04 00:46:21 rkowen Exp $
 ## Created:     2002/06/14
 ##
 ###########################################################################
@@ -58,6 +58,8 @@ cxref:
 
 SED=sed
 CVS=cvs
+GZIP=gzip
+BZIP2=bzip2
 
 patch: $(srcdir)/configure
 	@echo "Creating patch file -- do this after CVS tagging"
