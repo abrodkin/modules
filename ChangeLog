@@ -1,6 +1,22 @@
 Do Not Edit!  This is a generated file.
 	You should edit the NEWS file instead.
 
+2006-02-03 16:46  rkowen
+
+	* Makefile.am: Added macros for gzip and bzip2
+
+2006-02-03 16:45  rkowen
+
+	* version.c: Trying to get the patching working.
+
+2006-02-03 16:21  rkowen
+
+	* version.c: Set to patch level 1
+
+2006-02-03 16:20  rkowen
+
+	* utility.c: Fixed the sh alias function syntax when being eval'd.
+
 2006-02-03 16:11  rkowen
 
 	* Makefile.am: Forgot to add the LICENSE.GPL to the distribution.
@@ -1259,7 +1275,7 @@ Do Not Edit!  This is a generated file.
 
 2003-08-07 14:07  harlan
 
-	* tcl/modulecmd.tcl: Add $Revision: 1.50.2.1 $ to the version
+	* tcl/modulecmd.tcl: Add $Revision: 1.50.2.2 $ to the version
 
 2003-08-07 12:52  harlan
 
