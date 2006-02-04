@@ -50,7 +50,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.19.2.1 2006/02/03 22:36:42 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.19.2.2 2006/02/04 00:20:01 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -1211,7 +1211,7 @@ static	void	output_function(	const char	*var,
     /**
      **  This opens a function ...
      **/
-    fprintf( aliasfile, "%s() {%c", var, alias_separator);
+    fprintf( aliasfile, "%s() { ", var);
 
     /**
      **  ... now print the value. Print it as a single line and remove any
@@ -1340,8 +1340,8 @@ static	int	output_set_alias(	const char	*alias,
                 ||  !strcmp( shell_name, "ksh")) {
 	    /**
 	     **  in this case we only have to write a function if the alias
-	     **  take arguments. This is the case if the value has somewhere
-	     **  a '$' in it without a '\' infront.
+	     **  takes arguments. This is the case if the value has '$'
+	     **  somewhere in it without a '\' in front.
 	     **/
 	    while( *cptr) {
 		if( *cptr == '\\') {
