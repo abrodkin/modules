@@ -1,6 +1,25 @@
 Do Not Edit!  This is a generated file.
 	You should edit the NEWS file instead.
 
+2006-02-04 00:36  rkowen
+
+	* init/perl.in: Fixed where it needs to reference $ENV{...} [
+	705033 ] Bug in init/perl
+
+2006-02-03 17:41  rkowen
+
+	* init/perl.in: Added 1 at end so perl/init can be used by the perl
+	require.
+
+2006-02-03 17:12  rkowen
+
+	* cmdConflict.c: Removed i18n from the debugging statements ... not
+	necessary.
+
+2006-02-03 17:10  rkowen
+
+	* Makefile.am, utility.c: Rolled in the changes from 3-2-0 patch1
+
 2006-02-03 16:46  rkowen
 
 	* Makefile.am: Added macros for gzip and bzip2
@@ -1275,7 +1294,7 @@ Do Not Edit!  This is a generated file.
 
 2003-08-07 14:07  harlan
 
-	* tcl/modulecmd.tcl: Add $Revision: 1.50.2.2 $ to the version
+	* tcl/modulecmd.tcl: Add $Revision: 1.50.2.3 $ to the version
 
 2003-08-07 12:52  harlan
 
