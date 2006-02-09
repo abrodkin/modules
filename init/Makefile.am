@@ -1,7 +1,7 @@
 ###########################################################################
 ##
 ## File:        init/Makefile.am
-## Versions:    $Id: Makefile.am,v 1.2 2005/12/02 07:07:42 rkowen Exp $
+## Versions:    $Id: Makefile.am,v 1.2.6.1 2006/02/09 21:32:43 rkowen Exp $
 ## Created:     2002/06/14
 ##
 ###########################################################################
@@ -99,7 +99,7 @@ zsh : zsh.in ../config.status
 		< zsh.in > zsh
 
 tcsh : csh
-	cp $< $@
+	cp csh $@
 
 check :
 
