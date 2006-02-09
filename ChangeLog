@@ -1,6 +1,60 @@
 Do Not Edit!  This is a generated file.
 	You should edit the NEWS file instead.
 
+2006-02-06 13:52  rkowen
+
+	* cmdModule.c, cmdPath.c, init.c, modules_def.h: Got rid of all
+	explicit interp->result statements.  Such access is deprecated. 
+	Replaced with tcl_GetStringResult() which may be a macro for Tcl
+	versions before 8.0.
+
+2006-02-06 09:30  rkowen
+
+	* .cvsignore, Makefile.am, modulefiles/Makefile.am: Added the lang
+	modulefiles and upgraded the Makefile.am-s to create a working
+	distribution tar ball.
+
+2006-02-04 21:11  rkowen
+
+	* Makefile.am: After 'gettextize'.
+
+2006-02-04 21:08  rkowen
+
+	* configure.ac: The changes of 'gettextize', note that autopoint is
+	not too smart with AC_CONFIG_AUX_DIR ... it appends on any text
+	after macro to the directory name.  So do not add 'dnl' for
+	comments or to escape the \n.
+
+2006-02-04 13:54  rkowen
+
+	* version.c: The current version for the i18n mods is 3.3 alpha
+
+2006-02-04 13:53  rkowen
+
+	* main.c: Alert translators to the "common" strings.
+
+2006-02-04 13:06  rkowen
+
+	* error.c, init.c, utility.c, init/perl.in: Rolled in fixes from
+	the main trunk to the 3.2.0 branch.
+
+2006-02-04 12:44  rkowen
+
+	* error.c: Fixed grammar error.
+
+2006-02-04 09:04  rkowen
+
+	* utility.c: [ 730293 ] remove-path won't remove paths with a $ in
+	it.  Made the change and the tests ran fine.  I'm not sure what
+	cleanse_path() is supposed to do.
+
+2006-02-04 08:33  rkowen
+
+	* init.c: [ 672612 ] Tcl command execution failed and modules use
+	pointed out the use of the deprecated Tcl fn Tcl_VarEval(). 
+	Replaced this with Tcl_Eval() and added some Tcl logic to handle
+	when $auto_path is not set.
+
 2006-02-04 00:36  rkowen
 
 	* init/perl.in: Fixed where it needs to reference $ENV{...} [
@@ -1294,7 +1348,7 @@ Do Not Edit!  This is a generated file.
 
 2003-08-07 14:07  harlan
 
-	* tcl/modulecmd.tcl: Add $Revision: 1.50.2.3 $ to the version
+	* tcl/modulecmd.tcl: Add $Revision: 1.50.2.4 $ to the version
 
 2003-08-07 12:52  harlan
 
