@@ -28,7 +28,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Load.c,v 1.8 2005/11/29 04:26:30 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Load.c,v 1.8.6.1 2006/02/13 17:42:17 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -254,7 +254,7 @@ int	ModuleCmd_Load(	Tcl_Interp	*interp,
 	}
         Tcl_DeleteInterp(tmp_interp);
     } /** for **/
-    
+
     /**
      **  There may only be a spare save environment left, if the final module
      **  has been load successfully. Remove it in this case

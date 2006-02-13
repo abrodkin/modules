@@ -50,7 +50,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.19.2.3 2006/02/04 21:06:35 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.19.2.4 2006/02/13 17:42:17 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -2891,3 +2891,67 @@ size_t countTclHash(Tcl_HashTable *table) {
 
 	return result;
 } /** End of 'countHashTable' **/
+
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
+ **   Function:		ReturnValue					     **
+ ** 									     **
+ **   Description:	Handles the various possible return values	     **
+ ** 									     **
+ **   first edition:	2006/02/13	R.K.Owen <rk@owen.sj.ca.us>	     **
+ ** 									     **
+ **   Parameters:	Tcl_Interp      *interp		Attached Tcl Interp. **
+ **			int		retval		Return value to check**
+ ** 									     **
+ **   Result:		EM_RetVal		Limited set		     **
+ ** 									     **
+ **   Attached Globals:	g_retval	set to N if "exit N"		     **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
+
+
+EM_RetVal ReturnValue(Tcl_Interp *interp, int retval) {
+	EM_RetVal	 em_result;
+	char		*startp		= (char *) NULL,
+			*endp		= (char *) NULL;
+	int		 result;
+	Tcl_RegExp	 retexpPtr;
+
+	/* intercept any "EXIT N" first */
+	retexpPtr = Tcl_RegExpCompile(interp, "^EXIT ([0-9]*)");
+
+	if(0 < Tcl_RegExpExec(interp, retexpPtr,
+		TCL_RESULT(interp), TCL_RESULT(interp))) {
+		/* found 'EXIT' */
+		Tcl_RegExpRange(retexpPtr, 1,
+			(CONST84 char **) &startp, (CONST84 char **) &endp);
+		if( startp != '\0')
+			result = atoi((const char *) startp);
+
+		g_retval = result;
+		em_result = EM_EXIT;
+
+		/* clear the result string */
+		Tcl_ResetResult(interp);
+	} else {
+		switch (retval) {
+		case TCL_OK:
+			em_result = EM_OK;
+			/* clear the result string (just in case) */
+			Tcl_ResetResult(interp);
+			break;
+		case TCL_BREAK:
+			em_result = EM_BREAK;
+			/* clear the result string */
+			Tcl_ResetResult(interp);
+			break;
+		case TCL_ERROR:
+		default:
+			em_result = EM_ERROR;
+			break;
+		}
+	}
+	return em_result;
+} /** End of 'ReturnValue' **/
