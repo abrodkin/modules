@@ -259,6 +259,7 @@ typedef enum	{
 	EM_EXIT,			/** cmd: exit N		**/
 					/** (set g_retval = N)	**/
 	EM_BREAK,			/** cmd: break		**/
+	EM_CONTINUE,			/** cmd: continue	**/
 	EM_ERROR			/** abnormal return	**/
 } EM_RetVal;
 

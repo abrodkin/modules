@@ -50,7 +50,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.19.2.4 2006/02/13 17:42:17 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.19.2.5 2006/02/21 22:26:56 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -2916,16 +2916,31 @@ EM_RetVal ReturnValue(Tcl_Interp *interp, int retval) {
 	EM_RetVal	 em_result;
 	char		*startp		= (char *) NULL,
 			*endp		= (char *) NULL;
+	const char 	*tstr;
 	int		 result;
-	Tcl_RegExp	 retexpPtr;
+	static Tcl_RegExp	exit__expPtr,
+				break_expPtr,
+				continue_expPtr;
+
+	tstr = (const char *) TCL_RESULT(interp);
+
+	/* compile regular expression the first time through */
+	if (!exit__expPtr)
+		exit__expPtr = Tcl_RegExpCompile(interp, "^EXIT ([0-9]*)");
+
+	/*  result = "invoked \"break\" outside of a loop" */
+	if (!break_expPtr)
+		break_expPtr = Tcl_RegExpCompile(interp, ".*\"break\".*");
+
+	/*  result = "invoked \"continue\" outside of a loop" */
+	if (!continue_expPtr)
+		continue_expPtr = Tcl_RegExpCompile(interp, ".*\"continue\".*");
 
 	/* intercept any "EXIT N" first */
-	retexpPtr = Tcl_RegExpCompile(interp, "^EXIT ([0-9]*)");
-
-	if(0 < Tcl_RegExpExec(interp, retexpPtr,
-		TCL_RESULT(interp), TCL_RESULT(interp))) {
+	if(tstr && *tstr && 0 < Tcl_RegExpExec(interp, exit__expPtr,
+		(CONST84 char *) tstr, (CONST84 char *) tstr)){
 		/* found 'EXIT' */
-		Tcl_RegExpRange(retexpPtr, 1,
+		Tcl_RegExpRange(exit__expPtr, 1,
 			(CONST84 char **) &startp, (CONST84 char **) &endp);
 		if( startp != '\0')
 			result = atoi((const char *) startp);
@@ -2933,19 +2948,26 @@ EM_RetVal ReturnValue(Tcl_Interp *interp, int retval) {
 		g_retval = result;
 		em_result = EM_EXIT;
 
-		/* clear the result string */
-		Tcl_ResetResult(interp);
+	/* check for a break not within loop */
+	} else if(tstr && *tstr && 0 < Tcl_RegExpExec(interp, break_expPtr,
+		(CONST84 char *) tstr, (CONST84 char *) tstr)){
+		em_result = EM_BREAK;
+
+	/* check for a continue not within loop */
+	} else if(tstr && *tstr && 0 < Tcl_RegExpExec(interp, continue_expPtr,
+		(CONST84 char *) tstr, (CONST84 char *) tstr)){
+		em_result = EM_CONTINUE;
+
 	} else {
 		switch (retval) {
 		case TCL_OK:
 			em_result = EM_OK;
-			/* clear the result string (just in case) */
-			Tcl_ResetResult(interp);
 			break;
 		case TCL_BREAK:
 			em_result = EM_BREAK;
-			/* clear the result string */
-			Tcl_ResetResult(interp);
+			break;
+		case TCL_CONTINUE:
+			em_result = EM_CONTINUE;
 			break;
 		case TCL_ERROR:
 		default:
