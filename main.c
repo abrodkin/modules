@@ -29,7 +29,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: main.c,v 1.16.4.1 2006/02/13 17:42:17 rkowen Exp $";
+static char Id[] = "@(#)$Id: main.c,v 1.16.4.2 2006/03/07 19:18:55 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -75,6 +75,7 @@ int	  g_flags = 0,			/** Control what to do at the moment **/
 					/** The posible values are defined in**/
 					/** module_def.h		     **/
 	  g_retval = 0,			/** exit return value		     **/
+	  g_output = 0,			/** Has output been generated	     **/
 	  append_flag = 0;		/** only used by the 'use' command   **/
 
 char	  _default[] = "default";	/** id string for default versions   **/
@@ -339,6 +340,7 @@ int	main( int argc, char *argv[], char *environ[]) {
     ErrorLogger( NO_ERR_END, LOC, _proc_main, NULL);
 #endif
 
+    OutputExit();
     return ( return_val ? return_val : g_retval);
 
 unwind2:
@@ -348,7 +350,9 @@ unwind1:
 unwind0:
 
     /* and error occurred of some type */
-    return( g_retval ? g_retval : 1);
+    g_retval = (g_retval ? g_retval : 1);
+    OutputExit();
+    return (g_retval);
 
 } /** End of 'main' **/
 

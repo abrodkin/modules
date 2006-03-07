@@ -63,6 +63,8 @@ set lm_perl "\$ENV{'LOADEDMODULES'} = '$module';"
 set ts_perl1 "\$ENV{'testsuite1'} = 'yes';"
 set ts_perl3 "\$ENV{'testsuite3'} = 'yes';"
 
+set test01 " test 0 = 1;"
+
 #
 #  The tests
 #
@@ -73,11 +75,11 @@ test_cmd "csh" "load $mod1 $mod2 $mod3" "$lm_csh$lmf_csh$ts_csh1"
 test_cmd "tcsh" "load $mod1 $mod2 $mod3" "$lm_csh$lmf_csh$ts_csh1"
 test_cmd "perl" "load $mod1 $mod2 $mod3" "$lm_perl$lmf_perl$ts_perl1"
 
-test_cmd "sh" "load $mod1 $mod3 $mod2" "$lm_sh$lmf_sh$ts_sh1" 7
-test_cmd "ksh" "load $mod1 $mod3 $mod2" "$lm_sh$lmf_sh$ts_sh1" 7
-test_cmd "zsh" "load $mod1 $mod3 $mod2" "$lm_sh$lmf_sh$ts_sh1" 7
-test_cmd "csh" "load $mod1 $mod3 $mod2" "$lm_csh$lmf_csh$ts_csh1" 7
-test_cmd "tcsh" "load $mod1 $mod3 $mod2" "$lm_csh$lmf_csh$ts_csh1" 7
+test_cmd "sh" "load $mod1 $mod3 $mod2" "$lm_sh$lmf_sh$ts_sh1$test01" 7
+test_cmd "ksh" "load $mod1 $mod3 $mod2" "$lm_sh$lmf_sh$ts_sh1$test01" 7
+test_cmd "zsh" "load $mod1 $mod3 $mod2" "$lm_sh$lmf_sh$ts_sh1$test01" 7
+test_cmd "csh" "load $mod1 $mod3 $mod2" "$lm_csh$lmf_csh$ts_csh1$test01" 7
+test_cmd "tcsh" "load $mod1 $mod3 $mod2" "$lm_csh$lmf_csh$ts_csh1$test01" 7
 test_cmd "perl" "load $mod1 $mod3 $mod2" "$lm_perl$lmf_perl$ts_perl1" 7
 
 #
@@ -103,6 +105,8 @@ unset lm_perl
 unset lmf_perl
 unset ts_perl1
 unset ts_perl3
+
+unset test01
 
 unset modulefile
 unset module

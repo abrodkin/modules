@@ -497,6 +497,7 @@ extern	char	 *shell_init;
 extern	char	 *shell_cmd_separator;
 extern	int	  g_flags;
 extern	int	  g_retval;
+extern	int	  g_output;
 extern	int	  append_flag;
 extern	char	 *line;
 extern	char	 *error_line;
@@ -729,6 +730,7 @@ extern	char	 *stringer(char *, int, ...);
 extern	void	  null_free(void **);
 extern	size_t	  countTclHash(Tcl_HashTable *);
 extern	EM_RetVal	ReturnValue( Tcl_Interp*, int);
+extern	void	  OutputExit();
 
 #ifndef HAVE_STRDUP
 #  undef strdup

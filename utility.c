@@ -50,7 +50,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.19.2.5 2006/02/21 22:26:56 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.19.2.6 2006/03/07 19:18:55 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -1112,7 +1112,8 @@ static	int	output_set_variable(	Tcl_Interp	*interp,
     /**
      **  Return and acknowldge success
      **/
-    return( TCL_ERROR);
+    g_output = 1;
+    return( TCL_OK);
 
 } /** End of 'output_set_variable' **/
 
@@ -1170,6 +1171,7 @@ static	int	output_unset_variable( const char* var)
     /**
      **  Return and acknowldge success
      **/
+    g_output = 1;
     return( TCL_OK);
 
 } /** End of 'output_unset_variable' **/
@@ -2977,3 +2979,36 @@ EM_RetVal ReturnValue(Tcl_Interp *interp, int retval) {
 	}
 	return em_result;
 } /** End of 'ReturnValue' **/
+
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
+ **   Function:		OutputExit					     **
+ ** 									     **
+ **   Description:	Outputs a 'test 0 = 1' line so command will eval     **
+ ** 			with a non-zero	exit code			     **
+ ** 									     **
+ **   first edition:	2006/03/07	R.K.Owen <rk@owen.sj.ca.us>	     **
+ ** 									     **
+ **   Parameters:	void			none			     **
+ ** 									     **
+ **   result:		void    		(nothing)		     **
+ ** 									     **
+ **   Attached Globals:	g_retval	if non-zero			     **
+ **   			g_output	if non-zero			     **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
+void OutputExit() {
+
+	if( !strcmp( shell_derelict, "csh")) {
+		/* OK shell derelict */
+	} else if( !strcmp( shell_derelict, "sh")) {
+		/* OK shell derelict */
+	} else {
+		return;
+	}
+	if (g_retval) {
+		fprintf( stdout, " test 0 = 1;");
+	}
+} /** End of 'OutputExit' **/
