@@ -36,7 +36,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: init.c,v 1.9 2005/11/29 04:26:30 rkowen Exp $";
+static char Id[] = "@(#)$Id: init.c,v 1.9.6.2 2006/02/06 21:52:33 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -377,8 +377,8 @@ int Initialize_Tcl(	Tcl_Interp	**interp,
 			moduleSetenv( *interp, "_MODULESBEGINENV_", tmp, 1);
 			fclose( file);
 		} else
-			if( OK != ErrorLogger( ERR_OPEN, LOC,(*interp)->result,
-			    "append", NULL))
+			if( OK != ErrorLogger( ERR_OPEN, LOC,
+			    TCL_RESULT(*interp), "append", NULL))
 			    goto unwind0;
 
 		null_free((void *) &tmp);
@@ -422,8 +422,8 @@ int Initialize_Tcl(	Tcl_Interp	**interp,
                 moduleSetenv( *interp, "_MODULESBEGINENV_", buffer, 1);
                 fclose( file);
             } else
-		if( OK != ErrorLogger( ERR_OPEN, LOC, (*interp)->result,
-		    "append", NULL))
+		if( OK != ErrorLogger( ERR_OPEN, LOC,
+		    TCL_RESULT(*interp), "append", NULL))
 		    goto unwind0;
 
 	    null_free((void *) &buffer);
@@ -501,8 +501,11 @@ int InitializeModuleCommands( Tcl_Interp* interp)
     /**
      ** Extend autoload path
      **/
-    if( TCL_OK != Tcl_VarEval( interp, "set auto_path [linsert $auto_path 0 ",
-	AUTOLOADPATH, "]", (char *) NULL))
+    if( TCL_OK != Tcl_Eval( interp,
+	"if [info exists auto_path] { "
+		"set auto_path [linsert $auto_path 0 " AUTOLOADPATH
+	"]} else {"
+		"set auto_path \"" AUTOLOADPATH "\" }"))
 	if( OK != ErrorLogger( ERR_INIT_ALPATH, LOC, NULL))
 	    goto unwind0;
 

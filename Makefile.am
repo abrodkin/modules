@@ -1,7 +1,7 @@
 ###########################################################################
 ##
 ## File:        ./Makefile.am
-## Versions:    $Id: Makefile.am,v 1.20 2006/01/12 18:43:13 rkowen Exp $
+## Versions:    $Id: Makefile.am,v 1.21.2.3 2006/02/04 00:46:21 rkowen Exp $
 ## Created:     2002/06/14
 ##
 ###########################################################################
@@ -20,7 +20,8 @@ DIST_SUBDIRS = . init modulefiles etc ext doc
 SOURCES_H = modules_def.h getopt.h config.h
 EXTRA_DIST = modules_def.h getopt.h testsuite INSTALL.RH7x		\
 	init/filter init/bash.in init/sh.in init/zsh.in			\
-	init/csh.in init/ksh.in init/perl.in init/python.in
+	init/csh.in init/ksh.in init/perl.in init/python.in		\
+	LICENSE.GPL
 
 bin_PROGRAMS = modulecmd
 # bin_SCRIPTS = etc/mkroot etc/add.modules ext/add.ext
@@ -57,6 +58,8 @@ cxref:
 
 SED=sed
 CVS=cvs
+GZIP=gzip
+BZIP2=bzip2
 
 patch: $(srcdir)/configure
 	@echo "Creating patch file -- do this after CVS tagging"
@@ -121,15 +124,15 @@ dist-hook:
 	-rm -rf `find $(distdir) -name CVS`
 	-touch $(distdir)/testsuite/modulefiles/trace/CVS
 
-ftp: ftp-sunsite ftp-sourceforge
+ftp: ftp-ibiblio ftp-sourceforge
 
-ftp-sunsite: dist
+ftp-ibiblio: dist
 # do local files first ... mostly to verify their existence
 # this should be done by the maintainer (R.K.Owen) only!
-	@echo "placing sunsite.unc.edu files";
+	@echo "placing ftp.ibiblio.org files";
 	-@XXX=modules-`${SED} -n -e 's/^.*OLD TAG.*"modules-\([0-9]*\)-\([0-9]*\)-\([0-9]*\)".*$$/\1.\2.\3/p' ${srcdir}/version.c`-`${SED} -n -e 's/^.*NEW TAG.*"modules-\([0-9]*\)-\([0-9]*\)-\([0-9]*\)".*$$/\1.\2.\3/p' ${srcdir}/version.c`.diff."*" ; \
 	echo "placing modules.lsm $$XXX $(DISTNAME).tar.*"; \
-	./.ftp metalab.unc.edu /incoming/Linux \
+	./.ftp ftp.ibiblio.org /incoming/linux \
 		modules.lsm $$XXX $(DISTNAME).tar.*;
 
 ftp-sourceforge: dist
@@ -163,8 +166,8 @@ disthelp:
 	@echo "================ maintainers only =========================="
 	@echo "make lsm       - send off to the Linux Software Map"
 	@echo "make ftp-local - upload tarball (good test)"
-	@echo "make ftp-sunsite      - upload to sunsite"
+	@echo "make ftp-ibiblio      - upload to ibiblio"
 	@echo "make ftp-sourceforge  - upload to sourceforge"
-	@echo "make ftp       - upload to both sunsite & sourceforge"
+	@echo "make ftp       - upload to both ibiblio & sourceforge"
 	@echo ""
 

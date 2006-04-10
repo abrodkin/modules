@@ -50,7 +50,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.19 2006/01/17 22:58:29 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.19.2.6 2006/03/07 19:18:55 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -1112,7 +1112,8 @@ static	int	output_set_variable(	Tcl_Interp	*interp,
     /**
      **  Return and acknowldge success
      **/
-    return( TCL_ERROR);
+    g_output = 1;
+    return( TCL_OK);
 
 } /** End of 'output_set_variable' **/
 
@@ -1170,6 +1171,7 @@ static	int	output_unset_variable( const char* var)
     /**
      **  Return and acknowldge success
      **/
+    g_output = 1;
     return( TCL_OK);
 
 } /** End of 'output_unset_variable' **/
@@ -1211,7 +1213,7 @@ static	void	output_function(	const char	*var,
     /**
      **  This opens a function ...
      **/
-    fprintf( aliasfile, "%s() {%c", var, alias_separator);
+    fprintf( aliasfile, "%s() { ", var);
 
     /**
      **  ... now print the value. Print it as a single line and remove any
@@ -1340,8 +1342,8 @@ static	int	output_set_alias(	const char	*alias,
                 ||  !strcmp( shell_name, "ksh")) {
 	    /**
 	     **  in this case we only have to write a function if the alias
-	     **  take arguments. This is the case if the value has somewhere
-	     **  a '$' in it without a '\' infront.
+	     **  takes arguments. This is the case if the value has '$'
+	     **  somewhere in it without a '\' in front.
 	     **/
 	    while( *cptr) {
 		if( *cptr == '\\') {
@@ -2216,6 +2218,7 @@ void cleanse_path( const char	*path,
         switch(*path) {
             case '.':
             case '+':
+            case '$':
 		*newpath++ = '\\';		/** devalue '.' and '+'	    **/
 		j++;
 		break;
@@ -2626,6 +2629,7 @@ void EscapeCshString(const char* in,
 	*in == '<' ||
 	*in == '>' ||
 	*in == '!' ||
+	*in == ';' ||
 	*in == '#' ||
 	*in == '$' ||
 	*in == '^' ||
@@ -2655,6 +2659,7 @@ void EscapeShString(const char* in,
 	*in == '<' ||
 	*in == '>' ||
 	*in == '!' ||
+	*in == ';' ||
 	*in == '#' ||
 	*in == '$' ||
 	*in == '^' ||
@@ -2676,6 +2681,7 @@ void EscapePerlString(const char* in,
   
   for(;*in;in++) {
     if (*in == '\\'||
+	*in == ';' ||
 	*in == '\'') {
       *out++ = '\\';
     }
@@ -2887,3 +2893,122 @@ size_t countTclHash(Tcl_HashTable *table) {
 
 	return result;
 } /** End of 'countHashTable' **/
+
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
+ **   Function:		ReturnValue					     **
+ ** 									     **
+ **   Description:	Handles the various possible return values	     **
+ ** 									     **
+ **   first edition:	2006/02/13	R.K.Owen <rk@owen.sj.ca.us>	     **
+ ** 									     **
+ **   Parameters:	Tcl_Interp      *interp		Attached Tcl Interp. **
+ **			int		retval		Return value to check**
+ ** 									     **
+ **   Result:		EM_RetVal		Limited set		     **
+ ** 									     **
+ **   Attached Globals:	g_retval	set to N if "exit N"		     **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
+
+
+EM_RetVal ReturnValue(Tcl_Interp *interp, int retval) {
+	EM_RetVal	 em_result;
+	char		*startp		= (char *) NULL,
+			*endp		= (char *) NULL;
+	const char 	*tstr;
+	int		 result;
+	static Tcl_RegExp	exit__expPtr,
+				break_expPtr,
+				continue_expPtr;
+
+	tstr = (const char *) TCL_RESULT(interp);
+
+	/* compile regular expression the first time through */
+	if (!exit__expPtr)
+		exit__expPtr = Tcl_RegExpCompile(interp, "^EXIT ([0-9]*)");
+
+	/*  result = "invoked \"break\" outside of a loop" */
+	if (!break_expPtr)
+		break_expPtr = Tcl_RegExpCompile(interp, ".*\"break\".*");
+
+	/*  result = "invoked \"continue\" outside of a loop" */
+	if (!continue_expPtr)
+		continue_expPtr = Tcl_RegExpCompile(interp, ".*\"continue\".*");
+
+	/* intercept any "EXIT N" first */
+	if(tstr && *tstr && 0 < Tcl_RegExpExec(interp, exit__expPtr,
+		(CONST84 char *) tstr, (CONST84 char *) tstr)){
+		/* found 'EXIT' */
+		Tcl_RegExpRange(exit__expPtr, 1,
+			(CONST84 char **) &startp, (CONST84 char **) &endp);
+		if( startp != '\0')
+			result = atoi((const char *) startp);
+
+		g_retval = result;
+		em_result = EM_EXIT;
+
+	/* check for a break not within loop */
+	} else if(tstr && *tstr && 0 < Tcl_RegExpExec(interp, break_expPtr,
+		(CONST84 char *) tstr, (CONST84 char *) tstr)){
+		em_result = EM_BREAK;
+
+	/* check for a continue not within loop */
+	} else if(tstr && *tstr && 0 < Tcl_RegExpExec(interp, continue_expPtr,
+		(CONST84 char *) tstr, (CONST84 char *) tstr)){
+		em_result = EM_CONTINUE;
+
+	} else {
+		switch (retval) {
+		case TCL_OK:
+			em_result = EM_OK;
+			break;
+		case TCL_BREAK:
+			em_result = EM_BREAK;
+			break;
+		case TCL_CONTINUE:
+			em_result = EM_CONTINUE;
+			break;
+		case TCL_ERROR:
+		default:
+			em_result = EM_ERROR;
+			break;
+		}
+	}
+	return em_result;
+} /** End of 'ReturnValue' **/
+
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
+ **   Function:		OutputExit					     **
+ ** 									     **
+ **   Description:	Outputs a 'test 0 = 1' line so command will eval     **
+ ** 			with a non-zero	exit code			     **
+ ** 									     **
+ **   first edition:	2006/03/07	R.K.Owen <rk@owen.sj.ca.us>	     **
+ ** 									     **
+ **   Parameters:	void			none			     **
+ ** 									     **
+ **   result:		void    		(nothing)		     **
+ ** 									     **
+ **   Attached Globals:	g_retval	if non-zero			     **
+ **   			g_output	if non-zero			     **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
+void OutputExit() {
+
+	if( !strcmp( shell_derelict, "csh")) {
+		/* OK shell derelict */
+	} else if( !strcmp( shell_derelict, "sh")) {
+		/* OK shell derelict */
+	} else {
+		return;
+	}
+	if (g_retval) {
+		fprintf( stdout, " test 0 = 1;");
+	}
+} /** End of 'OutputExit' **/

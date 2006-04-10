@@ -43,6 +43,12 @@
 #  define CONST84	/* const */
 #endif
 
+#if (TCL_MAJOR_VERSION < 8)
+#  define TCL_RESULT(interp) ((interp)->result)
+#else
+#  define TCL_RESULT(interp) Tcl_GetStringResult(interp)
+#endif
+
 #ifndef HAVE_STDINT_H
 /* assume 32 bit - hope for the best */
 typedef	int	intptr_h;
@@ -243,6 +249,19 @@ typedef	enum	{
 	PANIC	= 20			/** progrm being aborted by the er-  **/
 					/** ror logger immediatelly	     **/
 } ErrCode;
+
+/**
+ **  Internal return value to handle the various ways a module load
+ **	could end.
+ **/
+typedef enum	{
+	EM_OK		= 0,		/** normal return	**/
+	EM_EXIT,			/** cmd: exit N		**/
+					/** (set g_retval = N)	**/
+	EM_BREAK,			/** cmd: break		**/
+	EM_CONTINUE,			/** cmd: continue	**/
+	EM_ERROR			/** abnormal return	**/
+} EM_RetVal;
 
 /** ************************************************************************ **/
 /** 				     CONSTANTS				     **/
@@ -477,6 +496,8 @@ extern	char	 *shell_derelict;
 extern	char	 *shell_init;
 extern	char	 *shell_cmd_separator;
 extern	int	  g_flags;
+extern	int	  g_retval;
+extern	int	  g_output;
 extern	int	  append_flag;
 extern	char	 *line;
 extern	char	 *error_line;
@@ -708,6 +729,8 @@ extern  int       tmpfile_mod( char**, FILE**);
 extern	char	 *stringer(char *, int, ...);
 extern	void	  null_free(void **);
 extern	size_t	  countTclHash(Tcl_HashTable *);
+extern	EM_RetVal	ReturnValue( Tcl_Interp*, int);
+extern	void	  OutputExit();
 
 #ifndef HAVE_STRDUP
 #  undef strdup
