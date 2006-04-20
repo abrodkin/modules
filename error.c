@@ -30,7 +30,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: error.c,v 1.8.6.1 2006/02/04 21:06:35 rkowen Exp $";
+static char Id[] = "@(#)$Id: error.c,v 1.8.6.1.4.1 2006/04/20 22:35:33 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -930,9 +930,9 @@ static	int	FlushError(	ErrType		  Type,
      **  Now tokenize the facilities string and schedule the error messge
      **  for every single facility
      **/
-    for( fac = strtok( facilities, ":");
+    for( fac = xstrtok( facilities, ":");
 	 fac;
-	 fac = strtok( (char *) NULL, ":") ) {
+	 fac = xstrtok( (char *) NULL, ":") ) {
 
 	/**
 	 **  Check for filenames. Two specials are defined: stderr and stdout
@@ -1143,7 +1143,7 @@ int	CheckFacility(	char *string, int *facility, int *level)
 
     /** 
      **  We cannot use strtok here, because there's one initialized in an
-     **  outter loop!
+     **  outer loop!
      **/
     for( s=buf; s && *s && *s != '.'; s++);
     if( !s || !*s)

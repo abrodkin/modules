@@ -23,7 +23,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Whatis.c,v 1.5 2005/11/29 04:26:30 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Whatis.c,v 1.5.4.1 2006/04/20 22:35:33 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -243,9 +243,9 @@ int ModuleCmd_Whatis(	Tcl_Interp	*interp,
 	     /**
 	      **  Tokenize the module path string and check all dirs
 	      **/
-	     for( dirname = strtok( modpath, ":");
+	     for( dirname = xstrtok( modpath, ":");
 		  dirname;
-		  dirname = strtok( NULL, ":") ) {
+		  dirname = xstrtok( NULL, ":") ) {
 	
 		 if( !check_dir( dirname))
 		     continue;
@@ -395,9 +395,9 @@ int ModuleCmd_Apropos(	Tcl_Interp	*interp,
 	/**
 	 **  Tokenize the module path string and check all dirs
 	 **/
-	for( dirname = strtok( modpath, ":");
+	for( dirname = xstrtok( modpath, ":");
 	     dirname;
-	     dirname = strtok( NULL, ":") ) {
+	     dirname = xstrtok( NULL, ":") ) {
 	
 	    if( !check_dir( dirname))
 		continue;

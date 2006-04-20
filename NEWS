@@ -6,6 +6,10 @@
   or spelling correction your name will probably not be listed.)
 
 ****************************   Release 3.2 ******************************
+Modules 3.2.2
+Apr 20, 2006				R.K. Owen (rk@owen.sj.ca.us)
+	* Replaced all strtok() calls with an internal version.
+	* Now can append/prepend and empty string '' or colons ':'
 Modules 3.2.1
 Feb 13, 2006				R.K. Owen (rk@owen.sj.ca.us)
 	* Catch 'exit N' within modulefiles, use this as an exit return code.

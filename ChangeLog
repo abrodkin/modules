@@ -1,6 +1,21 @@
 Do Not Edit!  This is a generated file.
 	You should edit the NEWS file instead.
 
+2006-03-23 15:38  rkowen
+
+	* init/csh.in: Rolled in init csh fix from 3.2.1
+
+2006-03-23 15:31  rkowen
+
+	* version.c, init/csh.in: Fixed the csh init script.
+
+2006-03-23 14:37  rkowen
+
+	* version.c, init/csh.in, testsuite/modules.00-init/006-procs.exp,
+	testsuite/modules.70-maint/045-listlong.exp,
+	testsuite/modules.90-avail/050-long.exp: Merged in the 3.2.1
+	changes.
+
 2006-03-23 13:51  rkowen
 
 	* testsuite/: modules.70-maint/045-listlong.exp,
@@ -1464,7 +1479,7 @@ Do Not Edit!  This is a generated file.
 
 2003-08-07 14:07  harlan
 
-	* tcl/modulecmd.tcl: Add $Revision: 1.50.2.4.2.1 $ to the version
+	* tcl/modulecmd.tcl: Add $Revision: 1.50.2.4.2.1.2.1 $ to the version
 
 2003-08-07 12:52  harlan
 
