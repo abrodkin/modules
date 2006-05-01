@@ -1,7 +1,7 @@
 ###########################################################################
 ##
 ## File:        ./Makefile.am
-## Versions:    $Id: Makefile.am,v 1.21.2.3 2006/02/04 00:46:21 rkowen Exp $
+## Versions:    $Id: Makefile.am,v 1.21.2.3.4.1 2006/05/01 22:07:56 rkowen Exp $
 ## Created:     2002/06/14
 ##
 ###########################################################################
@@ -81,7 +81,7 @@ tag:
 	  `${SED} -n -e 's/^.*NEW TAG.*"\(.*\)".*$$/\1/p' ${srcdir}/version.c` \
 	  modules
 
-ChangeLog: rmChangeLog
+CL: rmChangeLog
 	@echo "Updating ChangeLog"
 	-@./cvs2cl.pl
 
@@ -161,7 +161,7 @@ disthelp:
 	@echo "make maintainer-clean - cleans even more"
 	@echo "================ requires CVS access ======================="
 	@echo "make tag       - does a CVS rtag"
-	@echo "make ChangeLog - remakes the ChangeLog from the CVS commits"
+	@echo "make CL        - remakes the ChangeLog from the CVS commits"
 	@echo "make patch     - creates a patch file after tagging"
 	@echo "================ maintainers only =========================="
 	@echo "make lsm       - send off to the Linux Software Map"
