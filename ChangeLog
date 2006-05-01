@@ -1,6 +1,42 @@
 Do Not Edit!  This is a generated file.
 	You should edit the NEWS file instead.
 
+2006-04-20 15:35  rkowen
+
+	* testsuite/modulefiles/: append/0.1, prepend/0.1: file 0.1 was
+	initially added on branch modules-3-2-2.
+
+2006-04-20 15:35  rkowen
+
+	* testsuite/modulefiles/: append/0.2, prepend/0.2: file 0.2 was
+	initially added on branch modules-3-2-2.
+
+2006-04-20 15:35  rkowen
+
+	* ModuleCmd_List.c, ModuleCmd_Refresh.c, ModuleCmd_Update.c,
+	ModuleCmd_Whatis.c, NEWS, cmdLog.c, configure.ac, error.c,
+	locate_module.c, modules_def.h, utility.c, version.c,
+	testsuite/modulefiles/append/0.1, testsuite/modulefiles/append/0.2,
+	testsuite/modulefiles/prepend/0.1,
+	testsuite/modulefiles/prepend/0.2,
+	testsuite/modules.50-cmds/040-append.exp,
+	testsuite/modules.50-cmds/045-append-undo.exp,
+	testsuite/modules.50-cmds/050-prepend.exp,
+	testsuite/modules.50-cmds/055-prepend-undo.exp: Crafted an internal
+	version of strtok(), which allows for empty tokens and to obviate
+	the need to use any "native" strtok()s.
+
+2006-04-10 13:04  rkowen
+
+	* init/Makefile.am: Rolled in $(top_srcdir) and $(srcdir) changes
+	from main trunk.
+
+2006-04-10 13:03  rkowen
+
+	* init/Makefile.am: Change from using . & .. to $(srcdir) and
+	$(top_srcdir) respectively.  (Thanks to suggestion from Boris
+	Boesler <boesler.AT.ifn.et.tu-dresden.de>)
+
 2006-03-23 15:38  rkowen
 
 	* init/csh.in: Rolled in init csh fix from 3.2.1
@@ -1479,7 +1515,7 @@ Do Not Edit!  This is a generated file.
 
 2003-08-07 14:07  harlan
 
-	* tcl/modulecmd.tcl: Add $Revision: 1.50.2.4.2.1.2.1 $ to the version
+	* tcl/modulecmd.tcl: Add $Revision: 1.50.2.4.2.1.2.2 $ to the version
 
 2003-08-07 12:52  harlan
 
