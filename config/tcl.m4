@@ -106,7 +106,8 @@ AC_DEFUN([SC_PATH_TCLCONFIG], [
 			../../../tcl \
 			`ls -dr ../../../tcl[[8-9]].[[0-9]].[[0-9]]* 2>/dev/null` \
 			`ls -dr ../../../tcl[[8-9]].[[0-9]] 2>/dev/null` \
-			`ls -dr ../../../tcl[[8-9]].[[0-9]]* 2>/dev/null` ; do
+			`ls -dr ../../../tcl[[8-9]].[[0-9]]* 2>/dev/null` \
+		; do
 		    if test -f "$i/unix/tclConfig.sh" ; then
 			em_cv_tclconfig=`(cd $i/unix; pwd)`
 			break
@@ -118,8 +119,11 @@ AC_DEFUN([SC_PATH_TCLCONFIG], [
 	    if test x"${em_cv_tclconfig}" = x ; then
 		for i in `ls -d ${libdir} 2>/dev/null` \
 			`ls -d /usr/local/lib 2>/dev/null` \
+			`ls -d /usr/local/lib/tcl[[8-9]].[[0-9]]* 2>/dev/null` \
 			`ls -d /usr/contrib/lib 2>/dev/null` \
+			`ls -d /usr/contrib/lib/tcl[[8-9]].[[0-9]]* 2>/dev/null` \
 			`ls -d /usr/lib 2>/dev/null` \
+			`ls -d /usr/lib/tcl[[8-9]].[[0-9]]* 2>/dev/null` \
 			; do
 		    if test -f "$i/tclConfig.sh" ; then
 			em_cv_tclconfig=`(cd $i; pwd)`
@@ -293,7 +297,8 @@ AC_DEFUN([EM_PATH_TCLXCONFIG], [
 			../../../tclx \
 			`ls -dr ../../../tclx[[8-9]].[[0-9]].[[0-9]]* 2>/dev/null` \
 			`ls -dr ../../../tclx[[8-9]].[[0-9]] 2>/dev/null` \
-			`ls -dr ../../../tclx[[8-9]].[[0-9]]* 2>/dev/null` ; do
+			`ls -dr ../../../tclx[[8-9]].[[0-9]]* 2>/dev/null` \
+		; do
 		    if test -f "$i/unix/tclxConfig.sh" ; then
 			em_cv_tclxconfig=`(cd $i/unix; pwd)`
 			break
@@ -305,8 +310,11 @@ AC_DEFUN([EM_PATH_TCLXCONFIG], [
 	    if test x"${em_cv_tclxconfig}" = x ; then
 		for i in `ls -d ${libdir} 2>/dev/null` \
 			`ls -d /usr/local/lib 2>/dev/null` \
+			`ls -d /usr/local/lib/tclx[[8-9]].[[0-9]]* 2>/dev/null` \
 			`ls -d /usr/contrib/lib 2>/dev/null` \
+			`ls -d /usr/contrib/lib/tclx[[8-9]].[[0-9]]* 2>/dev/null` \
 			`ls -d /usr/lib 2>/dev/null` \
+			`ls -d /usr/lib/tclx[[8-9]].[[0-9]]* 2>/dev/null` \
 			; do
 		    if test -f "$i/tclxConfig.sh" ; then
 			em_cv_tclxconfig=`(cd $i; pwd)`

@@ -1,6 +1,6 @@
 dnl
 dnl File:        configure.in
-dnl Revision:    $Id: configure.ac,v 1.20.6.1 2006/04/20 22:35:33 rkowen Exp $
+dnl Revision:    $Id: configure.ac,v 1.20.6.2 2006/05/04 14:38:32 rkowen Exp $
 dnl Created:     1994/06/18
 dnl Author:      Leif Hedstrom<hedstrom@inf.ethz.ch>
 dnl		 Martin S. Utesch <wstd@hl.siemens.de>
@@ -230,9 +230,9 @@ This symbol, if defined, indicates that the C program can use X11
 directly.])dnl
 	AC_DEFINE(HAS_X11LIBS)dnl
 	AC_CHECK_LIB(X11, XMaxRequestSize,,,
-		[-I $ac_x_includes -L $ac_x_libraries])dnl
-	AC_CHECK_LIB(Xmu, XmuGetHostname,,,
-		[-I $ac_x_includes -L $ac_x_libraries])dnl
+		[-I ${ac_x_includes:-.} -L ${ac_x_libraries:-.}])dnl
+dnl	AC_CHECK_LIB(Xmu, XmuGetHostname,,,
+dnl		[-I ${ac_x_includes:-.} -L ${ac_x_libraries:-.}])dnl
 
 fi
 dnl ---------------------------------------------------------------------------
@@ -797,13 +797,15 @@ dnl--------------------------------------------------------------------
 
 EM_PATH_TCLXCONFIG
 EM_LOAD_TCLXCONFIG
-if test x"$no_tclx" != x"true"; then
-	AH_TEMPLATE([HAS_TCLXLIBS],[
-HAS_TCLXLIBS:
-This symbol, if defined, indicates that Modules should support
-extended TCL (tclX) commands.])dnl
-	AC_DEFINE(HAS_TCLXLIBS)dnl
-fi
+dnl if test x"$no_tclx" != x"true"; then
+dnl 	AH_TEMPLATE([HAS_TCLXLIBS],[
+dnl HAS_TCLXLIBS:
+dnl This symbol, if defined, indicates that Modules should support
+dnl extended TCL (tclX) commands.])dnl
+dnl 	AC_DEFINE(HAS_TCLXLIBS)dnl
+dnl fi
+EM_SET_TCLX
+EM_CHECK_TCLX
 
 dnl ---------------------------------------------------------------------------
 dnl
