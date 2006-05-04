@@ -29,7 +29,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: main.c,v 1.16.4.2 2006/03/07 19:18:55 rkowen Exp $";
+static char Id[] = "@(#)$Id: main.c,v 1.16.4.2.4.1 2006/05/04 16:36:39 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -772,17 +772,22 @@ static void version (FILE *output) {
 	fprintf(output, format, "DATE", date_string);
 	fprintf(output, "\n");
 	isdefined(AUTOLOADPATH,str(AUTOLOADPATH));
+	isdefined(BASEPREFIX,str(BASEPREFIX));
 	isdefined(BEGINENV,str(BEGINENV));
 	isdefined(CACHE_AVAIL,str(CACHE_AVAIL));
 	isdefined(DEF_COLLATE_BY_NUMBER,str(DEF_COLLATE_BY_NUMBER));
 	isdefined(DOT_EXT,str(DOT_EXT));
+	isdefined(EVAL_ALIAS,str(EVAL_ALIAS));
 	isdefined(HAS_BOURNE_FUNCS,str(HAS_BOURNE_FUNCS));
 	isdefined(HAS_BOURNE_ALIAS,str(HAS_BOURNE_ALIAS));
-	isdefined(EVAL_ALIAS,str(EVAL_ALIAS));
+	isdefined(HAS_TCLXLIBS,str(HAS_TCLXLIBS));
+	isdefined(HAS_X11LIBS,str(HAS_X11LIBS));
 	isdefined(LMSPLIT_SIZE,str(LMSPLIT_SIZE));
 	isdefined(MODULEPATH,str(MODULEPATH));
 	isdefined(MODULES_INIT_DIR,str(MODULES_INIT_DIR));
 	isdefined(PREFIX,str(PREFIX));
+	isdefined(TCL_VERSION,str(TCL_VERSION));
+	isdefined(TCL_PATCH_VERSION,str(TCL_PATCH_VERSION));
 	isdefined(TMP_DIR,str(TMP_DIR));
 	isdefined(USE_FREE,str(USE_FREE));
 	isdefined(VERSION_MAGIC,str(VERSION_MAGIC));
