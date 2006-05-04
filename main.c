@@ -29,7 +29,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: main.c,v 1.16.4.2.4.2 2006/05/04 22:02:44 rkowen Exp $";
+static char Id[] = "@(#)$Id: main.c,v 1.16.4.2.4.3 2006/05/04 22:03:47 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -794,6 +794,8 @@ static void version (FILE *output) {
 	isdefined(VERSIONPATH,str(VERSIONPATH));
 	isdefined(WANTS_VERSIONING,str(WANTS_VERSIONING));
 	isdefined(WITH_DEBUG_INFO,str(WITH_DEBUG_INFO));
+
+	fprintf(output, "\n");
 }
 
 #undef str
