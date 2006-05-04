@@ -174,7 +174,7 @@ AC_DEFUN([EM_SET_TCLX], [
 	AC_CACHE_VAL(em_cv_tclxver,[
 	    # First check to see if --with-tclx-ver was specified.
 	    if test x"${with_tclxver}" = x ; then
-		em_cv_tclxver=`echo 'puts [[info tclxversion]]' | tclsh 2>/dev/null`
+		em_cv_tclxver=`echo 'puts [[info tclversion]]' | tclsh 2>/dev/null`
 	    else
 		em_cv_tclxver=${with_tclxver}
 	    fi
@@ -183,7 +183,7 @@ AC_DEFUN([EM_SET_TCLX], [
 	    if test x"$tclxver" = x ; then
 		AC_MSG_ERROR([Must specify version (X.Y) if using this option])
 	    fi
-	    AC_MSG_RESULT([${em_cv_tclxver}])
+	    AC_MSG_RESULT([using ${em_cv_tclxver}])
 	])
 	TCLX_VERSION="${em_cv_tclxver}"
 
@@ -268,18 +268,24 @@ AC_DEFUN([EM_CHECK_TCLX], [
 
 	AC_MSG_CHECKING([TCLX_LIB_SPEC])
 	if test x"$TCLX_LIB_SPEC" = x ; then
-		AC_MSG_ERROR(
+		no_tclx=true
+		no_tclx_lib=true
+		AC_MSG_RESULT(
 		[TCLX_LIB_SPEC not found, need to use --with-tclx-lib])
 	else
+		no_tclx=
+		no_tclx_lib=
 		AC_MSG_RESULT([$TCLX_LIB_SPEC])
 	fi
 	AC_SUBST(TCLX_LIB_SPEC)
 
 	AC_MSG_CHECKING([TCLX_INCLUDE_SPEC])
 	if test x"$TCLX_INCLUDE_SPEC" = x ; then
-		AC_MSG_ERROR(
+		no_tclx=true
+		AC_MSG_RESULT(
 		[TCLX_INCLUDE_SPEC not found, need to use --with-tclx-inc])
 	else
+		test x"$no_tclx_lib" = x && no_tclx=
 		AC_MSG_RESULT([$TCLX_INCLUDE_SPEC])
 	fi
 	AC_SUBST(TCLX_INCLUDE_SPEC)

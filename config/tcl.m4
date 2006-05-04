@@ -237,7 +237,7 @@ AC_DEFUN([SC_LOAD_TCLCONFIG], [
 # EM_PATH_TCLXCONFIG --
 #
 #	Locate the tclxConfig.sh file and perform a sanity check on
-#	the Tclx compile flags
+#	the TclX compile flags
 #
 # Arguments:
 #	none
@@ -254,7 +254,7 @@ AC_DEFUN([SC_LOAD_TCLCONFIG], [
 
 AC_DEFUN([EM_PATH_TCLXCONFIG], [
     #
-    # Ok, lets find the tclx configuration
+    # Ok, lets find the TclX configuration
     # First, look for one uninstalled.
     # the alternative search directory is invoked by --with-tcl
     #
@@ -264,14 +264,14 @@ AC_DEFUN([EM_PATH_TCLXCONFIG], [
 	no_tclx=true
 	AC_ARG_WITH(tclx,
 	AC_HELP_STRING([--with-tclx=<dir>],
-	[directory containing tclx configuration (tclxConfig.sh) [[searches]]]),
+	[directory containing TclX configuration (tclxConfig.sh) [[searches]]]),
 	with_tclxconfig=${withval},
 	)
 	if test x"$withval" = x"no" ; then
-		AC_MSG_NOTICE([Skipping Tclx configuration])
+		AC_MSG_NOTICE([Skipping TclX configuration])
 		no_tclx=true
 	else #{
-		AC_MSG_CHECKING([for Tclx configuration (tclxConfig.sh)])
+		AC_MSG_CHECKING([for TclX configuration (tclxConfig.sh)])
 		AC_CACHE_VAL(em_cv_tclxconfig,[
 
 	    # First check to see if --with-tclx was specified.
@@ -339,7 +339,7 @@ AC_DEFUN([EM_PATH_TCLXCONFIG], [
 		])
 
 		if test x"${em_cv_tclxconfig}" = x ; then
-		    TCLX_BIN_DIR="# no Tclx configs found"
+		    TCLX_BIN_DIR="# no TclX configs found"
 		    AC_MSG_RESULT([not found])
 		else
 		    no_tclx=

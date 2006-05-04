@@ -1,6 +1,37 @@
 Do Not Edit!  This is a generated file.
 	You should edit the NEWS file instead.
 
+2006-05-04 07:38  rkowen
+
+	* NEWS, configure.ac, config/emtcl.m4, config/tcl.m4: * Replaced
+	all strtok() calls with an internal version.  * Now can
+	append/prepend and empty string '' or colons ':' * Added more
+	--with-tclx-* options in case tclxConfig.sh   can not be found, but
+	the TclX lib does exist.  * Expanded the search path for
+	tclConfig.sh.
+
+2006-05-01 15:07  rkowen
+
+	* Makefile.am: Don't have a ChangeLog target.
+
+2006-05-01 07:54  rkowen
+
+	* version.c: Updated release date.
+
+2006-05-01 07:52  rkowen
+
+	* ModuleCmd_List.c, ModuleCmd_Refresh.c, ModuleCmd_Update.c,
+	ModuleCmd_Whatis.c, cmdLog.c, configure.ac, error.c,
+	locate_module.c, modules_def.h, utility.c,
+	testsuite/modulefiles/append/0.1, testsuite/modulefiles/append/0.2,
+	testsuite/modulefiles/prepend/0.1,
+	testsuite/modulefiles/prepend/0.2,
+	testsuite/modules.50-cmds/040-append.exp,
+	testsuite/modules.50-cmds/045-append-undo.exp,
+	testsuite/modules.50-cmds/050-prepend.exp,
+	testsuite/modules.50-cmds/055-prepend-undo.exp: Rolled in the
+	xstrtok changes and tests from modules-3-2-2.
+
 2006-04-20 15:35  rkowen
 
 	* testsuite/modulefiles/: append/0.1, prepend/0.1: file 0.1 was
@@ -1515,7 +1546,7 @@ Do Not Edit!  This is a generated file.
 
 2003-08-07 14:07  harlan
 
-	* tcl/modulecmd.tcl: Add $Revision: 1.50.2.4.2.1.2.2 $ to the version
+	* tcl/modulecmd.tcl: Add $Revision: 1.50.2.4.2.1.2.3 $ to the version
 
 2003-08-07 12:52  harlan
 

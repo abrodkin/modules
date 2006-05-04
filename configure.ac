@@ -1,6 +1,6 @@
 dnl
 dnl File:        configure.in
-dnl Revision:    $Id: configure.ac,v 1.20.6.2 2006/05/04 14:38:32 rkowen Exp $
+dnl Revision:    $Id: configure.ac,v 1.20.6.3 2006/05/04 22:02:44 rkowen Exp $
 dnl Created:     1994/06/18
 dnl Author:      Leif Hedstrom<hedstrom@inf.ethz.ch>
 dnl		 Martin S. Utesch <wstd@hl.siemens.de>
@@ -42,11 +42,6 @@ AH_TOP([
  ** 									     ** 
  ** ************************************************************************ **/
 ])dnl
-AH_TEMPLATE([TCL_MINOR_VERSION],[
-TCL_MINOR_VERSION: if defined, contains the version of TCL (and TCLX)])dnl
-AH_TEMPLATE([TCL_MAJOR_VERSION],[
-TCL_MAJOR_VERSION: if defined, contains the version of TCL (and TCLX)])dnl
-dnl
 dnl ---------------------------------------------------------------------------
 dnl
 dnl Some special substitution we need:
@@ -797,15 +792,15 @@ dnl--------------------------------------------------------------------
 
 EM_PATH_TCLXCONFIG
 EM_LOAD_TCLXCONFIG
-dnl if test x"$no_tclx" != x"true"; then
-dnl 	AH_TEMPLATE([HAS_TCLXLIBS],[
-dnl HAS_TCLXLIBS:
-dnl This symbol, if defined, indicates that Modules should support
-dnl extended TCL (tclX) commands.])dnl
-dnl 	AC_DEFINE(HAS_TCLXLIBS)dnl
-dnl fi
 EM_SET_TCLX
 EM_CHECK_TCLX
+if test x"$no_tclx" != x"true"; then
+	AH_TEMPLATE([HAS_TCLXLIBS],[
+HAS_TCLXLIBS:
+This symbol, if defined, indicates that Modules should support
+extended TCL (tclX) commands.])dnl
+	AC_DEFINE(HAS_TCLXLIBS)dnl
+fi
 
 dnl ---------------------------------------------------------------------------
 dnl

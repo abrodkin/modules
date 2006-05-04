@@ -29,7 +29,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: main.c,v 1.16.4.2.4.1 2006/05/04 16:36:39 rkowen Exp $";
+static char Id[] = "@(#)$Id: main.c,v 1.16.4.2.4.2 2006/05/04 22:02:44 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -787,7 +787,7 @@ static void version (FILE *output) {
 	isdefined(MODULES_INIT_DIR,str(MODULES_INIT_DIR));
 	isdefined(PREFIX,str(PREFIX));
 	isdefined(TCL_VERSION,str(TCL_VERSION));
-	isdefined(TCL_PATCH_VERSION,str(TCL_PATCH_VERSION));
+	isdefined(TCL_PATCH_LEVEL,str(TCL_PATCH_LEVEL));
 	isdefined(TMP_DIR,str(TMP_DIR));
 	isdefined(USE_FREE,str(USE_FREE));
 	isdefined(VERSION_MAGIC,str(VERSION_MAGIC));
