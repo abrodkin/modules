@@ -1,6 +1,26 @@
 Do Not Edit!  This is a generated file.
 	You should edit the NEWS file instead.
 
+2006-05-04 15:03  rkowen
+
+	* main.c: Trivial add of linefeed.
+
+2006-05-04 15:02  rkowen
+
+	* Makefile.am, NEWS, configure.ac, init.c, main.c, version.c,
+	config/emtcl.m4, config/tcl.m4: * Updated the TclX init call for
+	8.4 - fixed up the TclX config logic.
+
+2006-05-04 09:55  rkowen
+
+	* NEWS, configure.ac, main.c, config/emtcl.m4, config/tcl.m4:
+	Rolled in the 3.2.2 configure changes to the main development
+	trunk.
+
+2006-05-04 09:36  rkowen
+
+	* main.c: Added more macros to display when given --version
+
 2006-05-04 07:38  rkowen
 
 	* NEWS, configure.ac, config/emtcl.m4, config/tcl.m4: * Replaced
@@ -1546,7 +1566,7 @@ Do Not Edit!  This is a generated file.
 
 2003-08-07 14:07  harlan
 
-	* tcl/modulecmd.tcl: Add $Revision: 1.50.2.4.2.1.2.3 $ to the version
+	* tcl/modulecmd.tcl: Add $Revision: 1.50.2.4.2.1.2.4 $ to the version
 
 2003-08-07 12:52  harlan
 
