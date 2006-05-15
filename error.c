@@ -30,7 +30,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: error.c,v 1.8.6.1.4.1 2006/04/20 22:35:33 rkowen Exp $";
+static char Id[] = "@(#)$Id: error.c,v 1.8.6.1.4.1.2.1 2006/05/15 21:05:27 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -957,6 +957,11 @@ static	int	FlushError(	ErrType		  Type,
 #if defined(HAVE_SYSLOG) && defined(WITH_LOGGING)
 	    int syslog_fac, syslog_lvl;
 
+	/* error output to stderr too if an error or verbose */
+	    if (Type >= NO_ERR_VERBOSE)
+		fprintf( stderr, "%s", errmsg_buffer);
+
+	/* now send to syslog */
 	    if( CheckFacility( fac, &syslog_fac, &syslog_lvl)) {
 		openlog( "modulecmd", LOG_PID, syslog_fac);
 		setlogmask( LOG_UPTO( syslog_lvl));
@@ -973,7 +978,7 @@ static	int	FlushError(	ErrType		  Type,
 
 #else
 #  ifdef	SYSLOG_DIR
-	    /* this is an intential memory leak */
+	    /* this is an intentional memory leak */
 	    buffer = stringer(NULL,0, SYSLOG_DIR, "/", fac);
 	    fac = buffer;
 #  endif
