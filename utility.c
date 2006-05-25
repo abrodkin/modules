@@ -51,7 +51,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.19.2.6.4.1 2006/04/20 22:35:33 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.19.2.6.4.1.2.1 2006/05/25 21:07:27 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -771,7 +771,6 @@ int Output_Modulefile_Changes(	Tcl_Interp	*interp)
 
 static	int Open_Aliasfile(int action)
 {
-
     if (action) {
 	/**
 	 **  Open the file ...
@@ -781,7 +780,7 @@ static	int Open_Aliasfile(int action)
 		return( TCL_ERROR);	/** -------- EXIT (FAILURE) -------> **/
     } else {
 	if( EOF == fclose( aliasfile))
-	    if( OK != ErrorLogger( ERR_CLOSE, LOC, aliasfile, NULL))
+	    if( OK != ErrorLogger( ERR_CLOSE, LOC, aliasfilename, NULL))
 		return( TCL_ERROR);	/** -------- EXIT (FAILURE) -------> **/
     }
 
@@ -918,8 +917,8 @@ static	int Output_Modulefile_Aliases( Tcl_Interp *interp)
 
 
     if(openfile) {
-	if( OK == Open_Aliasfile(0))
-	    if( OK != ErrorLogger( ERR_CLOSE, LOC, aliasfile, NULL))
+	if( OK != Open_Aliasfile(0))
+	    if( OK != ErrorLogger( ERR_CLOSE, LOC, aliasfilename, NULL))
 		return( TCL_ERROR);	/** -------- EXIT (FAILURE) -------> **/
 
 	null_free((void *) &aliasfilename);
@@ -1204,42 +1203,48 @@ static	int	output_unset_variable( const char* var)
 static	void	output_function(	const char	*var,
 					const char	*val)
 {
-    const char	*cptr = val;
-    int 	nobackslash = 1;
-    
+    const char *cptr = val;
+    int nobackslash = 1;
+
 #if WITH_DEBUGGING_UTIL_2
-    ErrorLogger( NO_ERR_START, LOC, _proc_output_function, NULL);
+    ErrorLogger(NO_ERR_START, LOC, _proc_output_function, NULL);
 #endif
 
     /**
      **  This opens a function ...
      **/
-    fprintf( aliasfile, "%s() { ", var);
+    fprintf(aliasfile, "%s() { ", var);
 
     /**
      **  ... now print the value. Print it as a single line and remove any
-     **  backslash
+     **  backslashes, and substitute a safe $*
      **/
-    while( *cptr) {
+    while (*cptr) {
 
-        if( *cptr == '\\') {
-            if( !nobackslash)
-		putc( *cptr, aliasfile);
-            else
+	if (*cptr == '\\') {
+	    if (!nobackslash)
+		putc(*cptr, aliasfile);
+	    else
 		nobackslash = 0;
-            cptr++;
-            continue;
-        } else
-            nobackslash = 1;
+	    cptr++;
+	    continue;
+	} else if (*cptr == '$' && (cptr + 1) && (*(cptr + 1) == '*')) {
+	    /* found $* */
+	    fputs("${1+\"$@\"}", aliasfile);
+	    cptr++;
+	    cptr++;
+	    continue;
+	} else
+	    nobackslash = 1;
 
-        putc(*cptr++, aliasfile);
+	putc(*cptr++, aliasfile);
 
     } /** while **/
 
     /**
      **  Finally close the function
      **/
-    fprintf( aliasfile, "%c}%c", alias_separator,alias_separator);
+    fprintf(aliasfile, "%c}%c", alias_separator, alias_separator);
 
 } /** End of 'output_function' **/
 
