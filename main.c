@@ -29,7 +29,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: main.c,v 1.16.4.2.4.3.2.1 2006/05/15 18:36:20 rkowen Exp $";
+static char Id[] = "@(#)$Id: main.c,v 1.16.4.2.4.3.2.2 2006/06/01 14:32:07 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -79,6 +79,7 @@ int	  g_flags = 0,			/** Control what to do at the moment **/
 	  append_flag = 0;		/** only used by the 'use' command   **/
 
 char	  _default[] = "default";	/** id string for default versions   **/
+char	  _colon[]   = ":";		/** directory separator		     **/
 
 /**
  **  Name of the rc files
