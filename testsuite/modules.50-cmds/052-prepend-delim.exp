@@ -69,7 +69,6 @@ test_cmd "perl" "load $module" "$lm_perl$lmf_perl$ts_perl"
 
 unset env(testsuite)
 
-unset ts_perl
 unset ts_new
 unset ts_3
 unset ts_2

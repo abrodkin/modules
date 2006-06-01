@@ -78,7 +78,6 @@ unset env(testsuite)
 unset env(_LMFILES_)
 unset env(LOADEDMODULES)
 
-unset ts_perl
 unset ts_new
 unset ts_3
 unset ts_2
