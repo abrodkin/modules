@@ -33,7 +33,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: locate_module.c,v 1.14.4.1.2.1 2006/06/01 14:32:07 rkowen Exp $";
+static char Id[] = "@(#)$Id: locate_module.c,v 1.14.4.1.2.2 2006/06/01 18:47:07 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -861,7 +861,7 @@ unwind0:
 char	**SplitIntoList(	Tcl_Interp	*interp,
 		     		char		*pathenv, 
 		     		int		*numpaths,
-				char		*delim) 
+				const char	*delim) 
 {
     char	**pathlist = NULL;	/** Temporary base pointer for the   **/
 					/** array to be created		     **/
