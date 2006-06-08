@@ -25,7 +25,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Update.c,v 1.6 2005/11/29 04:16:07 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Update.c,v 1.6.8.1 2006/06/08 04:17:53 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -246,9 +246,9 @@ int	ModuleCmd_Update(	Tcl_Interp	*interp,
      **/
     if( *loaded) {
 
-	for( load_list[ list_count++] = strtok( loaded, ":");
+	for( load_list[ list_count++] = xstrtok( loaded, ":");
 	     load_list[ list_count-1];
-             load_list[ list_count++] = strtok( NULL, ":") ) {
+             load_list[ list_count++] = xstrtok( NULL, ":") ) {
 
 	    /**
 	     **  Conditionally we have to double the space, we've allocated for

@@ -27,7 +27,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdConflict.c,v 1.9 2005/11/29 04:26:30 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdConflict.c,v 1.9.10.1 2006/06/08 04:17:53 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -270,7 +270,8 @@ int	cmdConflict(	ClientData	 client_data,
 	if( OK != ErrorLogger( ERR_MODULE_PATH, LOC, NULL))
 	    goto unwind0;
 
-    if((char **) NULL==(pathlist=SplitIntoList(interp, modulepath, &numpaths)))
+    if((char **) NULL==(pathlist=SplitIntoList(interp, modulepath, &numpaths,
+	_colon)))
         goto success1;
 
     /**
@@ -438,7 +439,8 @@ int	cmdPrereq(	ClientData	 client_data,
     ErrorLogger( NO_ERR_DEBUG, LOC, "Got modulepath: '", modulepath, "'", NULL);
 #endif
 
-    if((char **) NULL==(pathlist=SplitIntoList(interp, modulepath, &numpaths)))
+    if((char **) NULL==(pathlist=SplitIntoList(interp, modulepath, &numpaths,
+	_colon)))
         goto success1;
 
     /**

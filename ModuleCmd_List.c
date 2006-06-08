@@ -26,7 +26,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_List.c,v 1.5 2005/11/29 04:26:30 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_List.c,v 1.5.8.1 2006/06/08 04:17:53 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -134,13 +134,13 @@ int	ModuleCmd_List(	Tcl_Interp	*interp,
 	 **/
 
 	count1 = 1;
-        for( list[ 0] = strtok( loaded, ":");
-	     list[ count1] = strtok( NULL, ":");
+        for( list[ 0] = xstrtok( loaded, ":");
+	     list[ count1] = xstrtok( NULL, ":");
 	     count1++ );
 
 	count2 = 1;
-        for( files[ 0] = strtok( lmfiles, ":");
-	     files[ count2] = strtok( NULL, ":");
+        for( files[ 0] = xstrtok( lmfiles, ":");
+	     files[ count2] = xstrtok( NULL, ":");
 	     count2++ );
 	if (count1 != count2) {
 	  ErrorLogger( ERR_ENVVAR, LOC, NULL);

@@ -1,6 +1,292 @@
 Do Not Edit!  This is a generated file.
 	You should edit the NEWS file instead.
 
+2006-05-25 14:07  rkowen
+
+	* NEWS, utility.c, testsuite/modulefiles/alias/1.0,
+	testsuite/modules.50-cmds/075-alias.exp,
+	testsuite/modules.50-cmds/076-alias-sub.exp,
+	testsuite/modules.50-cmds/078-refresh.exp: * the set-alias command
+	will for Bourne shell derivatives substitute the safe ${1+"$@"} for
+	$*.  Addressed the feature request: [ 705032 ] Bourne shell aliases
+	should allow arguments.
+
+2006-05-25 14:07  rkowen
+
+	* testsuite/modules.50-cmds/076-alias-sub.exp: file
+	076-alias-sub.exp was initially added on branch modules-3-2-3.
+
+2006-05-25 14:07  rkowen
+
+	* testsuite/modulefiles/alias/1.0: file 1.0 was initially added on
+	branch modules-3-2-3.
+
+2006-05-19 08:53  rkowen
+
+	* Makefile.am, NEWS, init.c: Rolled in the TclX changes from 3-2-2.
+
+2006-05-15 14:11  rkowen
+
+	* NEWS, error.c, main.c,
+	testsuite/modules.35-trace/010-init_ts.exp,
+	testsuite/modules.50-cmds/100-loglevel.exp: Rolled in the syslog
+	related changes from 3.2.3
+
+2006-05-15 14:05  rkowen
+
+	* NEWS, error.c, testsuite/modules.35-trace/010-init_ts.exp,
+	testsuite/modules.50-cmds/100-loglevel.exp: Addressed bug [ 1471913
+	] syslog facility not working.	Actually, it is working, but the
+	changes will allow it to pass the tests.  There may still be a
+	memory error, but can't find it.
+
+2006-05-15 11:36  rkowen
+
+	* main.c: Bug fix [ 1471940 ] --with-debug=yes build fails Thanks
+	to Steven Klass for finding this.
+
+2006-05-12 15:30  rkowen
+
+	* NEWS: Added a section for 3.3.x
+
+2006-05-12 15:28  rkowen
+
+	* NEWS, cmdVersion.c: Folded in dgoldendias patch.
+
+2006-05-12 15:23  rkowen
+
+	* NEWS, cmdVersion.c, version.c: Included the patch by David Golden
+	Dias [ 1460801 ] to allow version names to be substrings of other
+	version names.
+
+2006-05-12 13:58  rkowen
+
+	* modules.lsm.in: Added the Title line, which must have gotten lost
+	in previous edits.
+
+2006-05-12 06:34  rkowen
+
+	* modules.lsm.in: Added the Title line, which must have been
+	dropped by accident.
+
+2006-05-04 15:03  rkowen
+
+	* main.c: Trivial add of linefeed.
+
+2006-05-04 15:02  rkowen
+
+	* Makefile.am, NEWS, configure.ac, init.c, main.c, version.c,
+	config/emtcl.m4, config/tcl.m4: * Updated the TclX init call for
+	8.4 - fixed up the TclX config logic.
+
+2006-05-04 09:55  rkowen
+
+	* NEWS, configure.ac, main.c, config/emtcl.m4, config/tcl.m4:
+	Rolled in the 3.2.2 configure changes to the main development
+	trunk.
+
+2006-05-04 09:36  rkowen
+
+	* main.c: Added more macros to display when given --version
+
+2006-05-04 07:38  rkowen
+
+	* NEWS, configure.ac, config/emtcl.m4, config/tcl.m4: * Replaced
+	all strtok() calls with an internal version.  * Now can
+	append/prepend and empty string '' or colons ':' * Added more
+	--with-tclx-* options in case tclxConfig.sh   can not be found, but
+	the TclX lib does exist.  * Expanded the search path for
+	tclConfig.sh.
+
+2006-05-01 15:07  rkowen
+
+	* Makefile.am: Don't have a ChangeLog target.
+
+2006-05-01 07:54  rkowen
+
+	* version.c: Updated release date.
+
+2006-05-01 07:52  rkowen
+
+	* ModuleCmd_List.c, ModuleCmd_Refresh.c, ModuleCmd_Update.c,
+	ModuleCmd_Whatis.c, cmdLog.c, configure.ac, error.c,
+	locate_module.c, modules_def.h, utility.c,
+	testsuite/modulefiles/append/0.1, testsuite/modulefiles/append/0.2,
+	testsuite/modulefiles/prepend/0.1,
+	testsuite/modulefiles/prepend/0.2,
+	testsuite/modules.50-cmds/040-append.exp,
+	testsuite/modules.50-cmds/045-append-undo.exp,
+	testsuite/modules.50-cmds/050-prepend.exp,
+	testsuite/modules.50-cmds/055-prepend-undo.exp: Rolled in the
+	xstrtok changes and tests from modules-3-2-2.
+
+2006-04-20 15:35  rkowen
+
+	* testsuite/modulefiles/: append/0.1, prepend/0.1: file 0.1 was
+	initially added on branch modules-3-2-2.
+
+2006-04-20 15:35  rkowen
+
+	* testsuite/modulefiles/: append/0.2, prepend/0.2: file 0.2 was
+	initially added on branch modules-3-2-2.
+
+2006-04-20 15:35  rkowen
+
+	* ModuleCmd_List.c, ModuleCmd_Refresh.c, ModuleCmd_Update.c,
+	ModuleCmd_Whatis.c, NEWS, cmdLog.c, configure.ac, error.c,
+	locate_module.c, modules_def.h, utility.c, version.c,
+	testsuite/modulefiles/append/0.1, testsuite/modulefiles/append/0.2,
+	testsuite/modulefiles/prepend/0.1,
+	testsuite/modulefiles/prepend/0.2,
+	testsuite/modules.50-cmds/040-append.exp,
+	testsuite/modules.50-cmds/045-append-undo.exp,
+	testsuite/modules.50-cmds/050-prepend.exp,
+	testsuite/modules.50-cmds/055-prepend-undo.exp: Crafted an internal
+	version of strtok(), which allows for empty tokens and to obviate
+	the need to use any "native" strtok()s.
+
+2006-04-10 13:04  rkowen
+
+	* init/Makefile.am: Rolled in $(top_srcdir) and $(srcdir) changes
+	from main trunk.
+
+2006-04-10 13:03  rkowen
+
+	* init/Makefile.am: Change from using . & .. to $(srcdir) and
+	$(top_srcdir) respectively.  (Thanks to suggestion from Boris
+	Boesler <boesler.AT.ifn.et.tu-dresden.de>)
+
+2006-03-23 15:38  rkowen
+
+	* init/csh.in: Rolled in init csh fix from 3.2.1
+
+2006-03-23 15:31  rkowen
+
+	* version.c, init/csh.in: Fixed the csh init script.
+
+2006-03-23 14:37  rkowen
+
+	* version.c, init/csh.in, testsuite/modules.00-init/006-procs.exp,
+	testsuite/modules.70-maint/045-listlong.exp,
+	testsuite/modules.90-avail/050-long.exp: Merged in the 3.2.1
+	changes.
+
+2006-03-23 13:51  rkowen
+
+	* testsuite/: modules.70-maint/045-listlong.exp,
+	modules.90-avail/050-long.exp: Fixed the tests to use regexps to
+	allow the date/time stamp to vary for the listed module.
+
+2006-03-23 13:50  rkowen
+
+	* testsuite/modules.00-init/006-procs.exp: Add '--' to the regexp
+	call so any tests that have lines that start with '-' will not be
+	interpreted as command options.
+
+2006-03-23 13:49  rkowen
+
+	* init/csh.in: Allow the command to pass a non-zero return status.
+
+2006-03-07 11:43  rkowen
+
+	* ModuleCmd_Load.c, NEWS, cmdModule.c, main.c, modules_def.h,
+	utility.c, doc/modulefile.4.in, testsuite/config/unix.exp,
+	testsuite/modulefiles/break/2.0, testsuite/modulefiles/break/4.0,
+	testsuite/modulefiles/continue/1.0,
+	testsuite/modulefiles/continue/2.0,
+	testsuite/modulefiles/continue/3.0,
+	testsuite/modulefiles/continue/4.0, testsuite/modulefiles/exit/1.0,
+	testsuite/modulefiles/exit/2.0, testsuite/modulefiles/exit/3.0,
+	testsuite/modules.00-init/006-procs.exp,
+	testsuite/modules.50-cmds/210-exit.exp,
+	testsuite/modules.50-cmds/220-continue.exp,
+	testsuite/modules.50-cmds/230-loop.exp,
+	testsuite/modules.50-cmds/999-cleanup.exp: Rolled in the 3.2.0 exit
+	changes.
+
+2006-03-07 11:18  rkowen
+
+	* main.c, modules_def.h, utility.c,
+	testsuite/modules.50-cmds/210-exit.exp: The resultant string to be
+	evaluated will now append a "test 0 = 1" string if an exit is
+	called.
+
+2006-02-21 14:26  rkowen
+
+	* testsuite/modulefiles/: continue/1.0, exit/1.0: file 1.0 was
+	initially added on branch modules-3-2-0.
+
+2006-02-21 14:26  rkowen
+
+	* testsuite/modulefiles/: continue/2.0, exit/2.0: file 2.0 was
+	initially added on branch modules-3-2-0.
+
+2006-02-21 14:26  rkowen
+
+	* testsuite/modules.50-cmds/210-exit.exp: file 210-exit.exp was
+	initially added on branch modules-3-2-0.
+
+2006-02-21 14:26  rkowen
+
+	* testsuite/modules.50-cmds/220-continue.exp: file 220-continue.exp
+	was initially added on branch modules-3-2-0.
+
+2006-02-21 14:26  rkowen
+
+	* testsuite/modules.50-cmds/230-loop.exp: file 230-loop.exp was
+	initially added on branch modules-3-2-0.
+
+2006-02-21 14:26  rkowen
+
+	* testsuite/modulefiles/: continue/3.0, exit/3.0: file 3.0 was
+	initially added on branch modules-3-2-0.
+
+2006-02-21 14:26  rkowen
+
+	* testsuite/modulefiles/: break/4.0, continue/4.0: file 4.0 was
+	initially added on branch modules-3-2-0.
+
+2006-02-21 14:26  rkowen
+
+	* testsuite/modules.50-cmds/999-cleanup.exp: file 999-cleanup.exp
+	was initially added on branch modules-3-2-0.
+
+2006-02-21 14:26  rkowen
+
+	* ModuleCmd_Load.c, NEWS, cmdModule.c, modules_def.h, utility.c,
+	doc/modulefile.4.in, testsuite/config/unix.exp,
+	testsuite/modulefiles/break/2.0, testsuite/modulefiles/break/4.0,
+	testsuite/modulefiles/continue/1.0,
+	testsuite/modulefiles/continue/2.0,
+	testsuite/modulefiles/continue/3.0,
+	testsuite/modulefiles/continue/4.0, testsuite/modulefiles/exit/1.0,
+	testsuite/modulefiles/exit/2.0, testsuite/modulefiles/exit/3.0,
+	testsuite/modules.00-init/006-procs.exp,
+	testsuite/modules.50-cmds/210-exit.exp,
+	testsuite/modules.50-cmds/220-continue.exp,
+	testsuite/modules.50-cmds/230-loop.exp,
+	testsuite/modules.50-cmds/999-cleanup.exp: Added or fixed up the
+	Tcl "break", "continue", and "exit N" commands to have definite
+	meanings,  and also added tests for the same.
+
+2006-02-21 10:05  rkowen
+
+	* testsuite/config/unix.exp: Catch the exit return code too.
+
+2006-02-13 09:42  rkowen
+
+	* ModuleCmd_Load.c, main.c, modules_def.h, utility.c: Added the
+	ReturnValue() fn to consolidate Tcl exit & result string testing.
+
+2006-02-09 13:32  rkowen
+
+	* init/: Makefile.am: Fixed the tcsh target.
+
+2006-02-06 14:03  rkowen
+
+	* cmdModule.c, cmdPath.c, init.c, modules_def.h: Rolled in the
+	Tcl_GetStringResult() changes from 3.2.0
+
 2006-02-06 13:52  rkowen
 
 	* cmdModule.c, cmdPath.c, init.c, modules_def.h: Got rid of all
@@ -1348,7 +1634,7 @@ Do Not Edit!  This is a generated file.
 
 2003-08-07 14:07  harlan
 
-	* tcl/modulecmd.tcl: Add $Revision: 1.50.2.4 $ to the version
+	* tcl/modulecmd.tcl: Add $Revision: 1.50.2.4.4.1 $ to the version
 
 2003-08-07 12:52  harlan
 
