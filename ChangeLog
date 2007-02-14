@@ -1,6 +1,10 @@
 Do Not Edit!  This is a generated file.
 	You should edit the NEWS file instead.
 
+2007-02-02 09:54  rkowen
+
+	* NEWS: Forgot to update NEWS with 3.2.4 changes
+
 2007-02-02 09:14  rkowen
 
 	* version.c: Updated the release date.
@@ -2280,7 +2284,7 @@ Do Not Edit!  This is a generated file.
 
 2003-08-07 14:07  harlan
 
-	* tcl/modulecmd.tcl: Add $Revision: 1.50.2.4.4.2 $ to the version
+	* tcl/modulecmd.tcl: Add $Revision: 1.50.2.4.4.3 $ to the version
 
 2003-08-07 12:52  harlan
 
