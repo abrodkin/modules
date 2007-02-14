@@ -12,7 +12,6 @@ Feb 14, 2007				R.K. Owen (rk@owen.sj.ca.us)
 	  This fixes a problem spotted by Francesco Nigro under AIX,
 	  and diagnosed by G Lehnert.
 	* Updated tests when domainname is unknown.
-
 Modules 3.2.4
 Feb  2, 2007				R.K. Owen (rk@owen.sj.ca.us)
 	* Fixed bug where "empty" directory paths in the MODULEPATH env.var.
