@@ -1,6 +1,78 @@
 Do Not Edit!  This is a generated file.
 	You should edit the NEWS file instead.
 
+2007-02-14 10:06  rkowen
+
+	* NEWS: Trivial format change.
+
+2007-02-14 10:04  rkowen
+
+	* NEWS, testsuite/modules.50-cmds/095-uname.exp: Rolled in 3.2.5
+	changes to the uname test
+
+2007-02-14 09:54  rkowen
+
+	* NEWS, testsuite/modules.50-cmds/095-uname.exp: Fixed the
+	uname/domainname test to handle when there is no domainname.
+
+2007-02-13 22:23  rkowen
+
+	* version.c: Updated version.
+
+2007-02-13 22:21  rkowen
+
+	* ModuleCmd_Avail.c, ModuleCmd_Update.c, ModuleCmd_Whatis.c,
+	cmdConflict.c, cmdLog.c, cmdModule.c, cmdTrace.c, cmdVersion.c,
+	cmdWhatis.c, cmdXResource.c, error.c, init.c, locate_module.c,
+	modules_def.h, utility.c: Rolled in the 3.2.5 module_malloc()
+	wrapper.
+
+2007-02-13 22:09  rkowen
+
+	* ModuleCmd_Avail.c, ModuleCmd_Update.c, ModuleCmd_Whatis.c,
+	cmdConflict.c, cmdLog.c, cmdModule.c, cmdTrace.c, cmdVersion.c,
+	cmdWhatis.c, cmdXResource.c, error.c, init.c, locate_module.c,
+	modules_def.h, utility.c, version.c: Wrapped all malloc() calls
+	with module_malloc().
+
+2007-02-13 21:38  rkowen
+
+	* Makefile.am, ModuleCmd_Init.c, ModuleCmd_List.c,
+	ModuleCmd_Refresh.c, ModuleCmd_Update.c, ModuleCmd_Whatis.c, NEWS,
+	TODO, cmdConflict.c, cmdIsLoaded.c, cmdLog.c, cmdPath.c,
+	cmdVersion.c, configure.ac, error.c, init.c, locate_module.c,
+	main.c, modules.lsm.in, modules_def.h, utility.c, version.c,
+	config/emtcl.m4, config/tcl.m4, doc/module.1.in,
+	doc/modulefile.4.in, etc/add.modules.in, etc/mkroot.in,
+	ext/add.ext.in, ext/mkroot.in, init/.modulespath.in,
+	init/Makefile.am, init/bash.in, init/csh.in, init/ksh.in,
+	init/sh.in, init/zsh.in, modulefiles/dot.in,
+	modulefiles/module-cvs.in, modulefiles/module-info.in,
+	modulefiles/modules.in, modulefiles/null.in,
+	modulefiles/use.own.in, modulefiles/version.in,
+	testsuite/modulefiles/alias/1.0, testsuite/modulefiles/append/0.1,
+	testsuite/modulefiles/append/0.2, testsuite/modulefiles/append/1.0,
+	testsuite/modulefiles/prepend/0.1,
+	testsuite/modulefiles/prepend/0.2,
+	testsuite/modulefiles/prepend/1.0,
+	testsuite/modules.00-init/006-procs.exp,
+	testsuite/modules.35-trace/010-init_ts.exp,
+	testsuite/modules.50-cmds/040-append.exp,
+	testsuite/modules.50-cmds/042-append-delim.exp,
+	testsuite/modules.50-cmds/045-append-undo.exp,
+	testsuite/modules.50-cmds/047-app-del-undo.exp,
+	testsuite/modules.50-cmds/050-prepend.exp,
+	testsuite/modules.50-cmds/052-prepend-delim.exp,
+	testsuite/modules.50-cmds/055-prepend-undo.exp,
+	testsuite/modules.50-cmds/057-pre-del-undo.exp,
+	testsuite/modules.50-cmds/075-alias.exp,
+	testsuite/modules.50-cmds/076-alias-sub.exp,
+	testsuite/modules.50-cmds/078-refresh.exp,
+	testsuite/modules.50-cmds/100-loglevel.exp,
+	testsuite/modules.70-maint/045-listlong.exp,
+	testsuite/modules.90-avail/050-long.exp: Preparing the
+	modules-3-2-5 branch.
+
 2007-02-02 09:54  rkowen
 
 	* NEWS: Forgot to update NEWS with 3.2.4 changes
@@ -481,9 +553,21 @@ Do Not Edit!  This is a generated file.
 
 2006-06-01 12:56  rkowen
 
+	* testsuite/modules.50-cmds/042-append-delim.exp: file
+	042-append-delim.exp was added on branch modules-3-2-5 on
+	2007-02-14 05:38:23 +0000
+
+2006-06-01 12:56  rkowen
+
 	* testsuite/modules.50-cmds/047-app-del-undo.exp: file
 	047-app-del-undo.exp was added on branch modules-3-2-0 on
 	2006-06-08 04:17:54 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modules.50-cmds/047-app-del-undo.exp: file
+	047-app-del-undo.exp was added on branch modules-3-2-5 on
+	2007-02-14 05:38:24 +0000
 
 2006-06-01 12:56  rkowen
 
@@ -493,9 +577,21 @@ Do Not Edit!  This is a generated file.
 
 2006-06-01 12:56  rkowen
 
+	* testsuite/modules.50-cmds/052-prepend-delim.exp: file
+	052-prepend-delim.exp was added on branch modules-3-2-5 on
+	2007-02-14 05:38:24 +0000
+
+2006-06-01 12:56  rkowen
+
 	* testsuite/modules.50-cmds/057-pre-del-undo.exp: file
 	057-pre-del-undo.exp was added on branch modules-3-2-0 on
 	2006-06-08 04:17:54 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modules.50-cmds/057-pre-del-undo.exp: file
+	057-pre-del-undo.exp was added on branch modules-3-2-5 on
+	2007-02-14 05:38:24 +0000
 
 2006-06-01 12:56  rkowen
 
@@ -516,6 +612,11 @@ Do Not Edit!  This is a generated file.
 
 	* testsuite/modulefiles/prepend/1.0: file 1.0 was added on branch
 	modules-3-2-4 on 2006-06-16 16:10:23 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modulefiles/: append/1.0, prepend/1.0: file 1.0 was
+	added on branch modules-3-2-5 on 2007-02-14 05:38:23 +0000
 
 2006-06-01 12:53  rkowen
 
@@ -628,8 +729,19 @@ Do Not Edit!  This is a generated file.
 
 2006-05-25 14:09  rkowen
 
+	* testsuite/modules.50-cmds/076-alias-sub.exp: file
+	076-alias-sub.exp was added on branch modules-3-2-5 on 2007-02-14
+	05:38:24 +0000
+
+2006-05-25 14:09  rkowen
+
 	* testsuite/modulefiles/alias/1.0: file 1.0 was added on branch
 	modules-3-2-0 on 2006-06-08 04:17:54 +0000
+
+2006-05-25 14:09  rkowen
+
+	* testsuite/modulefiles/alias/1.0: file 1.0 was added on branch
+	modules-3-2-5 on 2007-02-14 05:38:23 +0000
 
 2006-05-25 14:07  rkowen
 
@@ -748,6 +860,11 @@ Do Not Edit!  This is a generated file.
 
 2006-05-01 07:52  rkowen
 
+	* testsuite/modulefiles/: append/0.1, prepend/0.1: file 0.1 was
+	added on branch modules-3-2-5 on 2007-02-14 05:38:23 +0000
+
+2006-05-01 07:52  rkowen
+
 	* testsuite/modulefiles/: append/0.2, prepend/0.2: file 0.2 was
 	added on branch modules-3-2-0 on 2006-06-08 04:17:54 +0000
 
@@ -755,6 +872,11 @@ Do Not Edit!  This is a generated file.
 
 	* testsuite/modulefiles/: append/0.2, prepend/0.2: file 0.2 was
 	added on branch modules-3-2-4 on 2006-06-16 16:10:22 +0000
+
+2006-05-01 07:52  rkowen
+
+	* testsuite/modulefiles/: append/0.2, prepend/0.2: file 0.2 was
+	added on branch modules-3-2-5 on 2007-02-14 05:38:23 +0000
 
 2006-05-01 07:52  rkowen
 
@@ -2284,7 +2406,7 @@ Do Not Edit!  This is a generated file.
 
 2003-08-07 14:07  harlan
 
-	* tcl/modulecmd.tcl: Add $Revision: 1.50.2.4.6.1 $ to the version
+	* tcl/modulecmd.tcl: Add $Revision: 1.50.2.4.6.2 $ to the version
 
 2003-08-07 12:52  harlan
 
