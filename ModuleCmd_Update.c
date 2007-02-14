@@ -25,7 +25,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Update.c,v 1.6.10.1 2007/02/14 05:38:21 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Update.c,v 1.6.10.2 2007/02/14 06:09:03 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -233,7 +233,7 @@ int	ModuleCmd_Update(	Tcl_Interp	*interp,
      **  Allocate memory for a buffer to tokenize the list of loaded modules
      **  and a list buffer
      **/
-    if( NULL == (load_list = (char**) malloc( maxlist*sizeof(char**))))
+    if( NULL == (load_list = (char**) module_malloc( maxlist*sizeof(char**))))
 	if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
 	    goto unwind0;
     

@@ -30,7 +30,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: error.c,v 1.8.6.1.8.1 2007/02/14 05:38:21 rkowen Exp $";
+static char Id[] = "@(#)$Id: error.c,v 1.8.6.1.8.2 2007/02/14 06:09:04 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -609,7 +609,7 @@ int Module_Error(	ErrType		  error_type,
      **  Build the argument array at first
      **/
 
-    if( NULL == (argv = (char **) malloc( listsize * sizeof( char *)))) {
+    if( NULL == (argv = (char **) module_malloc(listsize * sizeof( char *)))) {
 	module = module_name;
 	error_type = ERR_ALLOC;
 	NoArgs = 1;

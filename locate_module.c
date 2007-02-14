@@ -33,7 +33,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: locate_module.c,v 1.14.10.1 2007/02/14 05:38:21 rkowen Exp $";
+static char Id[] = "@(#)$Id: locate_module.c,v 1.14.10.2 2007/02/14 06:09:04 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -1066,7 +1066,8 @@ int SourceRC( Tcl_Interp *interp, char *path, char *name)
 	     **/
 	    if( !listsize) {
 		listsize = SRCFRAG;
-		if((char **) NULL == (srclist = (char **) malloc( listsize *
+		if((char **) NULL
+			== (srclist = (char **) module_malloc( listsize *
 		    sizeof( char **)))) {
 		    ErrorLogger( ERR_ALLOC, LOC, NULL);
 		    goto unwind1;

@@ -26,7 +26,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdLog.c,v 1.5.10.1 2007/02/14 05:38:21 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdLog.c,v 1.5.10.2 2007/02/14 06:09:03 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -149,7 +149,7 @@ int	cmdModuleLog(	ClientData	 client_data,
     /**
      **  Allocate memory for the facility list
      **/
-    if((char *) NULL == (faclist = (char *) malloc( alc_len)))
+    if((char *) NULL == (faclist = (char *) module_malloc( alc_len)))
 	return(( OK == ErrorLogger( ERR_ALLOC, LOC, NULL)) ?
 	    TCL_OK : TCL_ERROR);
 
