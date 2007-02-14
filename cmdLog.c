@@ -26,7 +26,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdLog.c,v 1.5 2005/11/29 04:26:30 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdLog.c,v 1.5.10.1 2007/02/14 05:38:21 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -180,10 +180,11 @@ int	cmdModuleLog(	ClientData	 client_data,
 	    TCL_OK : TCL_ERROR);
     }
 
-    for( t = tmp, s = strtok( faclist, ":, \t");
+    for( t = tmp, s = xstrtok( faclist, ":, \t");
 	 s;
-	 s = strtok( NULL, ":, \t") ) {
+	 s = xstrtok( NULL, ":, \t") ) {
 
+	if (s && !*s) continue;		/* skip empty ones */
 	if( '.' == *s || '/' == *s ||			       /** filename  **/
 	    !strcmp( _stderr, s) || !strcmp( _stdout, s) ||    /** special   **/
 	    !strcmp( _null, s) || !strcmp( _none, s) ||        /** null	     **/
