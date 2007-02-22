@@ -36,7 +36,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: init.c,v 1.9.6.2 2006/02/06 21:52:33 rkowen Exp $";
+static char Id[] = "@(#)$Id: init.c,v 1.9.6.2.10.1 2007/02/22 23:13:00 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -46,7 +46,7 @@ static void *UseId[] = { &UseId, Id };
 #include "modules_def.h"
 
 #ifdef	HAS_TCLXLIBS
-#include "tclExtend.h"
+#  include "tclExtend.h"
 #endif	/* HAS_TCLXLIBS */
 
 /** ************************************************************************ **/
@@ -324,17 +324,17 @@ int Initialize_Tcl(	Tcl_Interp	**interp,
      **  initialized. Exit from the whole program in case allocation fails.
      **/
     if( ( ! ( setenvHashTable = 
-	    (Tcl_HashTable*) malloc( sizeof(Tcl_HashTable))) ) ||
+	    (Tcl_HashTable*) module_malloc( sizeof(Tcl_HashTable))) ) ||
         ( ! ( unsetenvHashTable = 
-	    (Tcl_HashTable*) malloc( sizeof(Tcl_HashTable))) ) ||
+	    (Tcl_HashTable*) module_malloc( sizeof(Tcl_HashTable))) ) ||
         ( ! ( aliasSetHashTable = 
-	    (Tcl_HashTable*) malloc( sizeof(Tcl_HashTable))) ) ||
+	    (Tcl_HashTable*) module_malloc( sizeof(Tcl_HashTable))) ) ||
         ( ! ( aliasUnsetHashTable = 
-	    (Tcl_HashTable*) malloc( sizeof(Tcl_HashTable))) ) ||
+	    (Tcl_HashTable*) module_malloc( sizeof(Tcl_HashTable))) ) ||
         ( ! ( markVariableHashTable = 
-	    (Tcl_HashTable*) malloc( sizeof(Tcl_HashTable))) ) ||
+	    (Tcl_HashTable*) module_malloc( sizeof(Tcl_HashTable))) ) ||
         ( ! ( markAliasHashTable = 
-	    (Tcl_HashTable*) malloc( sizeof(Tcl_HashTable))) ) ) {
+	    (Tcl_HashTable*) module_malloc( sizeof(Tcl_HashTable))) ) ) {
 
 	if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
 	    goto unwind0;
@@ -484,7 +484,9 @@ int InitializeModuleCommands( Tcl_Interp* interp)
      **  Extended Tcl initialization if configured so ...
      **/
 
-#if (TCL_MAJOR_VERSION > 7 || TCL_MAJOR_VERSION == 7 && TCL_MINOR_VERSION > 5)
+#if (TCL_MAJOR_VERSION > 8 || TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION > 3)
+    if( Tclx_Init( interp) == TCL_ERROR)
+#elif (TCL_MAJOR_VERSION > 7 || TCL_MAJOR_VERSION == 7 && TCL_MINOR_VERSION > 5)
     if( Tclxcmd_Init( interp) == TCL_ERROR)
 #else
     if( TclXCmd_Init( interp) == TCL_ERROR)

@@ -1,6 +1,1064 @@
 Do Not Edit!  This is a generated file.
 	You should edit the NEWS file instead.
 
+2007-02-14 10:06  rkowen
+
+	* NEWS: Trivial format change.
+
+2007-02-14 10:04  rkowen
+
+	* NEWS, testsuite/modules.50-cmds/095-uname.exp: Rolled in 3.2.5
+	changes to the uname test
+
+2007-02-14 09:54  rkowen
+
+	* NEWS, testsuite/modules.50-cmds/095-uname.exp: Fixed the
+	uname/domainname test to handle when there is no domainname.
+
+2007-02-13 22:23  rkowen
+
+	* version.c: Updated version.
+
+2007-02-13 22:21  rkowen
+
+	* ModuleCmd_Avail.c, ModuleCmd_Update.c, ModuleCmd_Whatis.c,
+	cmdConflict.c, cmdLog.c, cmdModule.c, cmdTrace.c, cmdVersion.c,
+	cmdWhatis.c, cmdXResource.c, error.c, init.c, locate_module.c,
+	modules_def.h, utility.c: Rolled in the 3.2.5 module_malloc()
+	wrapper.
+
+2007-02-13 22:09  rkowen
+
+	* ModuleCmd_Avail.c, ModuleCmd_Update.c, ModuleCmd_Whatis.c,
+	cmdConflict.c, cmdLog.c, cmdModule.c, cmdTrace.c, cmdVersion.c,
+	cmdWhatis.c, cmdXResource.c, error.c, init.c, locate_module.c,
+	modules_def.h, utility.c, version.c: Wrapped all malloc() calls
+	with module_malloc().
+
+2007-02-13 21:38  rkowen
+
+	* Makefile.am, ModuleCmd_Init.c, ModuleCmd_List.c,
+	ModuleCmd_Refresh.c, ModuleCmd_Update.c, ModuleCmd_Whatis.c, NEWS,
+	TODO, cmdConflict.c, cmdIsLoaded.c, cmdLog.c, cmdPath.c,
+	cmdVersion.c, configure.ac, error.c, init.c, locate_module.c,
+	main.c, modules.lsm.in, modules_def.h, utility.c, version.c,
+	config/emtcl.m4, config/tcl.m4, doc/module.1.in,
+	doc/modulefile.4.in, etc/add.modules.in, etc/mkroot.in,
+	ext/add.ext.in, ext/mkroot.in, init/.modulespath.in,
+	init/Makefile.am, init/bash.in, init/csh.in, init/ksh.in,
+	init/sh.in, init/zsh.in, modulefiles/dot.in,
+	modulefiles/module-cvs.in, modulefiles/module-info.in,
+	modulefiles/modules.in, modulefiles/null.in,
+	modulefiles/use.own.in, modulefiles/version.in,
+	testsuite/modulefiles/alias/1.0, testsuite/modulefiles/append/0.1,
+	testsuite/modulefiles/append/0.2, testsuite/modulefiles/append/1.0,
+	testsuite/modulefiles/prepend/0.1,
+	testsuite/modulefiles/prepend/0.2,
+	testsuite/modulefiles/prepend/1.0,
+	testsuite/modules.00-init/006-procs.exp,
+	testsuite/modules.35-trace/010-init_ts.exp,
+	testsuite/modules.50-cmds/040-append.exp,
+	testsuite/modules.50-cmds/042-append-delim.exp,
+	testsuite/modules.50-cmds/045-append-undo.exp,
+	testsuite/modules.50-cmds/047-app-del-undo.exp,
+	testsuite/modules.50-cmds/050-prepend.exp,
+	testsuite/modules.50-cmds/052-prepend-delim.exp,
+	testsuite/modules.50-cmds/055-prepend-undo.exp,
+	testsuite/modules.50-cmds/057-pre-del-undo.exp,
+	testsuite/modules.50-cmds/075-alias.exp,
+	testsuite/modules.50-cmds/076-alias-sub.exp,
+	testsuite/modules.50-cmds/078-refresh.exp,
+	testsuite/modules.50-cmds/100-loglevel.exp,
+	testsuite/modules.70-maint/045-listlong.exp,
+	testsuite/modules.90-avail/050-long.exp: Preparing the
+	modules-3-2-5 branch.
+
+2007-02-02 09:54  rkowen
+
+	* NEWS: Forgot to update NEWS with 3.2.4 changes
+
+2007-02-02 09:14  rkowen
+
+	* version.c: Updated the release date.
+
+2007-02-02 09:07  rkowen
+
+	* TODO: Need to fix the module-alias (sometime)
+
+2006-12-19 11:06  sirdude
+
+	* tcl/modulecmd.tcl: 
+	updated module list so it skips modules with no name for -l and -t
+	(it now handles them like module list without options)
+	
+	Kent
+
+2006-12-13 11:41  sirdude
+
+	* tcl/modulecmd.tcl: 
+	
+	Fix provied by Eric Mastromarc reference counting was not working
+	for unload-path now it is again.
+	
+	Kent
+
+2006-12-12 09:11  sirdude
+
+	* tcl/modulecmd.tcl: 
+	
+	Modified prereq so its a logical OR for multiple modulefies on one
+	command line.
+	
+	example: prereq foo bar If you want it foo AND bar do: prereq foo
+	prereq bar
+	
+	Patch done by Chris Pruett
+	
+	Kent
+
+2006-12-07 12:52  sirdude
+
+	* tcl/modulecmd.tcl: 
+	
+	Patch provided by  Thomas Zeiser,
+	
+	better fix for reverting header to find dynamically what version of
+	tclsh to use.  It also now sorts output of module avail.
+	
+	Kent
+
+2006-12-07 10:46  sirdude
+
+	* tcl/modulecmd.tcl: 
+	
+	reverting commit 1.75 where I removed the header section that finds
+	tclsh.
+	
+	Kent
+
+2006-09-13 10:41  sirdude
+
+	* tcl/modulecmd.tcl: 
+	
+	Changed (VAR)_modshare back to use g_def_seperator instead of user
+	defined variable.
+	
+	Currently there is an issue with doing something like append-path
+	-delem " " PATH /usr/bin append-path -delem " " PATH /usr/local/bin
+	append-path -delem ":" PATH /usr/sbin
+	
+	then loading that module and unloading it...  Because of the mixed
+	delimiters the unload does not work properly.  It at least works
+	for the basic case now though.
+	
+	Kent
+
+2006-09-07 10:44  sirdude
+
+	* tcl/modulecmd.tcl: 
+	
+	changed syntax of specifying a delimitor to match c version of
+	modules and also made sure you can use " " and { } as a delimitor.
+	
+	Thanks go to Dr Reinhold Bader for this fix....
+	
+	Kent
+
+2006-08-23 08:30  sirdude
+
+	* tcl/modulecmd.tcl: 
+	
+	"module use"   (without args) was broken, now its fixed again.
+	
+	Kent
+
+2006-08-23 08:24  sirdude
+
+	* tcl/modulecmd.tcl: 
+	
+	fixed revision variable stuff.
+	
+	Kent
+
+2006-08-23 08:19  sirdude
+
+	* tcl/modulecmd.tcl: 
+	
+	Added in cvs revision variables so that module help prints out what
+	version of cvs file was checked out.
+	
+	Kent
+
+2006-08-16 09:42  sirdude
+
+	* tcl/modulecmd.tcl: 
+	this is a pathetic commit ;)  Modified the comment for g_user so
+	that it says the right thing.
+	
+	Kent
+
+2006-08-15 14:15  sirdude
+
+	* tcl/modulecmd.tcl: 
+	This commit removes the remaining warnings generated by nagelfar
+	redid a couple of calls to interp eval recoded the replaceFromList
+	function so it uses lreplace removed the removeFromList function
+	and made it call replaceFromList instead...
+	
+	I also added _LMFILES_ environment variable haven't done anything
+	with it yet though.  (intent is to use it in unloading a module)
+	
+	Kent
+
+2006-08-15 05:16  sirdude
+
+	* tcl/modulecmd.tcl: 
+	removed all of the hardcoded default path seperators ":" and
+	replaced with a variable.
+	
+	Kent
+
+2006-08-14 14:21  sirdude
+
+	* tcl/init/.cvsignore: 
+	added scripts that get created so that they don't show up in cvs
+	update...
+	
+	Kent
+
+2006-08-14 13:02  sirdude
+
+	* tcl/modulecmd.tcl: 
+	fixed a few calls to catch and made sure they called it in a
+	similar manor...  (there are two more left that are slightly
+	different but I didn't take the time to figure them out)
+	
+	one of the fixes was posted by Chris Pruett, and I just applied it
+	where it needed it... :)
+	
+	Kent
+
+2006-08-14 12:56  sirdude
+
+	* tcl/modulecmd.tcl: 
+	added an else statement that I dropped by accident when merging
+	module command and module command help slave functions...
+	
+	Also reran frink so it looks pretty again...
+	
+	Kent
+
+2006-08-13 09:19  sirdude
+
+	* tcl/modulecmd.tcl: 
+	more work on seperator specification. (removing hardcoded ":"'s
+	
+	Kent
+
+2006-08-13 08:15  sirdude
+
+	* tcl/modulecmd.tcl: 
+	combined a couple of duplicate statements in a switch.
+	
+	Kent
+
+2006-08-13 07:54  sirdude
+
+	* tcl/modulecmd.tcl: 
+	Start of allowing a spwcified seperator for commands.  Still needs
+	a lot of work...
+	
+	Kent
+
+2006-08-13 06:51  sirdude
+
+	* tcl/modulecmd.tcl: 
+	made module switch behave like it use to...  (Sorry it took so long
+	to switch it back)
+	
+	now it does not recursively unload and reload modules...  This way
+	seems more flexable and more intunitive to users.
+	
+	Kent
+
+2006-08-11 20:30  sirdude
+
+	* tcl/modulecmd.tcl: 
+	by accident shut off showing default module files....  Turning it
+	back on.
+	
+	Kent
+
+2006-08-11 20:22  sirdude
+
+	* tcl/modulecmd.tcl: 
+	module avail with flag_default_dir was broken This fixes it.
+	
+	Kent
+
+2006-08-11 19:52  sirdude
+
+	* tcl/modulecmd.tcl: 
+	Null module was causing problems with module avail -l There were
+	some odd settings for null which I just changed to "" everything
+	seems to work better this way so going to commit it.
+	
+	Kent
+
+2006-08-11 19:26  sirdude
+
+	* tcl/modulecmd.tcl: 
+	Updated the help section so its more like the binary module
+	command...
+	
+	Kent
+
+2006-08-11 18:43  sirdude
+
+	* tcl/init/: bash.in, ksh.in, zsh.in: 
+	fix up bash's friends so they work properly...
+	
+	Kent
+
+2006-08-11 18:13  sirdude
+
+	* tcl/modulecmd.tcl: 
+	updated module-info so that it works with the module-info module
+	for the most part.  There is still some work here.
+	
+	Patch submitted by Mark Moraes
+	
+	Kent
+
+2006-08-11 16:08  sirdude
+
+	* tcl/Makefile, tcl/modulecmd.tcl, testsuite/config/unix.exp: 
+	updated Make test so it "works" again...  combined functions for
+	looking at .version and modulerc files...
+	
+	Kent
+
+2006-08-11 14:08  sirdude
+
+	* tcl/modulecmd.tcl: 
+	
+	This one has been on my todo list for awhile now.  Reduced
+	redundant code and made the slave for module help and executing a
+	module one function.
+	
+	Kent
+
+2006-08-11 13:42  sirdude
+
+	* tcl/modulecmd.tcl: 
+	
+	removed the following functions: module-log module-verbosity
+	module-user	   module-trace
+	
+	they were empty, if anyone ever decides to do them they can add
+	them back in.  just trying to make this thing a little leaner ;)
+	
+	Kent
+
+2006-08-11 13:36  sirdude
+
+	* tcl/modulecmd.tcl: 
+	
+	ran frink -e to make things look pretty again ;)
+	
+	Kent
+
+2006-08-11 13:24  sirdude
+
+	* tcl/modulecmd.tcl: 
+	
+	I used nagelfar.tcl (http://nagelfar.berlios.de/) a tcl syntax
+	checker and cleaned up most warnings from it.  found a couple of
+	typos as well because of it....
+	
+	Kent
+
+2006-08-11 12:09  sirdude
+
+	* tcl/modulecmd.tcl: 
+	
+	another typo.  (was missing a $ for a variable)
+	
+	Kent
+
+2006-08-11 12:05  sirdude
+
+	* tcl/modulecmd.tcl: 
+	
+	Removed the code to find tclsh since its in the init scripts no
+	reason to duplicate it and probably will speed things up a bit
+	keeping it in the init files.
+	
+	Kent
+
+2006-08-11 11:58  sirdude
+
+	* tcl/modulecmd.tcl: 
+	
+	On irix with an older version of tclsh I was getting errors with
+	reportWarning and reportInternalBug  not being defined	       when
+	there was a malformed module...
+	
+	made it so they were copied over to the slave where needed.
+	
+	Kent
+
+2006-08-11 11:33  sirdude
+
+	* tcl/modulecmd.tcl: 
+	
+	missed some prints to stderr and I also fixed some typos...
+	
+	Kent
+
+2006-08-11 11:09  sirdude
+
+	* tcl/modulecmd.tcl: 
+	made $contact = emailaddress and modified reportInternalError so it
+	prints out the contact email address.
+	
+	Kent
+
+2006-08-11 09:28  sirdude
+
+	* tcl/modulecmd.tcl: 
+	moved all puts stderr's to one of the report functions.  This could
+	still use some cleaning up.  (not really sure we need 3 report
+	functions) but its at least a little nicer.  (Was thinking about
+	changing it to echo "$msg" instead of sending it to stderr... that
+	way you could do things like module avail | more and it would
+	work...
+	
+	Need to do some more testing on it though :)
+	
+	Kent
+
+2006-08-11 08:51  sirdude
+
+	* tcl/init/: csh.in, tcsh.in: 
+	removed extra quotes that didn't need to be there.
+	
+	Kent
+
+2006-06-16 09:10  rkowen
+
+	* testsuite/modulefiles/: append/0.1, append/0.2, prepend/0.1,
+	prepend/0.2, prepend/1.0: Added the missing test files
+
+2006-06-15 13:58  rkowen
+
+	* locate_module.c: Rolled in 3.2.4 graceful handling of empty
+	MODULEPATH dirs.
+
+2006-06-15 13:56  rkowen
+
+	* locate_module.c: Need to handle "empty" directory paths in the
+	MODULEPATH env.var. gracefully.
+
+2006-06-15 13:53  rkowen
+
+	* testsuite/modulefiles/append/1.0: Forgot testfile
+
+2006-06-07 21:23  rkowen
+
+	* testsuite/modulefiles/append/1.0: Forgot this one.
+
+2006-06-07 21:17  rkowen
+
+	* Makefile.am, ModuleCmd_Init.c, ModuleCmd_List.c,
+	ModuleCmd_Refresh.c, ModuleCmd_Update.c, ModuleCmd_Whatis.c, NEWS,
+	cmdConflict.c, cmdIsLoaded.c, cmdLog.c, cmdPath.c, cmdVersion.c,
+	configure.ac, error.c, init.c, locate_module.c, main.c,
+	modules.lsm.in, modules_def.h, utility.c, version.c,
+	config/emtcl.m4, config/tcl.m4, doc/module.1.in,
+	doc/modulefile.4.in, etc/add.modules.in, etc/mkroot.in,
+	ext/add.ext.in, ext/mkroot.in, init/.modulespath.in,
+	init/Makefile.am, init/bash.in, init/csh.in, init/ksh.in,
+	init/sh.in, init/zsh.in, modulefiles/dot.in,
+	modulefiles/module-cvs.in, modulefiles/module-info.in,
+	modulefiles/modules.in, modulefiles/null.in,
+	modulefiles/use.own.in, modulefiles/version.in,
+	testsuite/modulefiles/alias/1.0, testsuite/modulefiles/append/0.1,
+	testsuite/modulefiles/append/0.2,
+	testsuite/modulefiles/prepend/0.1,
+	testsuite/modulefiles/prepend/0.2,
+	testsuite/modulefiles/prepend/1.0,
+	testsuite/modules.00-init/006-procs.exp,
+	testsuite/modules.35-trace/010-init_ts.exp,
+	testsuite/modules.50-cmds/040-append.exp,
+	testsuite/modules.50-cmds/042-append-delim.exp,
+	testsuite/modules.50-cmds/045-append-undo.exp,
+	testsuite/modules.50-cmds/047-app-del-undo.exp,
+	testsuite/modules.50-cmds/050-prepend.exp,
+	testsuite/modules.50-cmds/052-prepend-delim.exp,
+	testsuite/modules.50-cmds/055-prepend-undo.exp,
+	testsuite/modules.50-cmds/057-pre-del-undo.exp,
+	testsuite/modules.50-cmds/075-alias.exp,
+	testsuite/modules.50-cmds/076-alias-sub.exp,
+	testsuite/modules.50-cmds/078-refresh.exp,
+	testsuite/modules.50-cmds/100-loglevel.exp,
+	testsuite/modules.70-maint/045-listlong.exp,
+	testsuite/modules.90-avail/050-long.exp: 3.2.4 preparations
+
+2006-06-01 14:22  rkowen
+
+	* NEWS: 3.2.3 release preparation.
+
+2006-06-01 14:20  rkowen
+
+	* NEWS, doc/module.1.in, doc/modulefile.4.in, etc/add.modules.in,
+	etc/mkroot.in, ext/add.ext.in, ext/mkroot.in, init/.modulespath.in,
+	init/Makefile.am, init/bash.in, init/ksh.in, init/sh.in,
+	init/zsh.in, modulefiles/dot.in, modulefiles/module-cvs.in,
+	modulefiles/module-info.in, modulefiles/modules.in,
+	modulefiles/null.in, modulefiles/use.own.in,
+	modulefiles/version.in: Rolled in the 3.2.3 top_builddir and
+	@configure_input\@ changes.
+
+2006-06-01 14:04  rkowen
+
+	* NEWS, version.c, doc/module.1.in, doc/modulefile.4.in,
+	etc/add.modules.in, etc/mkroot.in, ext/add.ext.in, ext/mkroot.in,
+	init/.modulespath.in, init/Makefile.am, init/bash.in, init/ksh.in,
+	init/sh.in, init/zsh.in, modulefiles/dot.in,
+	modulefiles/module-cvs.in, modulefiles/module-info.in,
+	modulefiles/modules.in, modulefiles/null.in,
+	modulefiles/use.own.in, modulefiles/version.in: * Fixed build
+	problem with regards to the init/* files (solution due to Thomas
+	Zeiser) (changed from $(top_srddir)/config.status to
+	$(top_builddir)/config.status) * Also added @configure_input\@ to
+	most of the configure made files.
+
+2006-06-01 12:56  rkowen
+
+	* NEWS, cmdPath.c, locate_module.c, modules_def.h,
+	doc/modulefile.4.in, testsuite/modulefiles/append/1.0,
+	testsuite/modulefiles/prepend/1.0,
+	testsuite/modules.50-cmds/042-append-delim.exp,
+	testsuite/modules.50-cmds/047-app-del-undo.exp,
+	testsuite/modules.50-cmds/052-prepend-delim.exp,
+	testsuite/modules.50-cmds/057-pre-del-undo.exp: Rolled in the 3.2.3
+	prepend-path/append-path --delim changes.
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modules.50-cmds/042-append-delim.exp: file
+	042-append-delim.exp was added on branch modules-3-2-0 on
+	2006-06-08 04:17:54 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modules.50-cmds/042-append-delim.exp: file
+	042-append-delim.exp was added on branch modules-3-2-5 on
+	2007-02-14 05:38:23 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modules.50-cmds/047-app-del-undo.exp: file
+	047-app-del-undo.exp was added on branch modules-3-2-0 on
+	2006-06-08 04:17:54 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modules.50-cmds/047-app-del-undo.exp: file
+	047-app-del-undo.exp was added on branch modules-3-2-5 on
+	2007-02-14 05:38:24 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modules.50-cmds/052-prepend-delim.exp: file
+	052-prepend-delim.exp was added on branch modules-3-2-0 on
+	2006-06-08 04:17:54 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modules.50-cmds/052-prepend-delim.exp: file
+	052-prepend-delim.exp was added on branch modules-3-2-5 on
+	2007-02-14 05:38:24 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modules.50-cmds/057-pre-del-undo.exp: file
+	057-pre-del-undo.exp was added on branch modules-3-2-0 on
+	2006-06-08 04:17:54 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modules.50-cmds/057-pre-del-undo.exp: file
+	057-pre-del-undo.exp was added on branch modules-3-2-5 on
+	2007-02-14 05:38:24 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modulefiles/prepend/1.0: file 1.0 was added on branch
+	modules-3-2-0 on 2006-06-08 04:17:54 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modulefiles/append/1.0: file 1.0 was added on branch
+	modules-3-2-3 on 2006-06-08 04:23:35 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modulefiles/append/1.0: file 1.0 was added on branch
+	modules-3-2-4 on 2006-06-15 20:53:40 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modulefiles/prepend/1.0: file 1.0 was added on branch
+	modules-3-2-4 on 2006-06-16 16:10:23 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modulefiles/: append/1.0, prepend/1.0: file 1.0 was
+	added on branch modules-3-2-5 on 2007-02-14 05:38:23 +0000
+
+2006-06-01 12:53  rkowen
+
+	* testsuite/modules.50-cmds/: 042-append-delim.exp,
+	047-app-del-undo.exp, 052-prepend-delim.exp, 057-pre-del-undo.exp:
+	Fixed extra unsetting of a variable.
+
+2006-06-01 11:47  rkowen
+
+	* NEWS, cmdPath.c, locate_module.c, modules_def.h,
+	doc/modulefile.4.in, testsuite/modulefiles/prepend/1.0,
+	testsuite/modules.50-cmds/042-append-delim.exp,
+	testsuite/modules.50-cmds/047-app-del-undo.exp,
+	testsuite/modules.50-cmds/052-prepend-delim.exp,
+	testsuite/modules.50-cmds/057-pre-del-undo.exp: * Added the --delim
+	option to prepend-path and append-path to allow arbitrary
+	delimiters instead of the colon ':'
+
+2006-06-01 11:47  rkowen
+
+	* testsuite/modules.50-cmds/042-append-delim.exp: file
+	042-append-delim.exp was initially added on branch modules-3-2-3.
+
+2006-06-01 11:47  rkowen
+
+	* testsuite/modules.50-cmds/047-app-del-undo.exp: file
+	047-app-del-undo.exp was initially added on branch modules-3-2-3.
+
+2006-06-01 11:47  rkowen
+
+	* testsuite/modules.50-cmds/052-prepend-delim.exp: file
+	052-prepend-delim.exp was initially added on branch modules-3-2-3.
+
+2006-06-01 11:47  rkowen
+
+	* testsuite/modules.50-cmds/057-pre-del-undo.exp: file
+	057-pre-del-undo.exp was initially added on branch modules-3-2-3.
+
+2006-06-01 11:47  rkowen
+
+	* testsuite/modulefiles/prepend/1.0: file 1.0 was initially added
+	on branch modules-3-2-3.
+
+2006-06-01 07:54  rkowen
+
+	* ModuleCmd_Init.c, cmdConflict.c, cmdIsLoaded.c, cmdPath.c,
+	locate_module.c, main.c, modules_def.h: Rolled in the pre-changes
+	for handling arbitrary delimiters for lists (instead of ':').
+
+2006-06-01 07:32  rkowen
+
+	* ModuleCmd_Init.c, cmdConflict.c, cmdIsLoaded.c, cmdPath.c,
+	locate_module.c, main.c, modules_def.h: The pre-changes for
+	handling arbitrary delimiters for lists (instead of ':').
+
+2006-05-31 13:35  sirdude
+
+	* tcl/modulecmd.tcl: 
+	
+	 * minor typos in error output fixed
+	 * support for modules which are known to have no dependencies.
+	Presently a
+	
+	    module switch foo/4 foo/5
+	
+	    will reload all modules which have been loaded after foo. But
+	sometimes this
+	    may be a nuisance, especially if module files implement their
+	own reloading
+	    mechanism. Hence the modules entered as a ":" separated list
+	into the
+	    environment variable MODULE_NORELOAD will not be reloaded
+	during a
+	    module switch. The "module reload" command however still
+	reloads the complet
+	e      module set. This is upward compatible since the original
+	functionality is re  tained	if MODULE_RELOAD is left empty.
+	
+	patch provided by Dr. Reinhold Bader
+	
+	Kent
+
+2006-05-25 15:05  rkowen
+
+	* modules.lsm.in: Merged in the working LSM from 3.2.2
+
+2006-05-25 15:01  rkowen
+
+	* modules.lsm.in: Merged in the working LSM from 3.2.2
+
+2006-05-25 14:59  rkowen
+
+	* modules.lsm.in: Finally got a working LSM for uploading to
+	ibiblio.org.
+
+2006-05-25 14:09  rkowen
+
+	* NEWS, utility.c, testsuite/modulefiles/alias/1.0,
+	testsuite/modules.50-cmds/075-alias.exp,
+	testsuite/modules.50-cmds/076-alias-sub.exp,
+	testsuite/modules.50-cmds/078-refresh.exp: Rolled in the 3.2.3
+	changes * the set-alias command will for Bourne shell derivatives
+	substitute the safe ${1+"$@"} for $*.
+
+2006-05-25 14:09  rkowen
+
+	* testsuite/modules.50-cmds/076-alias-sub.exp: file
+	076-alias-sub.exp was added on branch modules-3-2-0 on 2006-06-08
+	04:17:54 +0000
+
+2006-05-25 14:09  rkowen
+
+	* testsuite/modules.50-cmds/076-alias-sub.exp: file
+	076-alias-sub.exp was added on branch modules-3-2-5 on 2007-02-14
+	05:38:24 +0000
+
+2006-05-25 14:09  rkowen
+
+	* testsuite/modulefiles/alias/1.0: file 1.0 was added on branch
+	modules-3-2-0 on 2006-06-08 04:17:54 +0000
+
+2006-05-25 14:09  rkowen
+
+	* testsuite/modulefiles/alias/1.0: file 1.0 was added on branch
+	modules-3-2-5 on 2007-02-14 05:38:23 +0000
+
+2006-05-25 14:07  rkowen
+
+	* NEWS, utility.c, testsuite/modulefiles/alias/1.0,
+	testsuite/modules.50-cmds/075-alias.exp,
+	testsuite/modules.50-cmds/076-alias-sub.exp,
+	testsuite/modules.50-cmds/078-refresh.exp: * the set-alias command
+	will for Bourne shell derivatives substitute the safe ${1+"$@"} for
+	$*.  Addressed the feature request: [ 705032 ] Bourne shell aliases
+	should allow arguments.
+
+2006-05-25 14:07  rkowen
+
+	* testsuite/modules.50-cmds/076-alias-sub.exp: file
+	076-alias-sub.exp was initially added on branch modules-3-2-3.
+
+2006-05-25 14:07  rkowen
+
+	* testsuite/modulefiles/alias/1.0: file 1.0 was initially added on
+	branch modules-3-2-3.
+
+2006-05-19 08:53  rkowen
+
+	* Makefile.am, NEWS, init.c: Rolled in the TclX changes from 3-2-2.
+
+2006-05-15 14:11  rkowen
+
+	* NEWS, error.c, main.c,
+	testsuite/modules.35-trace/010-init_ts.exp,
+	testsuite/modules.50-cmds/100-loglevel.exp: Rolled in the syslog
+	related changes from 3.2.3
+
+2006-05-15 14:05  rkowen
+
+	* NEWS, error.c, testsuite/modules.35-trace/010-init_ts.exp,
+	testsuite/modules.50-cmds/100-loglevel.exp: Addressed bug [ 1471913
+	] syslog facility not working.	Actually, it is working, but the
+	changes will allow it to pass the tests.  There may still be a
+	memory error, but can't find it.
+
+2006-05-15 11:36  rkowen
+
+	* main.c: Bug fix [ 1471940 ] --with-debug=yes build fails Thanks
+	to Steven Klass for finding this.
+
+2006-05-12 15:30  rkowen
+
+	* NEWS: Added a section for 3.3.x
+
+2006-05-12 15:28  rkowen
+
+	* NEWS, cmdVersion.c: Folded in dgoldendias patch.
+
+2006-05-12 15:23  rkowen
+
+	* NEWS, cmdVersion.c, version.c: Included the patch by David Golden
+	Dias [ 1460801 ] to allow version names to be substrings of other
+	version names.
+
+2006-05-12 13:58  rkowen
+
+	* modules.lsm.in: Added the Title line, which must have gotten lost
+	in previous edits.
+
+2006-05-12 06:34  rkowen
+
+	* modules.lsm.in: Added the Title line, which must have been
+	dropped by accident.
+
+2006-05-04 15:03  rkowen
+
+	* main.c: Trivial add of linefeed.
+
+2006-05-04 15:02  rkowen
+
+	* Makefile.am, NEWS, configure.ac, init.c, main.c, version.c,
+	config/emtcl.m4, config/tcl.m4: * Updated the TclX init call for
+	8.4 - fixed up the TclX config logic.
+
+2006-05-04 09:55  rkowen
+
+	* NEWS, configure.ac, main.c, config/emtcl.m4, config/tcl.m4:
+	Rolled in the 3.2.2 configure changes to the main development
+	trunk.
+
+2006-05-04 09:36  rkowen
+
+	* main.c: Added more macros to display when given --version
+
+2006-05-04 07:38  rkowen
+
+	* NEWS, configure.ac, config/emtcl.m4, config/tcl.m4: * Replaced
+	all strtok() calls with an internal version.  * Now can
+	append/prepend and empty string '' or colons ':' * Added more
+	--with-tclx-* options in case tclxConfig.sh   can not be found, but
+	the TclX lib does exist.  * Expanded the search path for
+	tclConfig.sh.
+
+2006-05-01 15:07  rkowen
+
+	* Makefile.am: Don't have a ChangeLog target.
+
+2006-05-01 07:54  rkowen
+
+	* version.c: Updated release date.
+
+2006-05-01 07:52  rkowen
+
+	* testsuite/modulefiles/: append/0.1, prepend/0.1: file 0.1 was
+	added on branch modules-3-2-0 on 2006-06-08 04:17:54 +0000
+
+2006-05-01 07:52  rkowen
+
+	* testsuite/modulefiles/: append/0.1, prepend/0.1: file 0.1 was
+	added on branch modules-3-2-4 on 2006-06-16 16:10:22 +0000
+
+2006-05-01 07:52  rkowen
+
+	* testsuite/modulefiles/: append/0.1, prepend/0.1: file 0.1 was
+	added on branch modules-3-2-5 on 2007-02-14 05:38:23 +0000
+
+2006-05-01 07:52  rkowen
+
+	* testsuite/modulefiles/: append/0.2, prepend/0.2: file 0.2 was
+	added on branch modules-3-2-0 on 2006-06-08 04:17:54 +0000
+
+2006-05-01 07:52  rkowen
+
+	* testsuite/modulefiles/: append/0.2, prepend/0.2: file 0.2 was
+	added on branch modules-3-2-4 on 2006-06-16 16:10:22 +0000
+
+2006-05-01 07:52  rkowen
+
+	* testsuite/modulefiles/: append/0.2, prepend/0.2: file 0.2 was
+	added on branch modules-3-2-5 on 2007-02-14 05:38:23 +0000
+
+2006-05-01 07:52  rkowen
+
+	* ModuleCmd_List.c, ModuleCmd_Refresh.c, ModuleCmd_Update.c,
+	ModuleCmd_Whatis.c, cmdLog.c, configure.ac, error.c,
+	locate_module.c, modules_def.h, utility.c,
+	testsuite/modulefiles/append/0.1, testsuite/modulefiles/append/0.2,
+	testsuite/modulefiles/prepend/0.1,
+	testsuite/modulefiles/prepend/0.2,
+	testsuite/modules.50-cmds/040-append.exp,
+	testsuite/modules.50-cmds/045-append-undo.exp,
+	testsuite/modules.50-cmds/050-prepend.exp,
+	testsuite/modules.50-cmds/055-prepend-undo.exp: Rolled in the
+	xstrtok changes and tests from modules-3-2-2.
+
+2006-04-20 15:35  rkowen
+
+	* testsuite/modulefiles/: append/0.1, prepend/0.1: file 0.1 was
+	initially added on branch modules-3-2-2.
+
+2006-04-20 15:35  rkowen
+
+	* testsuite/modulefiles/: append/0.2, prepend/0.2: file 0.2 was
+	initially added on branch modules-3-2-2.
+
+2006-04-20 15:35  rkowen
+
+	* ModuleCmd_List.c, ModuleCmd_Refresh.c, ModuleCmd_Update.c,
+	ModuleCmd_Whatis.c, NEWS, cmdLog.c, configure.ac, error.c,
+	locate_module.c, modules_def.h, utility.c, version.c,
+	testsuite/modulefiles/append/0.1, testsuite/modulefiles/append/0.2,
+	testsuite/modulefiles/prepend/0.1,
+	testsuite/modulefiles/prepend/0.2,
+	testsuite/modules.50-cmds/040-append.exp,
+	testsuite/modules.50-cmds/045-append-undo.exp,
+	testsuite/modules.50-cmds/050-prepend.exp,
+	testsuite/modules.50-cmds/055-prepend-undo.exp: Crafted an internal
+	version of strtok(), which allows for empty tokens and to obviate
+	the need to use any "native" strtok()s.
+
+2006-04-10 13:04  rkowen
+
+	* init/Makefile.am: Rolled in $(top_srcdir) and $(srcdir) changes
+	from main trunk.
+
+2006-04-10 13:03  rkowen
+
+	* init/Makefile.am: Change from using . & .. to $(srcdir) and
+	$(top_srcdir) respectively.  (Thanks to suggestion from Boris
+	Boesler <boesler.AT.ifn.et.tu-dresden.de>)
+
+2006-03-23 15:38  rkowen
+
+	* init/csh.in: Rolled in init csh fix from 3.2.1
+
+2006-03-23 15:31  rkowen
+
+	* version.c, init/csh.in: Fixed the csh init script.
+
+2006-03-23 14:37  rkowen
+
+	* version.c, init/csh.in, testsuite/modules.00-init/006-procs.exp,
+	testsuite/modules.70-maint/045-listlong.exp,
+	testsuite/modules.90-avail/050-long.exp: Merged in the 3.2.1
+	changes.
+
+2006-03-23 13:51  rkowen
+
+	* testsuite/: modules.70-maint/045-listlong.exp,
+	modules.90-avail/050-long.exp: Fixed the tests to use regexps to
+	allow the date/time stamp to vary for the listed module.
+
+2006-03-23 13:50  rkowen
+
+	* testsuite/modules.00-init/006-procs.exp: Add '--' to the regexp
+	call so any tests that have lines that start with '-' will not be
+	interpreted as command options.
+
+2006-03-23 13:49  rkowen
+
+	* init/csh.in: Allow the command to pass a non-zero return status.
+
+2006-03-07 11:43  rkowen
+
+	* ModuleCmd_Load.c, NEWS, cmdModule.c, main.c, modules_def.h,
+	utility.c, doc/modulefile.4.in, testsuite/config/unix.exp,
+	testsuite/modulefiles/break/2.0, testsuite/modulefiles/break/4.0,
+	testsuite/modulefiles/continue/1.0,
+	testsuite/modulefiles/continue/2.0,
+	testsuite/modulefiles/continue/3.0,
+	testsuite/modulefiles/continue/4.0, testsuite/modulefiles/exit/1.0,
+	testsuite/modulefiles/exit/2.0, testsuite/modulefiles/exit/3.0,
+	testsuite/modules.00-init/006-procs.exp,
+	testsuite/modules.50-cmds/210-exit.exp,
+	testsuite/modules.50-cmds/220-continue.exp,
+	testsuite/modules.50-cmds/230-loop.exp,
+	testsuite/modules.50-cmds/999-cleanup.exp: Rolled in the 3.2.0 exit
+	changes.
+
+2006-03-07 11:18  rkowen
+
+	* main.c, modules_def.h, utility.c,
+	testsuite/modules.50-cmds/210-exit.exp: The resultant string to be
+	evaluated will now append a "test 0 = 1" string if an exit is
+	called.
+
+2006-02-21 14:26  rkowen
+
+	* testsuite/modulefiles/: continue/1.0, exit/1.0: file 1.0 was
+	initially added on branch modules-3-2-0.
+
+2006-02-21 14:26  rkowen
+
+	* testsuite/modulefiles/: continue/2.0, exit/2.0: file 2.0 was
+	initially added on branch modules-3-2-0.
+
+2006-02-21 14:26  rkowen
+
+	* testsuite/modules.50-cmds/210-exit.exp: file 210-exit.exp was
+	initially added on branch modules-3-2-0.
+
+2006-02-21 14:26  rkowen
+
+	* testsuite/modules.50-cmds/220-continue.exp: file 220-continue.exp
+	was initially added on branch modules-3-2-0.
+
+2006-02-21 14:26  rkowen
+
+	* testsuite/modules.50-cmds/230-loop.exp: file 230-loop.exp was
+	initially added on branch modules-3-2-0.
+
+2006-02-21 14:26  rkowen
+
+	* testsuite/modulefiles/: continue/3.0, exit/3.0: file 3.0 was
+	initially added on branch modules-3-2-0.
+
+2006-02-21 14:26  rkowen
+
+	* testsuite/modulefiles/: break/4.0, continue/4.0: file 4.0 was
+	initially added on branch modules-3-2-0.
+
+2006-02-21 14:26  rkowen
+
+	* testsuite/modules.50-cmds/999-cleanup.exp: file 999-cleanup.exp
+	was initially added on branch modules-3-2-0.
+
+2006-02-21 14:26  rkowen
+
+	* ModuleCmd_Load.c, NEWS, cmdModule.c, modules_def.h, utility.c,
+	doc/modulefile.4.in, testsuite/config/unix.exp,
+	testsuite/modulefiles/break/2.0, testsuite/modulefiles/break/4.0,
+	testsuite/modulefiles/continue/1.0,
+	testsuite/modulefiles/continue/2.0,
+	testsuite/modulefiles/continue/3.0,
+	testsuite/modulefiles/continue/4.0, testsuite/modulefiles/exit/1.0,
+	testsuite/modulefiles/exit/2.0, testsuite/modulefiles/exit/3.0,
+	testsuite/modules.00-init/006-procs.exp,
+	testsuite/modules.50-cmds/210-exit.exp,
+	testsuite/modules.50-cmds/220-continue.exp,
+	testsuite/modules.50-cmds/230-loop.exp,
+	testsuite/modules.50-cmds/999-cleanup.exp: Added or fixed up the
+	Tcl "break", "continue", and "exit N" commands to have definite
+	meanings,  and also added tests for the same.
+
+2006-02-21 10:05  rkowen
+
+	* testsuite/config/unix.exp: Catch the exit return code too.
+
+2006-02-13 09:42  rkowen
+
+	* ModuleCmd_Load.c, main.c, modules_def.h, utility.c: Added the
+	ReturnValue() fn to consolidate Tcl exit & result string testing.
+
+2006-02-09 13:32  rkowen
+
+	* init/: Makefile.am: Fixed the tcsh target.
+
+2006-02-06 14:03  rkowen
+
+	* cmdModule.c, cmdPath.c, init.c, modules_def.h: Rolled in the
+	Tcl_GetStringResult() changes from 3.2.0
+
 2006-02-06 13:52  rkowen
 
 	* cmdModule.c, cmdPath.c, init.c, modules_def.h: Got rid of all
@@ -1348,7 +2406,7 @@ Do Not Edit!  This is a generated file.
 
 2003-08-07 14:07  harlan
 
-	* tcl/modulecmd.tcl: Add $Revision: 1.50.2.4 $ to the version
+	* tcl/modulecmd.tcl: Add $Revision: 1.50.2.4.8.1 $ to the version
 
 2003-08-07 12:52  harlan
 

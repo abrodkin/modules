@@ -23,7 +23,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Whatis.c,v 1.5 2005/11/29 04:26:30 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Whatis.c,v 1.5.12.1 2007/02/22 23:12:54 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -243,9 +243,9 @@ int ModuleCmd_Whatis(	Tcl_Interp	*interp,
 	     /**
 	      **  Tokenize the module path string and check all dirs
 	      **/
-	     for( dirname = strtok( modpath, ":");
+	     for( dirname = xstrtok( modpath, ":");
 		  dirname;
-		  dirname = strtok( NULL, ":") ) {
+		  dirname = xstrtok( NULL, ":") ) {
 	
 		 if( !check_dir( dirname))
 		     continue;
@@ -395,9 +395,9 @@ int ModuleCmd_Apropos(	Tcl_Interp	*interp,
 	/**
 	 **  Tokenize the module path string and check all dirs
 	 **/
-	for( dirname = strtok( modpath, ":");
+	for( dirname = xstrtok( modpath, ":");
 	     dirname;
-	     dirname = strtok( NULL, ":") ) {
+	     dirname = xstrtok( NULL, ":") ) {
 	
 	    if( !check_dir( dirname))
 		continue;
@@ -486,7 +486,7 @@ static	int	whatis_dir( char *dir, int argc, char **argv, FILE *cfp,
 	if( OK != ErrorLogger( ERR_READDIR, LOC, dir, NULL))
 	    goto unwind0;
 
-    if( NULL == (list = (char**) malloc( tcount * sizeof( char**))))
+    if( NULL == (list = (char**) module_malloc( tcount * sizeof( char**))))
 	if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
 	    goto unwind1;
 

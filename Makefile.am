@@ -1,7 +1,7 @@
 ###########################################################################
 ##
 ## File:        ./Makefile.am
-## Versions:    $Id: Makefile.am,v 1.21.2.3 2006/02/04 00:46:21 rkowen Exp $
+## Versions:    $Id: Makefile.am,v 1.21.2.3.10.1 2007/02/22 23:12:53 rkowen Exp $
 ## Created:     2002/06/14
 ##
 ###########################################################################
@@ -25,8 +25,8 @@ EXTRA_DIST = modules_def.h getopt.h testsuite INSTALL.RH7x		\
 
 bin_PROGRAMS = modulecmd
 # bin_SCRIPTS = etc/mkroot etc/add.modules ext/add.ext
-modulecmd_CFLAGS= @TCL_INCLUDE_SPEC@ @X_CFLAGS@
-modulecmd_LDFLAGS= @TCL_LIB_SPEC@ @TCLX_LIB_SPEC@ @X_LIBS@ @X_EXTRA_LIBS@ @LIBS@
+modulecmd_CFLAGS=@TCLX_INCLUDE_SPEC@  @TCL_INCLUDE_SPEC@ @X_CFLAGS@
+modulecmd_LDFLAGS= @TCLX_LIB_SPEC@ @TCL_LIB_SPEC@ @X_LIBS@ @X_EXTRA_LIBS@ @LIBS@
 modulecmd_SOURCES = \
 	ModuleCmd_Avail.c \
         ModuleCmd_Clear.c ModuleCmd_Display.c ModuleCmd_Help.c \
@@ -81,7 +81,7 @@ tag:
 	  `${SED} -n -e 's/^.*NEW TAG.*"\(.*\)".*$$/\1/p' ${srcdir}/version.c` \
 	  modules
 
-ChangeLog: rmChangeLog
+CL: rmChangeLog
 	@echo "Updating ChangeLog"
 	-@./cvs2cl.pl
 
@@ -161,7 +161,7 @@ disthelp:
 	@echo "make maintainer-clean - cleans even more"
 	@echo "================ requires CVS access ======================="
 	@echo "make tag       - does a CVS rtag"
-	@echo "make ChangeLog - remakes the ChangeLog from the CVS commits"
+	@echo "make CL        - remakes the ChangeLog from the CVS commits"
 	@echo "make patch     - creates a patch file after tagging"
 	@echo "================ maintainers only =========================="
 	@echo "make lsm       - send off to the Linux Software Map"

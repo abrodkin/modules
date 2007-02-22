@@ -47,7 +47,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdVersion.c,v 1.9 2005/11/29 04:26:30 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdVersion.c,v 1.9.14.1 2007/02/22 23:12:58 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -432,6 +432,7 @@ static	char	*scan_versions( char		 *buffer,
 {
     ModName     *tmp, *vers;
     char 	*s;
+    char 	*mayloop;
 
     /**
      **  Recursively print the queue of names
@@ -448,11 +449,17 @@ static	char	*scan_versions( char		 *buffer,
 
 	/**
 	 **  Prevent endless loops
+	 **  To allow for version names that are substrings of other
+	 **  version names, match against "(^|:)name:" not just "name"... 
 	 **/
-
-	if( strstr( base, ptr->name)) {
-	    ErrorLogger( ERR_SYMLOOP, LOC, ptr->name, NULL);
-	    return((char *) NULL);		/** ---- EXIT (FAILURE) ---> **/
+	mayloop = strstr( base, ptr->name);
+	if( mayloop != NULL ) {
+	    if( mayloop == base || *(mayloop-1) == ':' ) {
+		if( *(mayloop + strlen(ptr->name)) == ':' ) {
+	    	    ErrorLogger( ERR_SYMLOOP, LOC, ptr->name, NULL);
+		    return((char *) NULL);	/** ---- EXIT (FAILURE) ---> **/
+		}
+	    }
 	}
 
 	/**
@@ -461,6 +468,7 @@ static	char	*scan_versions( char		 *buffer,
 
 	/* sprintf( buffer, "%s:", ptr->name); */
 	strcpy( buffer, ptr->name);
+	/* if you change this, may affect the loop checker above */
 	strcat( buffer, ":");
 	buffer += strlen( buffer);
 
@@ -877,7 +885,7 @@ int	VersionLookup(	char *name, char **module, char **version)
     histsize = HISTTAB;
     histndx = 0;
 
-    if((ModName **) NULL == (history = (ModName **) malloc( histsize * 
+    if((ModName **) NULL == (history = (ModName **) module_malloc( histsize * 
 	sizeof( ModName *)))) {
 	ErrorLogger( ERR_ALLOC, LOC, NULL);
 	return( 0);			/** -------- EXIT (FAILURE) -------> **/
@@ -1062,7 +1070,8 @@ static	ModModule	*AddModule(	char	*name)
      **  Allocate a new guy
      **/
 
-    if((ModModule *) NULL == (ptr = (ModModule *) malloc( sizeof(ModModule)))) {
+    if((ModModule *) NULL ==
+		(ptr = (ModModule *) module_malloc( sizeof(ModModule)))) {
 	ErrorLogger( ERR_ALLOC, LOC, NULL);
 	return((ModModule *) NULL);
     }
@@ -1186,7 +1195,7 @@ static	ModName	*AddName(	char	 *name,
      **  Allocate a new guy
      **/
 
-    if((ModName *) NULL == (ptr = (ModName *) malloc( sizeof(ModName)))) {
+    if((ModName *) NULL == (ptr = (ModName *) module_malloc(sizeof(ModName)))) {
 	ErrorLogger( ERR_ALLOC, LOC, NULL);
 	return((ModName *) NULL);
     }
