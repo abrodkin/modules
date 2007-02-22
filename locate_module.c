@@ -33,7 +33,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: locate_module.c,v 1.14.12.1 2007/02/22 23:13:00 rkowen Exp $";
+static char Id[] = "@(#)$Id: locate_module.c,v 1.14.12.2 2007/02/22 23:29:06 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -750,7 +750,7 @@ char	**SortedDirList(	Tcl_Interp	*interp,
 	     **/
 	    if( j == n)
 		if( NULL == (filelist =
-		    (char**) realloc((char*) filelist, n *= 2)))
+		    (char**) realloc((char*) filelist, (n*=2)*sizeof(char*))))
 		    if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
 			goto unwindt;
 	    /**
@@ -894,7 +894,7 @@ char	**SplitIntoList(	Tcl_Interp	*interp,
      **  the list.
      **  Copy the passed path into the new buffer.
      **/
-    if((char **) NULL == (pathlist = (char**) calloc( n = 100, sizeof( char*))))
+    if((char **) NULL == (pathlist = (char**) calloc(n = 100,sizeof( char*))))
 	if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
 	    goto unwind1;
     /**
@@ -909,7 +909,7 @@ char	**SplitIntoList(	Tcl_Interp	*interp,
 	 **/
 	if( i == n )
 	    if((char **) NULL == (pathlist = (char**) realloc((char*) pathlist,
-		n *= 2)))
+		(n *= 2)*sizeof(char*))))
 		if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
 		    goto unwind1;
 	/**
