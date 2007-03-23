@@ -22,7 +22,7 @@ set	modroot		@prefix@
 
 setenv		MODULESHOME	$modroot
 prepend-path    PATH   		$modroot/bin
-prepend-path    MANPATH		$modroot/man
+prepend-path    MANPATH		$modroot/share/man
 
 module		use		@VERSIONPATH@
 
