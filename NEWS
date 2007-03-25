@@ -9,6 +9,7 @@
 Modules 3.2.6
 	* Fixed the locate_module.c:realloc() calls which didn't properly
 	  take the element size into account (Fix thanks to Ron Isaacson).
+	* Fixed some valgrind errors found and resolved by Alan Morris.
 Modules 3.2.5
 Feb 14, 2007				R.K. Owen (rk@owen.sj.ca.us)
 	* Wrapped all malloc() calls to make sure the size is never 0.
