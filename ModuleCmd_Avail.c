@@ -34,7 +34,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Avail.c,v 1.10.14.1 2007/02/22 23:12:53 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Avail.c,v 1.10.14.2 2007/10/29 16:36:41 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -689,7 +689,7 @@ static int	test_version_dir(	struct dirent	*dp)
  **   Description:	Read in the passed directory and save every interes- **
  **			ting item in the directory list			     **
  **			skipping known version control directories:	     **
- **				CVS RCS .svn				     **
+ **				CVS RCS .git .svn			     **
  **			unless they contain .version files		     **
  ** 									     **
  **   First Edition:	1991/10/23					     **
@@ -840,6 +840,7 @@ fi_ent	*get_dir(	char	*dir,
 	     **/
 	    if (!strcmp("CVS",dp->d_name)
 	    ||  !strcmp("RCS",dp->d_name)
+	    ||  !strcmp(".git",dp->d_name)
 	    ||  !strcmp(".svn",dp->d_name)) {
     		FILE	*fi;
 		if( (char *) NULL == stringer(buffer, MOD_BUFSIZE,
