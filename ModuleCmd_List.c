@@ -26,7 +26,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_List.c,v 1.5 2005/11/29 04:26:30 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_List.c,v 1.7 2006/05/01 14:52:18 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -114,7 +114,8 @@ int	ModuleCmd_List(	Tcl_Interp	*interp,
     
     if( !loaded || !*loaded) {
 	if( sw_format & (SW_TERSE | SW_LONG | SW_HUMAN) )
-	    fprintf(stderr, "No Modulefiles Currently Loaded.\n");
+	    fprintf(stderr, "%s\n",
+		_("No Modulefiles Currently Loaded."));
     } else {
 
 	/**
@@ -125,7 +126,8 @@ int	ModuleCmd_List(	Tcl_Interp	*interp,
 	    fprintf( stderr, long_header);
 	}
 	if( sw_format & (SW_TERSE | SW_LONG | SW_HUMAN) )
-	    fprintf( stderr, "Currently Loaded Modulefiles:\n");
+	    fprintf( stderr, "%s\n",
+		_("Currently Loaded Modulefiles:"));
 
 	/**
 	 **  LOADEDMODULES and _LMFILES_ should provide a list of loaded
@@ -134,13 +136,13 @@ int	ModuleCmd_List(	Tcl_Interp	*interp,
 	 **/
 
 	count1 = 1;
-        for( list[ 0] = strtok( loaded, ":");
-	     list[ count1] = strtok( NULL, ":");
+        for( list[ 0] = xstrtok( loaded, ":");
+	     list[ count1] = xstrtok( NULL, ":");
 	     count1++ );
 
 	count2 = 1;
-        for( files[ 0] = strtok( lmfiles, ":");
-	     files[ count2] = strtok( NULL, ":");
+        for( files[ 0] = xstrtok( lmfiles, ":");
+	     files[ count2] = xstrtok( NULL, ":");
 	     count2++ );
 	if (count1 != count2) {
 	  ErrorLogger( ERR_ENVVAR, LOC, NULL);

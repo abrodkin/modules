@@ -33,7 +33,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: locate_module.c,v 1.14 2005/11/29 04:26:30 rkowen Exp $";
+static char Id[] = "@(#)$Id: locate_module.c,v 1.21 2007/02/22 23:30:43 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -266,14 +266,16 @@ int Locate_ModuleFile(	Tcl_Interp	*interp,
 	/**
 	 **  Split up the MODULEPATH values into multiple directories
 	 **/
-	if( NULL == (pathlist = SplitIntoList(interp, modulespath, &numpaths)))
+	if( NULL == (pathlist = SplitIntoList(interp, modulespath, &numpaths,
+	_colon)))
 	    goto unwind0;
 	/**
 	 **  Check each directory to see if it contains the module
 	 **/
 	for(i=0; i<numpaths; i++) {
-	    if( NULL != (result = GetModuleName( interp, pathlist[i], NULL,
-		modulename))) {
+	    /* skip empty paths */
+	    if(*pathlist[i] && (NULL != (result =
+		GetModuleName( interp, pathlist[i], NULL, modulename)))) {
 
 		if( strlen( pathlist[i]) + 2 + strlen( result) > MOD_BUFSIZE) {
 		    if ((char *) NULL == stringer( filename, MOD_BUFSIZE,
@@ -409,7 +411,7 @@ static	char	*GetModuleName(	Tcl_Interp	*interp,
 	path,"/",mod, NULL))
 	    goto unwind1;
     }
-    is_def = !strcmp( mod, _default);
+    is_def = !strcmp( mod, _(em_default));
 
     if( is_def || !stat( fullpath, &stats)) {
 	/**
@@ -748,7 +750,7 @@ char	**SortedDirList(	Tcl_Interp	*interp,
 	     **/
 	    if( j == n)
 		if( NULL == (filelist =
-		    (char**) realloc((char*) filelist, n *= 2)))
+		    (char**) realloc((char*) filelist, (n*=2)*sizeof(char*))))
 		    if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
 			goto unwindt;
 	    /**
@@ -859,7 +861,8 @@ unwind0:
 
 char	**SplitIntoList(	Tcl_Interp	*interp,
 		     		char		*pathenv, 
-		     		int		*numpaths) 
+		     		int		*numpaths,
+				const char	*delim) 
 {
     char	**pathlist = NULL;	/** Temporary base pointer for the   **/
 					/** array to be created		     **/
@@ -891,22 +894,22 @@ char	**SplitIntoList(	Tcl_Interp	*interp,
      **  the list.
      **  Copy the passed path into the new buffer.
      **/
-    if((char **) NULL == (pathlist = (char**) calloc( n = 100, sizeof( char*))))
+    if((char **) NULL == (pathlist = (char**) calloc(n = 100,sizeof( char*))))
 	if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
 	    goto unwind1;
     /**
      **  Split the given path environment variable into its components.
      **/
-    for( i=0, dirname = strtok( givenpath, ": ");
+    for( i=0, dirname = xstrtok( givenpath, delim);
          dirname;
-	 dirname = strtok( NULL, ": ")) {
+	 dirname = xstrtok( NULL, delim)) {
 	/**
 	 **  Oops! The number of tokens exceed my array - reallocate it
 	 **  and double its size!
 	 **/
 	if( i == n )
 	    if((char **) NULL == (pathlist = (char**) realloc((char*) pathlist,
-		n *= 2)))
+		(n *= 2)*sizeof(char*))))
 		if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
 		    goto unwind1;
 	/**
@@ -1063,7 +1066,8 @@ int SourceRC( Tcl_Interp *interp, char *path, char *name)
 	     **/
 	    if( !listsize) {
 		listsize = SRCFRAG;
-		if((char **) NULL == (srclist = (char **) malloc( listsize *
+		if((char **) NULL
+			== (srclist = (char **) module_malloc( listsize *
 		    sizeof( char **)))) {
 		    ErrorLogger( ERR_ALLOC, LOC, NULL);
 		    goto unwind1;
@@ -1144,7 +1148,7 @@ int SourceVers( Tcl_Interp *interp, char *path, char *name)
      **  No default version defined so far?
      **/
     if( VersionLookup( name, &mod, &ver) &&
-	strcmp( ver, _default))
+	strcmp( ver, _(em_default)))
 	return( TCL_OK);
     /**
      **  Build the full name of the RC file and check whether it exists and
@@ -1180,7 +1184,7 @@ int SourceVers( Tcl_Interp *interp, char *path, char *name)
 
 		new_argv[0] = "module-version";
 		new_argv[1] = buffer;
-		new_argv[2] = _default;
+		new_argv[2] = _(em_default);
 		/**
 		 **  Define the default version
 		 **/

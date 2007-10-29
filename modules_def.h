@@ -43,6 +43,12 @@
 #  define CONST84	/* const */
 #endif
 
+#if (TCL_MAJOR_VERSION < 8)
+#  define TCL_RESULT(interp) ((interp)->result)
+#else
+#  define TCL_RESULT(interp) Tcl_GetStringResult(interp)
+#endif
+
 #ifndef HAVE_STDINT_H
 /* assume 32 bit - hope for the best */
 typedef	int	intptr_h;
@@ -122,6 +128,19 @@ typedef	int	intptr_h;
 #else
 extern	int	  errno;
 #endif
+
+#ifdef HAVE_LOCALE_H
+#  include <locale.h>
+#endif
+
+#if ENABLE_NLS
+#  include <libintl.h>
+#  define _(String) gettext(String)
+#else
+#  define _(String) (String)
+#endif
+/* gettext_noop() equivalent */
+#define N_(String) (String)
 
 /** ************************************************************************ **/
 /** 				  LOCAL DATATYPES			     **/
@@ -243,6 +262,19 @@ typedef	enum	{
 	PANIC	= 20			/** progrm being aborted by the er-  **/
 					/** ror logger immediatelly	     **/
 } ErrCode;
+
+/**
+ **  Internal return value to handle the various ways a module load
+ **	could end.
+ **/
+typedef enum	{
+	EM_OK		= 0,		/** normal return	**/
+	EM_EXIT,			/** cmd: exit N		**/
+					/** (set g_retval = N)	**/
+	EM_BREAK,			/** cmd: break		**/
+	EM_CONTINUE,			/** cmd: continue	**/
+	EM_ERROR			/** abnormal return	**/
+} EM_RetVal;
 
 /** ************************************************************************ **/
 /** 				     CONSTANTS				     **/
@@ -367,34 +399,6 @@ typedef	enum	{
 #define TCL_LEVEL0_RETURN    11
 
 /**
- **  uname defaults when uname can't be found 
- **/
-
-#ifndef UNAME_SYSNAME
-#  define UNAME_SYSNAME		"unknown"
-#endif
-
-#ifndef UNAME_NODENAME
-#  define UNAME_NODENAME	"unknown"
-#endif
-
-#ifndef UNAME_RELEASE
-#  define UNAME_RELEASE		"unknown"
-#endif
-
-#ifndef UNAME_VERSION
-#  define UNAME_VERSION		"unknown"
-#endif
-
-#ifndef UNAME_MACHINE
-#  define UNAME_MACHINE		"unknown"
-#endif
-
-#ifndef UNAME_DOMAIN
-#  define UNAME_DOMAIN		"unknown"
-#endif
-
-/**
  **  RC files
  **/
 
@@ -463,6 +467,17 @@ typedef	enum	{
 #define	LOC		module_name, __LINE__
 
 /** ************************************************************************ **/
+/** 				    COMMON STRINGS			     **/
+/** ************************************************************************ **/
+
+extern char	em_reading[];
+extern char	em_writing[];
+extern char	em_appending[];
+extern char	em_read_write[];
+extern char	em_unknown[];
+extern char	em_default[];
+
+/** ************************************************************************ **/
 /** 				    GLOBAL DATA				     **/
 /** ************************************************************************ **/
 
@@ -477,11 +492,13 @@ extern	char	 *shell_derelict;
 extern	char	 *shell_init;
 extern	char	 *shell_cmd_separator;
 extern	int	  g_flags;
+extern	int	  g_retval;
+extern	int	  g_output;
 extern	int	  append_flag;
 extern	char	 *line;
 extern	char	 *error_line;
 extern	char	  local_line[];
-extern	char	  _default[];
+extern	char	  _colon[];
 
 extern	int	  linenum;
 
@@ -543,7 +560,7 @@ extern	char	 long_header[];
 /**  locate_module.c  **/
 extern	int	  Locate_ModuleFile( Tcl_Interp*, char*, char*, char*);
 extern	char	**SortedDirList( Tcl_Interp*, char*, char*, int*);
-extern	char	**SplitIntoList( Tcl_Interp*, char*, int*);
+extern	char	**SplitIntoList( Tcl_Interp*, char*, int*, const char*);
 extern	int	  SourceVers( Tcl_Interp*, char*, char*);
 extern	int	  SourceRC( Tcl_Interp *interp, char *, char *);
 #ifdef USE_FREE
@@ -700,14 +717,19 @@ extern	int	  IsLoaded( Tcl_Interp*, char*, char**, char*);
 extern	int	  IsLoaded_ExactMatch( Tcl_Interp*, char*, char	**, char*);
 extern	int	  Update_LoadedList( Tcl_Interp*, char*, char*);
 extern	int	  check_magic( char*, char*, int);
+extern	char	 *xstrtok_r(char *, const char *, char **);
+extern	char	 *xstrtok(char *, const char *);
 extern	void	  chk4spch( char*);
 extern	void	  cleanse_path( const char*, char*, int);
+extern	void	 *module_malloc(size_t);
 extern	char	 *xdup(char const *);
 extern	char	 *xgetenv(char const *);
 extern  int       tmpfile_mod( char**, FILE**);
 extern	char	 *stringer(char *, int, ...);
 extern	void	  null_free(void **);
 extern	size_t	  countTclHash(Tcl_HashTable *);
+extern	EM_RetVal	ReturnValue( Tcl_Interp*, int);
+extern	void	  OutputExit();
 
 #ifndef HAVE_STRDUP
 #  undef strdup

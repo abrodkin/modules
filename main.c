@@ -29,7 +29,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: main.c,v 1.16 2006/01/12 20:31:31 rkowen Exp $";
+static char Id[] = "@(#)$Id: main.c,v 1.23 2006/06/01 14:54:30 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -52,10 +52,17 @@ static void *UseId[] = { &UseId, Id };
 /** not applicable **/
 
 /** ************************************************************************ **/
-/**				      MACROS				     **/
+/** 				    COMMON STRINGS			     **/
 /** ************************************************************************ **/
 
-/** not applicable **/
+/* TRANSLATORS: The next five are the common strings */
+char	em_reading[]	= N_("reading");
+char	em_writing[]	= N_("writing");
+char	em_appending[]	= N_("appending");
+char	em_read_write[]	= N_("read/write");
+char	em_unknown[]	= N_("unknown");
+/* TRANSLATORS: id string for default versions */
+char	em_default[]	= N_("default"); 
 
 /** ************************************************************************ **/
 /** 				    GLOBAL DATA				     **/
@@ -70,13 +77,14 @@ char	 *g_current_module = NULL,	/** The module which is handled by   **/
 					/** (first parameter to modulcmd)    **/
 	 *shell_derelict,		/** Shell family (sh, csh, etc)	     **/
 	 *shell_init,			/** Shell init script name	     **/
-	 *shell_cmd_separator;		/** Shell command separator char     **/
+	 *shell_cmd_separator,		/** Shell command separator char     **/
+	  _colon[] = ":";		/** directory separator		     **/
 int	  g_flags = 0,			/** Control what to do at the moment **/
 					/** The posible values are defined in**/
 					/** module_def.h		     **/
+	  g_retval = 0,			/** exit return value		     **/
+	  g_output = 0,			/** Has output been generated	     **/
 	  append_flag = 0;		/** only used by the 'use' command   **/
-
-char	  _default[] = "default";	/** id string for default versions   **/
 
 /**
  **  Name of the rc files
@@ -110,9 +118,6 @@ char
     *aproposRE  = "^(apr|key)",			/** 'module apropos'	     **/
     *refreshRE  = "^refr";			/** 'module refresh'	     **/
   
-  /**
-   **  Hash-Tables for all changes to the environment.
-
 /**
  **  Hash-Tables for all changes to the environment.
  **  ??? What do we save here, the old or the new setup ???
@@ -151,6 +156,9 @@ static	char	module_name[] = "main.c";	/** File name of this module **/
 
 #if WITH_DEBUGGING
 static	char	_proc_main[] = "main";
+#endif
+#if WITH_DEBUGGING_MODULECMD
+static	char	_proc_Module_Usage[] = "Module_Usage";
 #endif
 #if WITH_DEBUGGING_INIT
 static	char	_proc_Check_Switches[] = "Check_Switches";
@@ -198,6 +206,18 @@ int	main( int argc, char *argv[], char *environ[]) {
 #if WITH_DEBUGGING
     ErrorLogger( NO_ERR_START, LOC, _proc_main, NULL);
 #endif
+
+#ifdef HAVE_SETLOCALE
+	/* set local via LC_ALL */
+	setlocale(LC_ALL,"");
+#endif
+
+#if ENABLE_NLS
+	/* the text message domain. */
+	bindtextdomain(PACKAGE, LOCALEDIR);
+	textdomain(PACKAGE);
+#endif
+
     /**
      ** check if first argument is --version or -V then output the
      ** version to stdout.  This is a special circumstance handled
@@ -338,7 +358,8 @@ int	main( int argc, char *argv[], char *environ[]) {
     ErrorLogger( NO_ERR_END, LOC, _proc_main, NULL);
 #endif
 
-    return ( return_val);
+    OutputExit();
+    return ( return_val ? return_val : g_retval);
 
 unwind2:
     null_free((void *) &rc_path);
@@ -347,7 +368,9 @@ unwind1:
 unwind0:
 
     /* and error occurred of some type */
-    return( 1);
+    g_retval = (g_retval ? g_retval : 1);
+    OutputExit();
+    return (g_retval);
 
 } /** End of 'main' **/
 
@@ -379,14 +402,16 @@ void module_usage(FILE *output)
      **/
 
 #if WITH_DEBUGGING_MODULECMD
-    ErrorLogger( NO_ERR_START, LOC, _proc_ModuleCmd_Help, NULL);
+    ErrorLogger( NO_ERR_START, LOC, _proc_Module_Usage, NULL);
 #endif
 
 	fprintf(output,
-		"\n  Modules Release %s %s (Copyright GNU GPL v2 1991):\n\n",
+		_("\n  Modules Release %s %s (Copyright GNU GPL v2 1991):\n\n"),
                 version_string,date_string);
 	
 	fprintf(output,
+/* TRANSLATORS: keep the options and formatting the same */
+_(
 "  Usage: module [ switches ] [ subcommand ] [subcommand-args ]\n\n"
 "Switches:\n"
 "	-H|--help		this usage info\n"
@@ -408,9 +433,7 @@ void module_usage(FILE *output)
 "	+ avail			[modulefile [modulefile ...]]\n"
 "	+ use [-a|--append]	dir [dir ...]\n"
 "	+ unuse			dir [dir ...]\n"
-#ifdef BEGINENV
 "	+ update\n"
-#endif
 "	+ refresh\n"
 "	+ purge\n"
 "	+ list\n"
@@ -423,7 +446,7 @@ void module_usage(FILE *output)
 "	+ initrm		modulefile [modulefile ...]\n"
 "	+ initswitch		modulefile1 modulefile2\n"
 "	+ initlist\n"
-"	+ initclear\n\n");
+"	+ initclear\n\n"));
 
 } /** End of 'module_usage' **/
 
@@ -763,27 +786,36 @@ static void version (FILE *output) {
 	char	*x,
 		*format = "%s=%s\n";
 
-	fprintf(output, format, "VERSION", version_string);
-	fprintf(output, format, "DATE", date_string);
+	fprintf(output, format, _("VERSION"), version_string);
+	fprintf(output, format, _("DATE"), date_string);
 	fprintf(output, "\n");
+
 	isdefined(AUTOLOADPATH,str(AUTOLOADPATH));
+	isdefined(BASEPREFIX,str(BASEPREFIX));
 	isdefined(BEGINENV,str(BEGINENV));
 	isdefined(CACHE_AVAIL,str(CACHE_AVAIL));
 	isdefined(DEF_COLLATE_BY_NUMBER,str(DEF_COLLATE_BY_NUMBER));
 	isdefined(DOT_EXT,str(DOT_EXT));
-	isdefined(HAS_BOURNE_FUNCS,str(HAS_BOURNE_FUNCS));
-	isdefined(HAS_BOURNE_ALIAS,str(HAS_BOURNE_ALIAS));
+	isdefined(ENABLE_NLS,str(ENABLE_NLS));
 	isdefined(EVAL_ALIAS,str(EVAL_ALIAS));
+	isdefined(HAS_BOURNE_ALIAS,str(HAS_BOURNE_ALIAS));
+	isdefined(HAS_BOURNE_FUNCS,str(HAS_BOURNE_FUNCS));
+	isdefined(HAS_TCLXLIBS,str(HAS_TCLXLIBS));
+	isdefined(HAS_X11LIBS,str(HAS_X11LIBS));
 	isdefined(LMSPLIT_SIZE,str(LMSPLIT_SIZE));
 	isdefined(MODULEPATH,str(MODULEPATH));
 	isdefined(MODULES_INIT_DIR,str(MODULES_INIT_DIR));
 	isdefined(PREFIX,str(PREFIX));
+	isdefined(TCL_VERSION,str(TCL_VERSION));
+	isdefined(TCL_PATCH_LEVEL,str(TCL_PATCH_LEVEL));
 	isdefined(TMP_DIR,str(TMP_DIR));
 	isdefined(USE_FREE,str(USE_FREE));
 	isdefined(VERSION_MAGIC,str(VERSION_MAGIC));
 	isdefined(VERSIONPATH,str(VERSIONPATH));
 	isdefined(WANTS_VERSIONING,str(WANTS_VERSIONING));
 	isdefined(WITH_DEBUG_INFO,str(WITH_DEBUG_INFO));
+
+  	fprintf(output, "\n");
 }
 
 #undef str

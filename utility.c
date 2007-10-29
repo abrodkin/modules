@@ -28,7 +28,10 @@
  **			Update_LoadedList				     **
  **			check_magic					     **
  **			cleanse_path					     **
+ **			xstrtok						     **
+ **			xstrtok_r					     **
  **			chk4spch					     **
+ **			module_malloc					     **
  **			xdup						     **
  **			xgetenv						     **
  **			stringer					     **
@@ -36,7 +39,6 @@
  **			countTclHash					     **
  **									     **
  **			strdup		if not defined by the system libs.   **
- **			strtok		if not defined by the system libs.   **
  ** 									     **
  **   Notes:								     **
  ** 									     **
@@ -50,7 +52,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.19 2006/01/17 22:58:29 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.26 2007/02/14 06:21:50 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -483,7 +485,7 @@ Tcl_HashTable	**Copy_Hash_Tables( void)
     /**
      **  Allocate storage for the new list of hash tables
      **/
-    if( !(newTable = (Tcl_HashTable**) malloc( sizeof( oldTable))))
+    if( !(newTable = (Tcl_HashTable**) module_malloc( sizeof( oldTable))))
 	if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
 	    goto unwind0;
 
@@ -495,7 +497,7 @@ Tcl_HashTable	**Copy_Hash_Tables( void)
 	/**
 	 **  Allocate memory for a single hash table
 	 **/
-	if( !(*n_ptr = (Tcl_HashTable*) malloc( sizeof( Tcl_HashTable))))
+	if( !(*n_ptr = (Tcl_HashTable*) module_malloc( sizeof( Tcl_HashTable))))
 	    if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
 		goto unwind1;
 
@@ -692,7 +694,7 @@ int Output_Modulefile_Changes(	Tcl_Interp	*interp)
 	hcnt = countTclHash(table[i]);
 
 	/* allocate array for keys */
-	if( !(list = (char **) malloc(hcnt * sizeof(char *)))) {
+	if( !(list = (char **) module_malloc(hcnt * sizeof(char *)))) {
 		if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
 	    		return(TCL_ERROR);/** ------- EXIT (FAILURE) ------> **/
 	}
@@ -770,17 +772,17 @@ int Output_Modulefile_Changes(	Tcl_Interp	*interp)
 
 static	int Open_Aliasfile(int action)
 {
-
     if (action) {
 	/**
 	 **  Open the file ...
 	 **/
 	if( tmpfile_mod(&aliasfilename,&aliasfile))
-	    if(OK != ErrorLogger( ERR_OPEN, LOC, aliasfilename, "append", NULL))
+	    if(OK != ErrorLogger( ERR_OPEN, LOC, aliasfilename,
+		_(em_appending), NULL))
 		return( TCL_ERROR);	/** -------- EXIT (FAILURE) -------> **/
     } else {
 	if( EOF == fclose( aliasfile))
-	    if( OK != ErrorLogger( ERR_CLOSE, LOC, aliasfile, NULL))
+	    if( OK != ErrorLogger( ERR_CLOSE, LOC, aliasfilename, NULL))
 		return( TCL_ERROR);	/** -------- EXIT (FAILURE) -------> **/
     }
 
@@ -858,7 +860,8 @@ static	int Output_Modulefile_Aliases( Tcl_Interp *interp)
 	if (!eval_alias
 	|| (!strcmp(shell_name,"sh") && !bourne_alias && bourne_funcs)) {
 	    if (OK != Open_Aliasfile(1))
-		if(OK != ErrorLogger(ERR_OPEN,LOC,aliasfilename,"append",NULL))
+		if(OK != ErrorLogger(ERR_OPEN,LOC,aliasfilename,
+		    _(em_appending),NULL))
 		    return( TCL_ERROR);	/** -------- EXIT (FAILURE) -------> **/
 	    openfile = 1;
 	}
@@ -917,8 +920,8 @@ static	int Output_Modulefile_Aliases( Tcl_Interp *interp)
 
 
     if(openfile) {
-	if( OK == Open_Aliasfile(0))
-	    if( OK != ErrorLogger( ERR_CLOSE, LOC, aliasfile, NULL))
+	if( OK != Open_Aliasfile(0))
+	    if( OK != ErrorLogger( ERR_CLOSE, LOC, aliasfilename, NULL))
 		return( TCL_ERROR);	/** -------- EXIT (FAILURE) -------> **/
 
 	null_free((void *) &aliasfilename);
@@ -1059,7 +1062,7 @@ static	int	output_set_variable(	Tcl_Interp	*interp,
      **/
     } else if( !strcmp((char*) shell_derelict, "sh")) {
 
-      char* escaped = (char*)malloc(strlen(val)*2+1);
+      char* escaped = (char*)module_malloc(strlen(val)*2+1);
       EscapeShString(val,escaped);
 
       fprintf( stdout, "%s=%s %sexport %s%s", var, escaped, shell_cmd_separator,
@@ -1112,7 +1115,8 @@ static	int	output_set_variable(	Tcl_Interp	*interp,
     /**
      **  Return and acknowldge success
      **/
-    return( TCL_ERROR);
+    g_output = 1;
+    return( TCL_OK);
 
 } /** End of 'output_set_variable' **/
 
@@ -1170,6 +1174,7 @@ static	int	output_unset_variable( const char* var)
     /**
      **  Return and acknowldge success
      **/
+    g_output = 1;
     return( TCL_OK);
 
 } /** End of 'output_unset_variable' **/
@@ -1201,42 +1206,48 @@ static	int	output_unset_variable( const char* var)
 static	void	output_function(	const char	*var,
 					const char	*val)
 {
-    const char	*cptr = val;
-    int 	nobackslash = 1;
-    
+    const char *cptr = val;
+    int nobackslash = 1;
+
 #if WITH_DEBUGGING_UTIL_2
-    ErrorLogger( NO_ERR_START, LOC, _proc_output_function, NULL);
+    ErrorLogger(NO_ERR_START, LOC, _proc_output_function, NULL);
 #endif
 
     /**
      **  This opens a function ...
      **/
-    fprintf( aliasfile, "%s() {%c", var, alias_separator);
+    fprintf(aliasfile, "%s() { ", var);
 
     /**
      **  ... now print the value. Print it as a single line and remove any
-     **  backslash
+     **  backslashes, and substitute a safe $*
      **/
-    while( *cptr) {
+    while (*cptr) {
 
-        if( *cptr == '\\') {
-            if( !nobackslash)
-		putc( *cptr, aliasfile);
-            else
+	if (*cptr == '\\') {
+	    if (!nobackslash)
+		putc(*cptr, aliasfile);
+	    else
 		nobackslash = 0;
-            cptr++;
-            continue;
-        } else
-            nobackslash = 1;
+	    cptr++;
+	    continue;
+	} else if (*cptr == '$' && (cptr + 1) && (*(cptr + 1) == '*')) {
+	    /* found $* */
+	    fputs("${1+\"$@\"}", aliasfile);
+	    cptr++;
+	    cptr++;
+	    continue;
+	} else
+	    nobackslash = 1;
 
-        putc(*cptr++, aliasfile);
+	putc(*cptr++, aliasfile);
 
     } /** while **/
 
     /**
      **  Finally close the function
      **/
-    fprintf( aliasfile, "%c}%c", alias_separator,alias_separator);
+    fprintf(aliasfile, "%c}%c", alias_separator, alias_separator);
 
 } /** End of 'output_function' **/
 
@@ -1340,8 +1351,8 @@ static	int	output_set_alias(	const char	*alias,
                 ||  !strcmp( shell_name, "ksh")) {
 	    /**
 	     **  in this case we only have to write a function if the alias
-	     **  take arguments. This is the case if the value has somewhere
-	     **  a '$' in it without a '\' infront.
+	     **  takes arguments. This is the case if the value has '$'
+	     **  somewhere in it without a '\' in front.
 	     **/
 	    while( *cptr) {
 		if( *cptr == '\\') {
@@ -1784,7 +1795,7 @@ static int __IsLoaded(	Tcl_Interp	 *interp,
 	 **  following:
 	 **                gnu/2.0:openwin/3.0
 	 **/
-	loadedmodule_path = strtok( l_modules, ":");
+	loadedmodule_path = xstrtok( l_modules, ":");
 	while( loadedmodule_path) {
 
 	    if((char *) NULL == (loaded = stringer(NULL,0,
@@ -1834,7 +1845,7 @@ static int __IsLoaded(	Tcl_Interp	 *interp,
 	    /**
 	     **  Get the next entry from the loaded modules list
 	     **/
-	    loadedmodule_path = strtok( NULL, ":");
+	    loadedmodule_path = xstrtok( NULL, ":");
             count++;
 
 	    null_free ((void *) &loaded); /** Free what has been alloc. **/
@@ -1855,10 +1866,10 @@ static int __IsLoaded(	Tcl_Interp	 *interp,
 	     **  list of modulefiles by the colon until the wanted position
 	     **  is reached.
 	     **/
-            char* modulefile_path = strtok(l_modulefiles, ":");
+            char* modulefile_path = xstrtok(l_modulefiles, ":");
 	
             while( count) {
-                if( !( modulefile_path = strtok( NULL, ":"))) {
+                if( !( modulefile_path = xstrtok( NULL, ":"))) {
 
 		    /**
 		     **  Oops! Fewer entries in the list of loaded modulefiles
@@ -2153,7 +2164,7 @@ int check_magic( char	*filename,
      **  less than magic_len have been read) return on failure.
      **/
     if( 0 > (fd = open( filename, O_RDONLY)))
-	if( OK != ErrorLogger( ERR_OPEN, LOC, filename, "reading", NULL))
+	if( OK != ErrorLogger( ERR_OPEN, LOC, filename, _(em_reading), NULL))
 	    return( 0);			/** -------- EXIT (FAILURE) -------> **/
 
     read_len = read( fd, buf, magic_len);
@@ -2216,6 +2227,7 @@ void cleanse_path( const char	*path,
         switch(*path) {
             case '.':
             case '+':
+            case '$':
 		*newpath++ = '\\';		/** devalue '.' and '+'	    **/
 		j++;
 		break;
@@ -2311,22 +2323,22 @@ char	*strdup( char *str)
 }
 #endif /* HAVE_STRDUP  */
 
-#ifndef HAVE_STRTOK
 
 /*++++
  ** ** Function-Header ***************************************************** **
  ** 									     **
- **   Function:		strtok						     **
+ **   Function:		xstrtok_r,xstrtok				     **
  ** 									     **
- **   Description: 	Considers the string s1 to consist of a sequence of  **
+ **   Description: 	Considers the string s to consist of a sequence of   **
  **			zero or more text tokens separated by spans of one   **
- **			or more characters from the separator string  s2.    **
- **			Just like the "standard" strtok(3).		     **
+ **			or more characters from the separator string  delim. **
+ **			Just like the "standard" strtok(3), and the
+ **			reentrant version strtok_r(3).			     **
+ **			Except this tokenizer will return "empty" tokens too.**
+ **			Providing our own strtok() eliminates the various    **
+ **			nuances of different implementations.		     **
  **									     **
- **   Note:		This function is from the Berkeley BSD distribution. **
- **			It was modified to fit our needs!		     **
- ** 									     **
- **   First Edition:	1991/10/23					     **
+ **   First Edition:	2006/04/17	R.K.Owen <rk@owen.sj.ca.us>	     **
  ** 									     **
  **   Parameters:							     **
  **   Result:								     **
@@ -2335,88 +2347,72 @@ char	*strdup( char *str)
  ** ************************************************************************ **
  ++++*/
 
-/*
- * Copyright (c) 1988 Regents of the University of California.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- */
+char *xstrtok_r(char *s, const char *delim, char **ptrptr) {
+	register char	*ptr, *lptr;
+	register int	 c,sc;
+	const char	*tok;
 
-char *strtok(	char		*s,
-		const char	*delim)
-{
-	register char *spanp;
-	register int c, sc;
-	char *tok;
-	static char *last;
-
-
-	if( s == NULL && (s = last) == NULL)
+	/* return NULL if NULL string and at end of the line */
+	if (s == NULL && *ptrptr == NULL)
 		return (NULL);
 
-	/*
-	 * Skip (span) leading delimiters (s += strspn(s, delim), sort of).
-	 */
-cont:
-	c = *s++;
-	for( spanp = (char *)delim; (sc = *spanp++) != 0;) {
-		if (c == sc)
-			goto cont;
-	}
+	/* do not skip leading (or trailing) delimiters ... */
 
-	if( !c) {		/* no non-delimiter characters */
-		last = NULL;
-		return (NULL);
-	}
-	tok = s - 1;
+	/* if non-NULL string then at beginning of token parsing */
+	if (s != NULL)	*ptrptr = s;
 
-	/*
-	 * Scan token (scan for delimiters: s += strcspn(s, delim), sort of).
-	 * Note that delim must have one NUL; we stop if we see that, too.
-	 */
-	for (;;) {
-		c = *s++;
-		spanp = (char *)delim;
-		do {
-			if ((sc = *spanp++) == c) {
-				if (c == 0)
-					s = NULL;
-				else
-					s[-1] = 0;
-				last = s;
-				return (tok);
+	ptr = *ptrptr;
+	while (ptr && *ptr) {
+		/* cycle through delimiters */
+		tok = delim;
+		while (tok && *tok) {
+			if (*ptr == *tok) {	/* match */
+				*ptr = '\0';	/* null terminate */
+				lptr = *ptrptr;
+				*ptrptr = ++ptr;	/* set for next time */
+				return  lptr;
 			}
-		} while (sc != 0);
+			tok++;
+		}
+		ptr++;
 	}
-	/* NOTREACHED */
+	/* didn't find delimiter */
+	lptr = *ptrptr;
+	*ptrptr = NULL;
+	return lptr;
+} /** End of 'xstrtok_r' **/
 
-} /** End of 'strtok' **/
+char *xstrtok(char *s, const char *delim) {
+	static char	*last;
+	return	xstrtok_r(s,delim,&last);
+} /** End of 'xstrtok' **/
+
+#if 0
+void tryxstrtok (char *string, char *delim) {
+	char *start, *str;
+	char *token;
+	int n = 1;
+
+	start = str = strdup(string);
+	printf("string: %s\n", str);
+	printf("delim : %s\n", delim);
+	
+	token = xstrtok(str,delim);
+	printf("\t%d = %s\n", n, token);
+	while (token = xstrtok(NULL, delim)) {
+		printf("\t%d = %s\n", ++n, token);
+	}
+	free(start);
+}
+int main () {
+	tryxstrtok("abc:def;ghi,jkl", ":;,");
+	tryxstrtok(":abc:def;ghi,jkl", ":;,");
+	tryxstrtok("::abc:def;ghi,jkl", ":;,");
+	tryxstrtok("abc:def;ghi,jkl:", ":;,");
+	tryxstrtok("abc:def;ghi,jkl::", ":;,");
+	tryxstrtok("abc", ":;,");
+	tryxstrtok("", ":;,");
+}
 #endif
 
 /*++++
@@ -2445,6 +2441,31 @@ void chk4spch(char* s)
 
 } /** End of 'chk4spch' **/
 
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
+ **   Function:		module_malloc					     **
+ ** 									     **
+ **   Description:	A wrapper for the system malloc() function,	     **
+ ** 			so the argument can be tested and set to a positive  **
+ ** 			value.						     **
+ ** 									     **
+ **   First Edition:	2007/02/14	R.K.Owen <rk@owen.sj.ca.us>	     **
+ ** 									     **
+ **   Parameters:	size_t	size		Number of bytes to allocate  **
+ ** 									     **
+ **   Result:		void    *		An allocated memory pointer  **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
+
+
+void *module_malloc(size_t size) {
+
+	return malloc(size > 0 ? size : 1);
+
+} /** End of 'module_malloc' **/
+
 /*++++
  ** ** Function-Header ***************************************************** **
  ** 									     **
@@ -2626,6 +2647,7 @@ void EscapeCshString(const char* in,
 	*in == '<' ||
 	*in == '>' ||
 	*in == '!' ||
+	*in == ';' ||
 	*in == '#' ||
 	*in == '$' ||
 	*in == '^' ||
@@ -2655,6 +2677,7 @@ void EscapeShString(const char* in,
 	*in == '<' ||
 	*in == '>' ||
 	*in == '!' ||
+	*in == ';' ||
 	*in == '#' ||
 	*in == '$' ||
 	*in == '^' ||
@@ -2676,6 +2699,7 @@ void EscapePerlString(const char* in,
   
   for(;*in;in++) {
     if (*in == '\\'||
+	*in == ';' ||
 	*in == '\'') {
       *out++ = '\\';
     }
@@ -2733,7 +2757,7 @@ int tmpfile_mod(char** filename, FILE** file) {
 
   null_free((void *) &filename2);
   fprintf(stderr,
-	"FATAL: could not get a temp file! at %s(%d)",__FILE__,__LINE__);
+	_("FATAL: could not get a temp file! at %s(%d)"),__FILE__,__LINE__);
   
   return 1;
 }
@@ -2806,7 +2830,7 @@ char *stringer(	char *		buffer,
 		if (len == 0) {
 			len = sumlen + 1;
 		}
-		if ((char *) NULL == (tbuf = (char*) malloc(len))) {
+		if ((char *) NULL == (tbuf = (char*) module_malloc(len))) {
 			if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
 				return (char *) NULL;
 		}
@@ -2887,3 +2911,122 @@ size_t countTclHash(Tcl_HashTable *table) {
 
 	return result;
 } /** End of 'countHashTable' **/
+
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
+ **   Function:		ReturnValue					     **
+ ** 									     **
+ **   Description:	Handles the various possible return values	     **
+ ** 									     **
+ **   first edition:	2006/02/13	R.K.Owen <rk@owen.sj.ca.us>	     **
+ ** 									     **
+ **   Parameters:	Tcl_Interp      *interp		Attached Tcl Interp. **
+ **			int		retval		Return value to check**
+ ** 									     **
+ **   Result:		EM_RetVal		Limited set		     **
+ ** 									     **
+ **   Attached Globals:	g_retval	set to N if "exit N"		     **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
+
+
+EM_RetVal ReturnValue(Tcl_Interp *interp, int retval) {
+	EM_RetVal	 em_result;
+	char		*startp		= (char *) NULL,
+			*endp		= (char *) NULL;
+	const char 	*tstr;
+	int		 result;
+	static Tcl_RegExp	exit__expPtr,
+				break_expPtr,
+				continue_expPtr;
+
+	tstr = (const char *) TCL_RESULT(interp);
+
+	/* compile regular expression the first time through */
+	if (!exit__expPtr)
+		exit__expPtr = Tcl_RegExpCompile(interp, "^EXIT ([0-9]*)");
+
+	/*  result = "invoked \"break\" outside of a loop" */
+	if (!break_expPtr)
+		break_expPtr = Tcl_RegExpCompile(interp, ".*\"break\".*");
+
+	/*  result = "invoked \"continue\" outside of a loop" */
+	if (!continue_expPtr)
+		continue_expPtr = Tcl_RegExpCompile(interp, ".*\"continue\".*");
+
+	/* intercept any "EXIT N" first */
+	if(tstr && *tstr && 0 < Tcl_RegExpExec(interp, exit__expPtr,
+		(CONST84 char *) tstr, (CONST84 char *) tstr)){
+		/* found 'EXIT' */
+		Tcl_RegExpRange(exit__expPtr, 1,
+			(CONST84 char **) &startp, (CONST84 char **) &endp);
+		if( startp != '\0')
+			result = atoi((const char *) startp);
+
+		g_retval = result;
+		em_result = EM_EXIT;
+
+	/* check for a break not within loop */
+	} else if(tstr && *tstr && 0 < Tcl_RegExpExec(interp, break_expPtr,
+		(CONST84 char *) tstr, (CONST84 char *) tstr)){
+		em_result = EM_BREAK;
+
+	/* check for a continue not within loop */
+	} else if(tstr && *tstr && 0 < Tcl_RegExpExec(interp, continue_expPtr,
+		(CONST84 char *) tstr, (CONST84 char *) tstr)){
+		em_result = EM_CONTINUE;
+
+	} else {
+		switch (retval) {
+		case TCL_OK:
+			em_result = EM_OK;
+			break;
+		case TCL_BREAK:
+			em_result = EM_BREAK;
+			break;
+		case TCL_CONTINUE:
+			em_result = EM_CONTINUE;
+			break;
+		case TCL_ERROR:
+		default:
+			em_result = EM_ERROR;
+			break;
+		}
+	}
+	return em_result;
+} /** End of 'ReturnValue' **/
+
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
+ **   Function:		OutputExit					     **
+ ** 									     **
+ **   Description:	Outputs a 'test 0 = 1' line so command will eval     **
+ ** 			with a non-zero	exit code			     **
+ ** 									     **
+ **   first edition:	2006/03/07	R.K.Owen <rk@owen.sj.ca.us>	     **
+ ** 									     **
+ **   Parameters:	void			none			     **
+ ** 									     **
+ **   result:		void    		(nothing)		     **
+ ** 									     **
+ **   Attached Globals:	g_retval	if non-zero			     **
+ **   			g_output	if non-zero			     **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
+void OutputExit() {
+
+	if( !strcmp( shell_derelict, "csh")) {
+		/* OK shell derelict */
+	} else if( !strcmp( shell_derelict, "sh")) {
+		/* OK shell derelict */
+	} else {
+		return;
+	}
+	if (g_retval) {
+		fprintf( stdout, " test 0 = 1;");
+	}
+} /** End of 'OutputExit' **/

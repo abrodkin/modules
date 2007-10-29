@@ -40,7 +40,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdXResource.c,v 1.7 2006/01/17 22:51:34 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdXResource.c,v 1.9 2007/02/14 06:21:50 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -652,7 +652,7 @@ static	ErrType getOld( register char **buf)
 	if( OK != ErrorLogger( ERR_PARAM, LOC, "Resource database", NULL))
 	    return( ERR_PARAM);		/** ------- EXIT (PARAMETER) -----> **/
 
-    if( !(resDB.data = (Tcl_HashTable *) malloc( sizeof( Tcl_HashTable))))
+    if( !(resDB.data = (Tcl_HashTable *) module_malloc(sizeof(Tcl_HashTable))))
 	if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
 	    return( ERR_ALLOC);		/** ----- EXIT (OUT OF MEMORY) ----> **/
 
@@ -738,7 +738,7 @@ static	ErrType	initBuffers(	Tcl_Interp *interp,
      **/
 
     if( !buffer) {
-	if( !(buffer = (Tcl_DString *) malloc( sizeof( Tcl_DString)))) {
+	if( !(buffer = (Tcl_DString *) module_malloc(sizeof(Tcl_DString)))) {
 	    if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
 		return( ERR_ALLOC);	/** ----- EXIT (OUT OF MEMORY) ----> **/
 	} else 
@@ -754,7 +754,7 @@ static	ErrType	initBuffers(	Tcl_Interp *interp,
 	defines[ def_base] = '\0';
     else if( is_file) {
 
-	if( !(defines = (char *) malloc( BUFSIZ * sizeof( char))))
+	if( !(defines = (char *) module_malloc(BUFSIZ * sizeof( char))))
 	    if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
 		return( ERR_ALLOC);	/** ----- EXIT (OUT OF MEMORY) ----> **/
 
@@ -935,7 +935,7 @@ int	cmdXResource(	ClientData	 client_data,
 		    popen( strcat( defines, argv[ opt_ind]), "r") : 
 		    fopen( argv[ opt_ind], "r")) ) )
 		    if( OK != ErrorLogger( (do_cpp ? ERR_POPEN : ERR_OPEN), LOC,
-			"argv[ opt_ind]", "reading" ))
+			"argv[ opt_ind]", _(em_reading) ))
 			return( TCL_ERROR);     /** ---- EXIT (FAILURE) ---> **/
 
 		if( TCL_ERROR == readFile( inp, do_cpp))

@@ -1,6 +1,6 @@
 dnl
 dnl File:        configure.in
-dnl Revision:    $Id: configure.ac,v 1.20 2006/01/17 22:58:29 rkowen Exp $
+dnl Revision:    $Id: configure.ac,v 1.26 2006/05/04 16:55:44 rkowen Exp $
 dnl Created:     1994/06/18
 dnl Author:      Leif Hedstrom<hedstrom@inf.ethz.ch>
 dnl		 Martin S. Utesch <wstd@hl.siemens.de>
@@ -12,13 +12,18 @@ dnl You need autoconf 2.52 or better!
 dnl
 dnl ---------------------------------------------------------------------------
 AC_INIT(modules,3.2)dnl
-AC_CONFIG_AUX_DIR(config)dnl
+AC_CONFIG_AUX_DIR(config)
 AM_INIT_AUTOMAKE(1.9.6 foreign dejagnu no-installinfo dist-bzip2)dnl
 AC_CONFIG_SRCDIR([version.c])dnl
 AM_CONFIG_HEADER(config.h)dnl
+AC_AIX
 AM_PROG_CC_C_O
 AC_PROG_MAKE_SET
 AC_PREREQ(2.59)dnl
+dnl I18N support
+AM_GNU_GETTEXT([external])
+AM_GNU_GETTEXT_VERSION([0.14.5])
+AM_PO_SUBDIRS
 
 dnl ---------------------------------------------------------------------------
 dnl Autoheader "templates" (was acconfig.h)
@@ -42,11 +47,6 @@ AH_TOP([
  ** 									     ** 
  ** ************************************************************************ **/
 ])dnl
-AH_TEMPLATE([TCL_MINOR_VERSION],[
-TCL_MINOR_VERSION: if defined, contains the version of TCL (and TCLX)])dnl
-AH_TEMPLATE([TCL_MAJOR_VERSION],[
-TCL_MAJOR_VERSION: if defined, contains the version of TCL (and TCLX)])dnl
-dnl
 dnl ---------------------------------------------------------------------------
 dnl
 dnl Some special substitution we need:
@@ -181,7 +181,6 @@ AC_PROG_CPP
 AC_PROG_GCC_TRADITIONAL
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
-AC_AIX
 AC_ISC_POSIX
 AC_PATH_PROG([UNAME],[uname],[""])dnl
 dnl ---------------------------------------------------------------------------
@@ -204,7 +203,7 @@ AC_STRUCT_TM
 dnl ---------------------------------------------------------------------------
 dnl Checks for library functions.
 dnl ---------------------------------------------------------------------------
-AC_CHECK_FUNCS([strdup strtok uname gethostname getdomainname \
+AC_CHECK_FUNCS([strdup uname gethostname getdomainname \
 	mktemp tmpnam tempnam \
 	syslog dup2])dnl
 dnl ---------------------------------------------------------------------------
@@ -230,9 +229,9 @@ This symbol, if defined, indicates that the C program can use X11
 directly.])dnl
 	AC_DEFINE(HAS_X11LIBS)dnl
 	AC_CHECK_LIB(X11, XMaxRequestSize,,,
-		[-I $ac_x_includes -L $ac_x_libraries])dnl
-	AC_CHECK_LIB(Xmu, XmuGetHostname,,,
-		[-I $ac_x_includes -L $ac_x_libraries])dnl
+		[-I ${ac_x_includes:-.} -L ${ac_x_libraries:-.}])dnl
+dnl	AC_CHECK_LIB(Xmu, XmuGetHostname,,,
+dnl		[-I ${ac_x_includes:-.} -L ${ac_x_libraries:-.}])dnl
 
 fi
 dnl ---------------------------------------------------------------------------
@@ -797,6 +796,8 @@ dnl--------------------------------------------------------------------
 
 EM_PATH_TCLXCONFIG
 EM_LOAD_TCLXCONFIG
+EM_SET_TCLX
+EM_CHECK_TCLX
 if test x"$no_tclx" != x"true"; then
 	AH_TEMPLATE([HAS_TCLXLIBS],[
 HAS_TCLXLIBS:
@@ -964,7 +965,7 @@ PREFIX/Modules/modulefiles
 dnl ---------------------------------------------------------------------------
 dnl Now put it all out!
 dnl ---------------------------------------------------------------------------
-AC_CONFIG_FILES([Makefile modules.lsm .spec doc/Makefile
+AC_CONFIG_FILES([Makefile modules.lsm .spec doc/Makefile po/Makefile.in
 	init/Makefile init/.modulespath
 	doc/module.1 doc/modulefile.4
 	etc/Makefile etc/add.modules etc/mkroot
