@@ -1,6 +1,11 @@
 Do Not Edit!  This is a generated file.
 	You should edit the NEWS file instead.
 
+2007-10-29 09:36  rkowen
+
+	* ModuleCmd_Avail.c, NEWS: Skip .git version control dirs in
+	modulefile dirs.
+
 2007-10-23 13:58  sirdude
 
 	* tcl/modulecmd.tcl: updated ignored directories to include .svn
@@ -2533,7 +2538,7 @@ Do Not Edit!  This is a generated file.
 
 2003-08-07 14:07  harlan
 
-	* tcl/modulecmd.tcl: Add $Revision: 1.50.2.4.8.2 $ to the version
+	* tcl/modulecmd.tcl: Add $Revision: 1.50.2.4.8.3 $ to the version
 
 2003-08-07 12:52  harlan
 
