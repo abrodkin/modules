@@ -30,7 +30,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: error.c,v 1.8.6.1 2006/02/04 21:06:35 rkowen Exp $";
+static char Id[] = "@(#)$Id: error.c,v 1.8.6.1.12.1 2008/02/12 00:06:09 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -609,7 +609,7 @@ int Module_Error(	ErrType		  error_type,
      **  Build the argument array at first
      **/
 
-    if( NULL == (argv = (char **) malloc( listsize * sizeof( char *)))) {
+    if( NULL == (argv = (char **) module_malloc(listsize * sizeof( char *)))) {
 	module = module_name;
 	error_type = ERR_ALLOC;
 	NoArgs = 1;
@@ -930,9 +930,9 @@ static	int	FlushError(	ErrType		  Type,
      **  Now tokenize the facilities string and schedule the error messge
      **  for every single facility
      **/
-    for( fac = strtok( facilities, ":");
+    for( fac = xstrtok( facilities, ":");
 	 fac;
-	 fac = strtok( (char *) NULL, ":") ) {
+	 fac = xstrtok( (char *) NULL, ":") ) {
 
 	/**
 	 **  Check for filenames. Two specials are defined: stderr and stdout
@@ -957,6 +957,11 @@ static	int	FlushError(	ErrType		  Type,
 #if defined(HAVE_SYSLOG) && defined(WITH_LOGGING)
 	    int syslog_fac, syslog_lvl;
 
+	/* error output to stderr too if an error or verbose */
+	    if (Type >= NO_ERR_VERBOSE)
+		fprintf( stderr, "%s", errmsg_buffer);
+
+	/* now send to syslog */
 	    if( CheckFacility( fac, &syslog_fac, &syslog_lvl)) {
 		openlog( "modulecmd", LOG_PID, syslog_fac);
 		setlogmask( LOG_UPTO( syslog_lvl));
@@ -973,7 +978,7 @@ static	int	FlushError(	ErrType		  Type,
 
 #else
 #  ifdef	SYSLOG_DIR
-	    /* this is an intential memory leak */
+	    /* this is an intentional memory leak */
 	    buffer = stringer(NULL,0, SYSLOG_DIR, "/", fac);
 	    fac = buffer;
 #  endif
@@ -1143,7 +1148,7 @@ int	CheckFacility(	char *string, int *facility, int *level)
 
     /** 
      **  We cannot use strtok here, because there's one initialized in an
-     **  outter loop!
+     **  outer loop!
      **/
     for( s=buf; s && *s && *s != '.'; s++);
     if( !s || !*s)

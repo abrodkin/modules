@@ -27,7 +27,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdConflict.c,v 1.9 2005/11/29 04:26:30 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdConflict.c,v 1.9.16.1 2008/02/12 00:06:08 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -270,7 +270,8 @@ int	cmdConflict(	ClientData	 client_data,
 	if( OK != ErrorLogger( ERR_MODULE_PATH, LOC, NULL))
 	    goto unwind0;
 
-    if((char **) NULL==(pathlist=SplitIntoList(interp, modulepath, &numpaths)))
+    if((char **) NULL==(pathlist=SplitIntoList(interp, modulepath, &numpaths,
+	_colon)))
         goto success1;
 
     /**
@@ -438,18 +439,19 @@ int	cmdPrereq(	ClientData	 client_data,
     ErrorLogger( NO_ERR_DEBUG, LOC, "Got modulepath: '", modulepath, "'", NULL);
 #endif
 
-    if((char **) NULL==(pathlist=SplitIntoList(interp, modulepath, &numpaths)))
+    if((char **) NULL==(pathlist=SplitIntoList(interp, modulepath, &numpaths,
+	_colon)))
         goto success1;
 
     /**
      **  Allocate memory for the lists of conflict modules
      **/
-    if((char ***) NULL==(savedlists=(char***) malloc(numpaths * (argc - 1)
+    if((char ***) NULL==(savedlists=(char***) module_malloc(numpaths * (argc-1)
 	* sizeof(char**))))
 	if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
 	    goto unwind1;
 
-    if((int *) NULL == (savedlens = (int*) malloc(numpaths * (argc - 1)
+    if((int *) NULL == (savedlens = (int*) module_malloc(numpaths * (argc-1)
 	* sizeof( int))))
 	if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
 	    goto unwind2;

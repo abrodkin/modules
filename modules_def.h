@@ -503,6 +503,7 @@ extern	char	 *line;
 extern	char	 *error_line;
 extern	char	  local_line[];
 extern	char	  _default[];
+extern	char	  _colon[];
 
 extern	int	  linenum;
 
@@ -564,7 +565,7 @@ extern	char	 long_header[];
 /**  locate_module.c  **/
 extern	int	  Locate_ModuleFile( Tcl_Interp*, char*, char*, char*);
 extern	char	**SortedDirList( Tcl_Interp*, char*, char*, int*);
-extern	char	**SplitIntoList( Tcl_Interp*, char*, int*);
+extern	char	**SplitIntoList( Tcl_Interp*, char*, int*, const char*);
 extern	int	  SourceVers( Tcl_Interp*, char*, char*);
 extern	int	  SourceRC( Tcl_Interp *interp, char *, char *);
 #ifdef USE_FREE
@@ -721,8 +722,11 @@ extern	int	  IsLoaded( Tcl_Interp*, char*, char**, char*);
 extern	int	  IsLoaded_ExactMatch( Tcl_Interp*, char*, char	**, char*);
 extern	int	  Update_LoadedList( Tcl_Interp*, char*, char*);
 extern	int	  check_magic( char*, char*, int);
+extern	char	 *xstrtok_r(char *, const char *, char **);
+extern	char	 *xstrtok(char *, const char *);
 extern	void	  chk4spch( char*);
 extern	void	  cleanse_path( const char*, char*, int);
+extern	void	 *module_malloc(size_t);
 extern	char	 *xdup(char const *);
 extern	char	 *xgetenv(char const *);
 extern  int       tmpfile_mod( char**, FILE**);
