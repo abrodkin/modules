@@ -1,6 +1,6 @@
 dnl
 dnl File:        configure.in
-dnl Revision:    $Id: configure.ac,v 1.20.14.1 2008/02/12 00:06:09 rkowen Exp $
+dnl Revision:    $Id: configure.ac,v 1.20.14.2 2008/02/20 06:18:14 rkowen Exp $
 dnl Created:     1994/06/18
 dnl Author:      Leif Hedstrom<hedstrom@inf.ethz.ch>
 dnl		 Martin S. Utesch <wstd@hl.siemens.de>
@@ -16,8 +16,6 @@ AC_CONFIG_AUX_DIR(config)dnl
 AM_INIT_AUTOMAKE(1.9.6 foreign dejagnu no-installinfo dist-bzip2)dnl
 AC_CONFIG_SRCDIR([version.c])dnl
 AM_CONFIG_HEADER(config.h)dnl
-AM_PROG_CC_C_O
-AC_PROG_MAKE_SET
 AC_PREREQ(2.59)dnl
 
 dnl ---------------------------------------------------------------------------
@@ -175,6 +173,7 @@ AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_GCC_TRADITIONAL
 AC_PROG_INSTALL
+AM_PROG_CC_C_O
 AC_PROG_MAKE_SET
 AC_AIX
 AC_ISC_POSIX
