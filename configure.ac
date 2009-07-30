@@ -1,6 +1,6 @@
 dnl
 dnl File:        configure.in
-dnl Revision:    $Id: configure.ac,v 1.20 2006/01/17 22:58:29 rkowen Exp $
+dnl Revision:    $Id: configure.ac,v 1.20.14.3 2009/07/30 18:03:21 rkowen Exp $
 dnl Created:     1994/06/18
 dnl Author:      Leif Hedstrom<hedstrom@inf.ethz.ch>
 dnl		 Martin S. Utesch <wstd@hl.siemens.de>
@@ -16,8 +16,6 @@ AC_CONFIG_AUX_DIR(config)dnl
 AM_INIT_AUTOMAKE(1.9.6 foreign dejagnu no-installinfo dist-bzip2)dnl
 AC_CONFIG_SRCDIR([version.c])dnl
 AM_CONFIG_HEADER(config.h)dnl
-AM_PROG_CC_C_O
-AC_PROG_MAKE_SET
 AC_PREREQ(2.59)dnl
 
 dnl ---------------------------------------------------------------------------
@@ -42,11 +40,6 @@ AH_TOP([
  ** 									     ** 
  ** ************************************************************************ **/
 ])dnl
-AH_TEMPLATE([TCL_MINOR_VERSION],[
-TCL_MINOR_VERSION: if defined, contains the version of TCL (and TCLX)])dnl
-AH_TEMPLATE([TCL_MAJOR_VERSION],[
-TCL_MAJOR_VERSION: if defined, contains the version of TCL (and TCLX)])dnl
-dnl
 dnl ---------------------------------------------------------------------------
 dnl
 dnl Some special substitution we need:
@@ -136,7 +129,7 @@ else
     NODEFAULTPATH=$ac_default_prefix/Modules/$VERSION
     BASEPREFIX=$ac_default_prefix
     ac_default_prefix=$BASEPREFIX/Modules/$VERSION
-    export ax_default_prefix
+    export ac_default_prefix
   else
     DEFAULTPATH=$ac_default_prefix/Modules
     NODEFAULTPATH=$ac_default_prefix/Modules
@@ -180,6 +173,7 @@ AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_GCC_TRADITIONAL
 AC_PROG_INSTALL
+AM_PROG_CC_C_O
 AC_PROG_MAKE_SET
 AC_AIX
 AC_ISC_POSIX
@@ -192,8 +186,8 @@ AC_HEADER_DIRENT
 AC_HEADER_STDC
 AC_CHECK_HEADERS(string.h memory.h stdlib.h unistd.h termio.h fcntl.h ctype.h \
 	stdarg.h varargs.h syslog.h stdint.h)dnl
-AC_CHECK_HEADERS(errno.h sys/ioctl.h sys/termios.h sys/mode.h sys/stat.h      \
-	sys/param.h)dnl
+AC_CHECK_HEADERS([sys/ioctl.h sys/termios.h sys/mode.h sys/stat.h sys/param.h \
+		  errno.h assert.h])dnl
 dnl ---------------------------------------------------------------------------
 dnl Checks for typedefs, structures, and compiler characteristics.
 dnl ---------------------------------------------------------------------------
@@ -204,7 +198,7 @@ AC_STRUCT_TM
 dnl ---------------------------------------------------------------------------
 dnl Checks for library functions.
 dnl ---------------------------------------------------------------------------
-AC_CHECK_FUNCS([strdup strtok uname gethostname getdomainname \
+AC_CHECK_FUNCS([strdup uname gethostname getdomainname \
 	mktemp tmpnam tempnam \
 	syslog dup2])dnl
 dnl ---------------------------------------------------------------------------
@@ -230,9 +224,9 @@ This symbol, if defined, indicates that the C program can use X11
 directly.])dnl
 	AC_DEFINE(HAS_X11LIBS)dnl
 	AC_CHECK_LIB(X11, XMaxRequestSize,,,
-		[-I $ac_x_includes -L $ac_x_libraries])dnl
-	AC_CHECK_LIB(Xmu, XmuGetHostname,,,
-		[-I $ac_x_includes -L $ac_x_libraries])dnl
+		[-I ${ac_x_includes:-.} -L ${ac_x_libraries:-.}])dnl
+dnl	AC_CHECK_LIB(Xmu, XmuGetHostname,,,
+dnl		[-I ${ac_x_includes:-.} -L ${ac_x_libraries:-.}])dnl
 
 fi
 dnl ---------------------------------------------------------------------------
@@ -797,6 +791,8 @@ dnl--------------------------------------------------------------------
 
 EM_PATH_TCLXCONFIG
 EM_LOAD_TCLXCONFIG
+EM_SET_TCLX
+EM_CHECK_TCLX
 if test x"$no_tclx" != x"true"; then
 	AH_TEMPLATE([HAS_TCLXLIBS],[
 HAS_TCLXLIBS:
