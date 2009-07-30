@@ -1,6 +1,12 @@
 Do Not Edit!  This is a generated file.
 	You should edit the NEWS file instead.
 
+2009-07-30 13:10  rkowen
+
+	* ModuleCmd_Purge.c, NEWS, error.c, version.c, init/filter: * Have
+	purge remove loaded modules in reverse order   (patch contributed
+	by carriees)
+
 2009-07-30 11:03  rkowen
 
 	* init/bash_completion.in: file bash_completion.in was initially
@@ -2797,7 +2803,7 @@ Do Not Edit!  This is a generated file.
 
 2003-08-07 14:07  harlan
 
-	* tcl/modulecmd.tcl: Add $Revision: 1.50.2.4.10.2 $ to the version
+	* tcl/modulecmd.tcl: Add $Revision: 1.50.2.4.10.3 $ to the version
 
 2003-08-07 12:52  harlan
 
