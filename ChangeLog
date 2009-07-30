@@ -1,6 +1,327 @@
 Do Not Edit!  This is a generated file.
 	You should edit the NEWS file instead.
 
+2009-07-30 11:03  rkowen
+
+	* init/bash_completion.in: file bash_completion.in was initially
+	added on branch b327now.
+
+2009-07-30 11:03  rkowen
+
+	* cmdChdir.c: file cmdChdir.c was initially added on branch
+	b327now.
+
+2009-07-30 11:03  rkowen
+
+	* Makefile.am, ModuleCmd_Avail.c, ModuleCmd_Clear.c,
+	ModuleCmd_Display.c, ModuleCmd_Help.c, ModuleCmd_Init.c,
+	ModuleCmd_List.c, ModuleCmd_Purge.c, ModuleCmd_Refresh.c,
+	ModuleCmd_Switch.c, ModuleCmd_Update.c, ModuleCmd_Use.c,
+	ModuleCmd_Whatis.c, NEWS, cmdAlias.c, cmdChdir.c, cmdConflict.c,
+	cmdInfo.c, cmdIsLoaded.c, cmdLog.c, cmdMisc.c, cmdModule.c,
+	cmdPath.c, cmdSetenv.c, cmdTrace.c, cmdUlvl.c, cmdUname.c,
+	cmdVerbose.c, cmdVersion.c, cmdWhatis.c, cmdXResource.c,
+	configure.ac, error.c, init.c, locate_module.c, modules_def.h,
+	utility.c, doc/module.1.in, doc/modulefile.4.in,
+	etc/global/bashrc.in, etc/global/csh.modules.in,
+	etc/global/profile.modules.in, init/.modulespath.in,
+	init/Makefile.am, init/bash.in, init/bash_completion.in,
+	init/csh.in, init/ksh.in, init/perl.in, init/python.in, init/sh.in,
+	init/zsh.in, modulefiles/Makefile.am: * Added a batch of patches
+	from Gerrit Renker   - Goes through each of the two manpages,
+	bringing them up to date.    - Fix an error in configure.ac caused
+	by misspelling	  - Fix typos in help messages and source-code
+	comments    - Fix the setup of $MODULESPATH to not have a trailing
+	':'    - Fix segmentation violation occurring when the shelltype is
+	absent	  - Fix a condition where 'make uninstall' does not cleanse
+	a directory    - Fix a build problem which set the executable bit
+	on 'data' files    - Cleans up noise in '.modulespath' file    -
+	Replaces external sed filter script with internal Makefile.am rule 
+	  - Adds missing 'zsh' case in etc/global    - simplify (t)csh
+	initialisation	  - Add bash auto-completion for the 'module'
+	command    - Adds new 'chdir' modulefile command (sets cwd on
+	module load)
+
+2009-04-09 12:53  sirdude
+
+	* tcl/modulecmd.tcl: This is a patch by John Tseng,
+	
+	It adds the ability to support Dynamic columns using stty you just
+	setenv DYNAMIC_COLUMNS 1 and it will start using them.
+	
+	Kent
+
+2009-04-09 11:48  sirdude
+
+	* tcl/modulecmd.tcl: Fleshed out the debugging statements so most
+	functions have them now.
+	
+	Kent
+
+2009-02-24 13:08  sirdude
+
+	* tcl/modulecmd.tcl: Some more cruft removal.
+	
+	Kent
+
+2009-02-24 12:13  sirdude
+
+	* tcl/: Makefile, modulecmd.tcl, init/modulerc: added synonym of
+	search for apropos/keyword Partialy contributed by Hunter Matthews.
+	
+	There is still an issue with it though.  If you have a malformed
+	module it will die.  Probably there are other commands that die as
+	well.  Need to look at it more.
+	
+	Kent
+
+2009-02-24 11:47  sirdude
+
+	* tcl/modulecmd.tcl: Cleaned up some stuff that wasn't used and
+	also fixed some minor formating issues.
+	
+	Kent
+
+2009-02-24 11:21  sirdude
+
+	* tcl/modulecmd.tcl: Updated the help dialog so its a bit more
+	organized an easier to read.
+	
+	Kent
+
+2009-02-24 10:35  sirdude
+
+	* tcl/modulecmd.tcl: Patch by Hunter Matthews to clean up the
+	output of module avail a little bit.
+	
+	Kent
+
+2009-02-24 10:22  sirdude
+
+	* tcl/modulecmd.tcl: Some patches submitted by Hunter Matthews
+	
+	adds --help as a commandline option.  fixes issues with modulerc
+	file getting sourced twice in sh and tcsh shells.
+	
+	Kent
+
+2008-09-17 08:14  sirdude
+
+	* tcl/modulecmd.tcl: 
+	
+	Small patch for differences in glob on various platforms. 
+	Contributed by Thomas Zeiser
+	
+	Kent
+
+2008-02-19 22:21  rkowen
+
+	* NEWS, cmdPath.c, configure.ac, init/bash.in,
+	testsuite/modulefiles/append/2.1, testsuite/modulefiles/append/2.2,
+	testsuite/modulefiles/prepend/2.1,
+	testsuite/modulefiles/prepend/2.2,
+	testsuite/modules.50-cmds/060-remove.exp,
+	testsuite/modules.50-cmds/175-swap2.exp: Rolled in the 3.2.7
+	changes so far.
+
+2008-02-19 22:18  rkowen
+
+	* testsuite/modules.50-cmds/175-swap2.exp: file 175-swap2.exp was
+	initially added on branch b327now.
+
+2008-02-19 22:18  rkowen
+
+	* testsuite/modulefiles/: append/2.1, prepend/2.1: file 2.1 was
+	initially added on branch b327now.
+
+2008-02-19 22:18  rkowen
+
+	* testsuite/modulefiles/: append/2.2, prepend/2.2: file 2.2 was
+	initially added on branch b327now.
+
+2008-02-19 22:18  rkowen
+
+	* NEWS, cmdPath.c, configure.ac, testsuite/modulefiles/append/2.1,
+	testsuite/modulefiles/append/2.2,
+	testsuite/modulefiles/prepend/2.1,
+	testsuite/modulefiles/prepend/2.2,
+	testsuite/modules.50-cmds/060-remove.exp,
+	testsuite/modules.50-cmds/175-swap2.exp: * Fixed swap bug when
+	prepending or appending multiple times	 (fix thanks to Gavin
+	Walker), added tests for same.
+
+2008-02-11 16:06  rkowen
+
+	* Makefile.am, ModuleCmd_Avail.c, ModuleCmd_Init.c,
+	ModuleCmd_List.c, ModuleCmd_Refresh.c, ModuleCmd_Update.c,
+	ModuleCmd_Whatis.c, NEWS, TODO, cmdConflict.c, cmdIsLoaded.c,
+	cmdLog.c, cmdModule.c, cmdPath.c, cmdTrace.c, cmdVersion.c,
+	cmdWhatis.c, cmdXResource.c, configure.ac, error.c, init.c,
+	locate_module.c, main.c, modules.lsm.in, modules_def.h, utility.c,
+	version.c, config/emtcl.m4, config/tcl.m4, doc/module.1.in,
+	doc/modulefile.4.in, etc/add.modules.in, etc/mkroot.in,
+	ext/add.ext.in, ext/mkroot.in, init/.modulespath.in,
+	init/Makefile.am, init/bash.in, init/csh.in, init/ksh.in,
+	init/sh.in, init/zsh.in, modulefiles/dot.in,
+	modulefiles/module-cvs.in, modulefiles/module-info.in,
+	modulefiles/modules.in, modulefiles/null.in,
+	modulefiles/use.own.in, modulefiles/version.in,
+	testsuite/modulefiles/alias/1.0, testsuite/modulefiles/append/0.1,
+	testsuite/modulefiles/append/0.2, testsuite/modulefiles/append/1.0,
+	testsuite/modulefiles/prepend/0.1,
+	testsuite/modulefiles/prepend/0.2,
+	testsuite/modulefiles/prepend/1.0,
+	testsuite/modules.00-init/006-procs.exp,
+	testsuite/modules.35-trace/010-init_ts.exp,
+	testsuite/modules.50-cmds/040-append.exp,
+	testsuite/modules.50-cmds/042-append-delim.exp,
+	testsuite/modules.50-cmds/045-append-undo.exp,
+	testsuite/modules.50-cmds/047-app-del-undo.exp,
+	testsuite/modules.50-cmds/050-prepend.exp,
+	testsuite/modules.50-cmds/052-prepend-delim.exp,
+	testsuite/modules.50-cmds/055-prepend-undo.exp,
+	testsuite/modules.50-cmds/057-pre-del-undo.exp,
+	testsuite/modules.50-cmds/075-alias.exp,
+	testsuite/modules.50-cmds/076-alias-sub.exp,
+	testsuite/modules.50-cmds/078-refresh.exp,
+	testsuite/modules.50-cmds/095-uname.exp,
+	testsuite/modules.50-cmds/100-loglevel.exp,
+	testsuite/modules.70-maint/045-listlong.exp,
+	testsuite/modules.90-avail/050-long.exp: Preparing the 3.2.7
+	branch, and some minor changes.
+
+2007-10-29 09:43  rkowen
+
+	* ModuleCmd_Avail.c, NEWS: Rolled in the skip .git version control
+	dirs in modulefile dirs.
+
+2007-10-29 09:36  rkowen
+
+	* ModuleCmd_Avail.c, NEWS: Skip .git version control dirs in
+	modulefile dirs.
+
+2007-10-23 13:58  sirdude
+
+	* tcl/modulecmd.tcl: updated ignored directories to include .svn
+	and .git Thanks to John Tseng.
+	
+	Kent
+
+2007-09-05 13:20  sirdude
+
+	* tcl/modulecmd.tcl: 
+	
+	Made it so that module use and module unuse work the same way, I
+	also added a little debugging info for both of them.
+	
+	Kent
+
+2007-05-16 10:24  sirdude
+
+	* tcl/modulecmd.tcl: 
+	
+	update to replaceFromList  patch from Olly.  adds a fix for when
+	item2 is empty.
+	
+	Kent
+
+2007-05-16 08:23  sirdude
+
+	* tcl/modulecmd.tcl: 
+	
+	Another great little patch by Olly Stephens,
+	
+	This one makes it so that if a module has an error message in it
+	module help (modulefile) will still attempt to call the help
+	function for that module.
+	
+	Kent
+
+2007-05-16 08:07  sirdude
+
+	* tcl/modulecmd.tcl: 
+	
+	Another patch by Olly,
+	
+	This one extends some of the shortcuts accepted.  example module lo
+	blah   now works just like module load blah Its not perfect but
+	again better than what is there currently.
+	
+	Kent
+
+2007-05-16 08:01  sirdude
+
+	* tcl/modulecmd.tcl: 
+	
+	Another patch by Olly,
+	
+	This one makes it so that help is displayed if a user types an
+	invalid module command (Example: module blah)  or if a user just
+	types module with no args.
+	
+	Kent
+
+2007-05-16 07:50  sirdude
+
+	* tcl/modulecmd.tcl: 
+	
+	Patch by Olly,
+	
+	Forces 0600 mode on the tmpfile when opening it.  Really we need to
+	figure out how to remove the need for a tmpfile, until then though
+	this is still better than it was.
+	
+	Kent
+
+2007-03-25 08:11  rkowen
+
+	* NEWS, cmdPath.c, utility.c: * Fixed some valgrind errors found
+	and resolved by Alan Morris.
+
+2007-03-23 09:52  rkowen
+
+	* modulefiles/modules.in: The man dir is now in share/
+
+2007-02-22 15:30  rkowen
+
+	* NEWS, locate_module.c: Rolled in 3.2.6 realloc() fix.
+
+2007-02-22 15:29  rkowen
+
+	* NEWS, locate_module.c: * Fixed the locate_module.c:realloc()
+	calls which didn't properly   take the element size into account
+	(Fix thanks to Ron Isaacson).
+
+2007-02-22 15:12  rkowen
+
+	* Makefile.am, ModuleCmd_Avail.c, ModuleCmd_Init.c,
+	ModuleCmd_List.c, ModuleCmd_Refresh.c, ModuleCmd_Update.c,
+	ModuleCmd_Whatis.c, NEWS, TODO, cmdConflict.c, cmdIsLoaded.c,
+	cmdLog.c, cmdModule.c, cmdPath.c, cmdTrace.c, cmdVersion.c,
+	cmdWhatis.c, cmdXResource.c, configure.ac, error.c, init.c,
+	locate_module.c, main.c, modules.lsm.in, modules_def.h, utility.c,
+	version.c, config/emtcl.m4, config/tcl.m4, doc/module.1.in,
+	doc/modulefile.4.in, etc/add.modules.in, etc/mkroot.in,
+	ext/add.ext.in, ext/mkroot.in, init/.modulespath.in,
+	init/Makefile.am, init/bash.in, init/csh.in, init/ksh.in,
+	init/sh.in, init/zsh.in, modulefiles/dot.in,
+	modulefiles/module-cvs.in, modulefiles/module-info.in,
+	modulefiles/modules.in, modulefiles/null.in,
+	modulefiles/use.own.in, modulefiles/version.in,
+	testsuite/modulefiles/append/1.0,
+	testsuite/modules.00-init/006-procs.exp,
+	testsuite/modules.35-trace/010-init_ts.exp,
+	testsuite/modules.50-cmds/040-append.exp,
+	testsuite/modules.50-cmds/045-append-undo.exp,
+	testsuite/modules.50-cmds/050-prepend.exp,
+	testsuite/modules.50-cmds/055-prepend-undo.exp,
+	testsuite/modules.50-cmds/075-alias.exp,
+	testsuite/modules.50-cmds/078-refresh.exp,
+	testsuite/modules.50-cmds/095-uname.exp,
+	testsuite/modules.50-cmds/100-loglevel.exp,
+	testsuite/modules.70-maint/045-listlong.exp,
+	testsuite/modules.90-avail/050-long.exp: Initial 3.2.6 check-in
+
 2007-02-14 10:06  rkowen
 
 	* NEWS: Trivial format change.
@@ -548,6 +869,12 @@ Do Not Edit!  This is a generated file.
 2006-06-01 12:56  rkowen
 
 	* testsuite/modules.50-cmds/042-append-delim.exp: file
+	042-append-delim.exp was added on branch b320now on 2008-02-12
+	00:06:17 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modules.50-cmds/042-append-delim.exp: file
 	042-append-delim.exp was added on branch modules-3-2-0 on
 	2006-06-08 04:17:54 +0000
 
@@ -556,6 +883,12 @@ Do Not Edit!  This is a generated file.
 	* testsuite/modules.50-cmds/042-append-delim.exp: file
 	042-append-delim.exp was added on branch modules-3-2-5 on
 	2007-02-14 05:38:23 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modules.50-cmds/047-app-del-undo.exp: file
+	047-app-del-undo.exp was added on branch b320now on 2008-02-12
+	00:06:17 +0000
 
 2006-06-01 12:56  rkowen
 
@@ -572,6 +905,12 @@ Do Not Edit!  This is a generated file.
 2006-06-01 12:56  rkowen
 
 	* testsuite/modules.50-cmds/052-prepend-delim.exp: file
+	052-prepend-delim.exp was added on branch b320now on 2008-02-12
+	00:06:18 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modules.50-cmds/052-prepend-delim.exp: file
 	052-prepend-delim.exp was added on branch modules-3-2-0 on
 	2006-06-08 04:17:54 +0000
 
@@ -580,6 +919,12 @@ Do Not Edit!  This is a generated file.
 	* testsuite/modules.50-cmds/052-prepend-delim.exp: file
 	052-prepend-delim.exp was added on branch modules-3-2-5 on
 	2007-02-14 05:38:24 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modules.50-cmds/057-pre-del-undo.exp: file
+	057-pre-del-undo.exp was added on branch b320now on 2008-02-12
+	00:06:18 +0000
 
 2006-06-01 12:56  rkowen
 
@@ -595,8 +940,23 @@ Do Not Edit!  This is a generated file.
 
 2006-06-01 12:56  rkowen
 
+	* testsuite/modulefiles/append/1.0: file 1.0 was added on branch
+	b320now on 2008-02-12 00:06:15 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modulefiles/prepend/1.0: file 1.0 was added on branch
+	b320now on 2008-02-12 00:06:16 +0000
+
+2006-06-01 12:56  rkowen
+
 	* testsuite/modulefiles/prepend/1.0: file 1.0 was added on branch
 	modules-3-2-0 on 2006-06-08 04:17:54 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modulefiles/append/1.0: file 1.0 was added on branch
+	modules-3-2-0 on 2007-02-22 23:13:15 +0000
 
 2006-06-01 12:56  rkowen
 
@@ -724,6 +1084,12 @@ Do Not Edit!  This is a generated file.
 2006-05-25 14:09  rkowen
 
 	* testsuite/modules.50-cmds/076-alias-sub.exp: file
+	076-alias-sub.exp was added on branch b320now on 2008-02-12
+	00:06:18 +0000
+
+2006-05-25 14:09  rkowen
+
+	* testsuite/modules.50-cmds/076-alias-sub.exp: file
 	076-alias-sub.exp was added on branch modules-3-2-0 on 2006-06-08
 	04:17:54 +0000
 
@@ -732,6 +1098,11 @@ Do Not Edit!  This is a generated file.
 	* testsuite/modules.50-cmds/076-alias-sub.exp: file
 	076-alias-sub.exp was added on branch modules-3-2-5 on 2007-02-14
 	05:38:24 +0000
+
+2006-05-25 14:09  rkowen
+
+	* testsuite/modulefiles/alias/1.0: file 1.0 was added on branch
+	b320now on 2008-02-12 00:06:15 +0000
 
 2006-05-25 14:09  rkowen
 
@@ -850,6 +1221,16 @@ Do Not Edit!  This is a generated file.
 
 2006-05-01 07:52  rkowen
 
+	* testsuite/modulefiles/append/0.1: file 0.1 was added on branch
+	b320now on 2008-02-12 00:06:15 +0000
+
+2006-05-01 07:52  rkowen
+
+	* testsuite/modulefiles/prepend/0.1: file 0.1 was added on branch
+	b320now on 2008-02-12 00:06:16 +0000
+
+2006-05-01 07:52  rkowen
+
 	* testsuite/modulefiles/: append/0.1, prepend/0.1: file 0.1 was
 	added on branch modules-3-2-0 on 2006-06-08 04:17:54 +0000
 
@@ -862,6 +1243,16 @@ Do Not Edit!  This is a generated file.
 
 	* testsuite/modulefiles/: append/0.1, prepend/0.1: file 0.1 was
 	added on branch modules-3-2-5 on 2007-02-14 05:38:23 +0000
+
+2006-05-01 07:52  rkowen
+
+	* testsuite/modulefiles/append/0.2: file 0.2 was added on branch
+	b320now on 2008-02-12 00:06:15 +0000
+
+2006-05-01 07:52  rkowen
+
+	* testsuite/modulefiles/prepend/0.2: file 0.2 was added on branch
+	b320now on 2008-02-12 00:06:16 +0000
 
 2006-05-01 07:52  rkowen
 
@@ -2406,7 +2797,7 @@ Do Not Edit!  This is a generated file.
 
 2003-08-07 14:07  harlan
 
-	* tcl/modulecmd.tcl: Add $Revision: 1.50.2.4.10.1 $ to the version
+	* tcl/modulecmd.tcl: Add $Revision: 1.50.2.4.10.2 $ to the version
 
 2003-08-07 12:52  harlan
 

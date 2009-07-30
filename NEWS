@@ -7,9 +7,12 @@
 
 ****************************   Release 3.2 ******************************
 Modules 3.2.7
+Jul 30, 2009				R.K. Owen (rk@owen.sj.ca.us)
 	* Have init/bash export the module function (thanks to Roy Dragseth)
 	* Fixed swap bug when prepending or appending multiple times
 	  (fix thanks to Gavin Walker), added tests for same.
+	* Have purge remove loaded modules in reverse order
+	  (patch contributed by carriees)
 	* Added a batch of patches from Gerrit Renker
 	  - Goes through each of the two manpages, bringing them up to date.
 	  - Fix an error in configure.ac caused by misspelling

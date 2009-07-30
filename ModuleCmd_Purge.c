@@ -26,7 +26,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Purge.c,v 1.3.18.1 2009/07/30 18:03:17 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Purge.c,v 1.3.18.2 2009/07/30 20:10:00 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -97,6 +97,8 @@ int	ModuleCmd_Purge(	Tcl_Interp	*interp,
 		*unload_argv[ MOD_BUFSIZE];
     int		 unload_argc = 0,
     		 status;
+    char        *unload_argv_rev[ MOD_BUFSIZE];
+    int          reverse;
 
 #if WITH_DEBUGGING_MODULECMD
     fprintf( stderr, "ModuleCmd_Purge(%d):DEBUG: Starting\n", __LINE__);
@@ -129,12 +131,20 @@ int	ModuleCmd_Purge(	Tcl_Interp	*interp,
     
     unload_argv[ unload_argc] = NULL;
     
+    for( reverse=0; reverse<unload_argc; reverse++ ) {
+        unload_argv_rev[unload_argc - (reverse + 1)] = unload_argv[reverse]; 
+    }   
+
+    unload_argv_rev[ unload_argc] = NULL;
+ 
     /**
      **  Unload 'em all
      **  We always say the load succeeded.  ModuleCmd_Load will
      **  output any necessary error messages.
      **/
-    ModuleCmd_Load( interp, 0, unload_argc, unload_argv);
+/*  ModuleCmd_Load( interp, 0, unload_argc, unload_argv); */
+    ModuleCmd_Load( interp, 0, unload_argc, unload_argv_rev);
+
     status = TCL_OK;
 
     /**
