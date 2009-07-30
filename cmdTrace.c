@@ -29,7 +29,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdTrace.c,v 1.8.16.1 2008/02/12 00:06:09 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdTrace.c,v 1.8.16.2 2009/07/30 18:03:21 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -234,7 +234,7 @@ static	int	CheckTracingPat(	Tcl_Interp *interp,
  **			int		 argc		Number of arguments  **
  **			char		*argv[]		Argument array	     **
  ** 									     **
- **   Result:		int	TCL_OK		Successfull completion	     **
+ **   Result:		int	TCL_OK		Successful completion	     **
  **				TCL_ERROR	Any error		     **
  ** 									     **
  **   Attached Globals:	TraceSelect	List containing all tracing settings **
@@ -387,7 +387,7 @@ int	cmdModuleTrace(	ClientData	 client_data,
  **   Parameters:	char	*cmd		Subcommand to be checked     **
  **			int	 num		Number of commands to be chk **
  ** 									     **
- **   Result:		int	>= 0		Successfull completion	     **
+ **   Result:		int	>= 0		Successful completion	     **
  **				-1		Any error		     **
  ** 									     **
  ** ************************************************************************ **
@@ -460,7 +460,7 @@ char	*GetTraceSel(	Tcl_Interp *interp,
  **			char	*module_pat	Pattern for the affected     **
  **						module files		     **
  ** 									     **
- **   Result:		int	TCL_OK		Successfull completion	     **
+ **   Result:		int	TCL_OK		Successful completion	     **
  **				TCL_ERROR	Any error		     **
  ** 									     **
  ** ************************************************************************ **

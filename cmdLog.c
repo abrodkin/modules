@@ -26,7 +26,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdLog.c,v 1.5.14.1 2008/02/12 00:06:09 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdLog.c,v 1.5.14.2 2009/07/30 18:03:19 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -89,7 +89,7 @@ static	char	_none[] = "none";
  **			int		 argc		Number of arguments  **
  **			char		*argv[]		Argument array	     **
  ** 									     **
- **   Result:		int	TCL_OK		Successfull completion	     **
+ **   Result:		int	TCL_OK		Successful completion	     **
  **				TCL_ERROR	Any error		     **
  ** 									     **
  **   Attached Globals:	tracelist	List containing all tracing settings **

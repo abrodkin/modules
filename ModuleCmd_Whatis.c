@@ -23,7 +23,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Whatis.c,v 1.5.14.1 2008/02/12 00:06:07 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Whatis.c,v 1.5.14.2 2009/07/30 18:03:18 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -91,7 +91,7 @@ static	char	*apropos_cache(void);
  **			char		*argv[]		Argument list	     **
  **									     **
  **   Result:		int	TCL_ERROR	Failure			     **
- **				TCL_OK		Successfull operation	     **
+ **				TCL_OK		Successful operation	     **
  **									     **
  **   Attached Globals:	g_flags		These are set up accordingly before  **
  **					this function is called in order to  **
@@ -311,7 +311,7 @@ unwind0:
  **			char		*argv[]		Argument list	     **
  **									     **
  **   Result:		int	TCL_ERROR	Failure			     **
- **				TCL_OK		Successfull operation	     **
+ **				TCL_OK		Successful operation	     **
  **									     **
  **   Attached Globals:							     **
  **									     **
@@ -447,7 +447,7 @@ unwind0:
  **			char   **argv		List of tokens to check	     **
  **			FILE	*cfp		Cache file pointer	     **
  **									     **
- **   Result:		int	TCL_OK		Successfull operation	     **
+ **   Result:		int	TCL_OK		Successful operation	     **
  **									     **
  **   Attached Globals:	g_flags		These are set up accordingly before  **
  **					this function is called in order to  **
@@ -618,7 +618,7 @@ unwind0:
  **			char   **argv		List of tokens to check	     **
  **			FILE	*cfp		Cache file pointer	     **
  **									     **
- **   Result:		int	TCL_OK		Successfull operation	     **
+ **   Result:		int	TCL_OK		Successful operation	     **
  **									     **
  **   Attached Globals: -						     **
  **									     **

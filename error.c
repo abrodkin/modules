@@ -30,7 +30,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: error.c,v 1.8.6.1.12.1 2008/02/12 00:06:09 rkowen Exp $";
+static char Id[] = "@(#)$Id: error.c,v 1.8.6.1.12.2 2009/07/30 18:03:21 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -248,7 +248,7 @@ static	ErrTransTab	TransTab[] = {
     { NO_ERR_START,	WGHT_DEBUG, "Starting $*" },
     { NO_ERR_END,	WGHT_DEBUG, "Exit $*" },
     { NO_ERR_VERBOSE,	WGHT_VERBOSE,  NULL },
-    { ERR_PARAM,	WGHT_ERROR, "Paramter error concerning '$1'" },
+    { ERR_PARAM,	WGHT_ERROR, "Parameter error concerning '$1'" },
     { ERR_USAGE,	WGHT_ERROR, "Usage is '$*'" },
     { ERR_ARGSTOLONG,	WGHT_ERROR, "'$1': Arguments too long. Max. is '$2'" },
     { ERR_OPT_AMBIG,	WGHT_ERROR, "Option '$1' is ambiguous" },

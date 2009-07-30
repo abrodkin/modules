@@ -34,7 +34,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Avail.c,v 1.10.16.1 2008/02/12 00:06:07 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Avail.c,v 1.10.16.2 2009/07/30 18:03:16 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -178,7 +178,7 @@ static	char	**create_cache_list( FILE*, int*, char* );
  **			char		*argv[]		Arguments to the     **
  **							command		     **
  ** 									     **
- **   Result:		int	TCL_OK		Successfull operation	     **
+ **   Result:		int	TCL_OK		Successful operation	     **
  **				TCL_ERROR	Any failure		     **
  ** 									     **
  **   Attached Globals:	g_specified_module	The module name from the     **
@@ -396,7 +396,7 @@ int check_dir(	char	*dirname)
  **   Parameters:	char	*dir		Directory to be scanned	     **
  **			char	*module		A selcted module name or NULL**
  ** 									     **
- **   Result:		int	TCL_OK		Successfull operation	     **
+ **   Result:		int	TCL_OK		Successful operation	     **
  ** 									     **
  **   Attached Globals:	-						     **
  ** 									     **
