@@ -30,7 +30,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdPath.c,v 1.15 2009/08/03 16:23:55 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdPath.c,v 1.15.6.1 2009/08/11 21:54:52 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -69,7 +69,7 @@ static void *UseId[] = { &UseId, Id };
 /** 				    LOCAL DATA				     **/
 /** ************************************************************************ **/
 
-static	char	module_name[] = "cmdPath.c";	/** File name of this module **/
+static	char	module_name[] = __FILE__;
 
 #if WITH_DEBUGGING_CALLBACK
 static	char	_proc_cmdSetPath[] = "cmdSetPath";

@@ -28,7 +28,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdInfo.c,v 1.10 2009/08/03 21:04:10 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdInfo.c,v 1.10.4.1 2009/08/11 21:54:52 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -59,7 +59,7 @@ static void *UseId[] = { &UseId, Id };
 /** 				    LOCAL DATA				     **/
 /** ************************************************************************ **/
 
-static	char	module_name[] = "cmdInfo.c";	/** File name of this module **/
+static	char	module_name[] = __FILE__;
 #if WITH_DEBUGGING_CALLBACK
 static	char	_proc_cmdModuleInfo[] = "cmdModuleInfo";
 #endif
