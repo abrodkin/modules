@@ -1,6 +1,6 @@
 dnl
 dnl File:        configure.in
-dnl Revision:    $Id: configure.ac,v 1.30 2009/08/10 19:28:00 rkowen Exp $
+dnl Revision:    $Id: configure.ac,v 1.32 2009/08/13 19:17:43 rkowen Exp $
 dnl Created:     1994/06/18
 dnl Author:      Leif Hedstrom<hedstrom@inf.ethz.ch>
 dnl		 Martin S. Utesch <wstd@hl.siemens.de>
@@ -203,7 +203,7 @@ AC_STRUCT_TM
 dnl ---------------------------------------------------------------------------
 dnl Checks for library functions.
 dnl ---------------------------------------------------------------------------
-AC_CHECK_FUNCS([strdup uname gethostname getdomainname \
+AC_CHECK_FUNCS([uname gethostname getdomainname \
 	mktemp tmpnam tempnam \
 	syslog dup2])dnl
 dnl ---------------------------------------------------------------------------
@@ -268,9 +268,6 @@ dnl
 dnl --with-split-size[=<size>]	With split size=<size>		[TEST]
 dnl --without-split-size	Without  - " -
 dnl
-dnl --enable-cache		With directory cache
-dnl --disable-cache		Without  - " -			[DEF]
-dnl
 dnl --enable-shell-funcs	With sh functions		[TEST]
 dnl --disable-shell-funcs	Without  - " -
 dnl
@@ -289,7 +286,7 @@ dnl
 dnl --enable-version-magic      Set .version magic requirement	[DEF]
 dnl --disable-version-magic     .version need not have magic cookie
 dnl
-dnl --enable-beginenv		Use .modulesbeginenv for initial env.	[TEST]
+dnl --enable-beginenv		Use .modulesbeginenv for initial env.	[NO]
 dnl --disable-beginenv		Do not use .modulesbeginenv
 dnl
 dnl ---------------------------------------------------------------------------
@@ -471,26 +468,6 @@ AC_ARG_ENABLE(free,
 	    AC_DEFINE(USE_FREE)
 	fi)dnl
 dnl ---------------------------------------------------------------------------
-AH_TEMPLATE([CACHE_AVAIL],[
-CACHE_AVAIL:
-This symbol, if defined, indicates that Modules should cache the
-directories in MODULEPATH when doing an avail.])dnl
-AC_ARG_ENABLE(cache,
-	AC_HELP_STRING([--enable-cache],[use directory cache [[no]]]),
-	if test "$enableval" = "yes"; then
-	    AC_DEFINE(CACHE_AVAIL)
-	fi)dnl
-dnl ---------------------------------------------------------------------------
-AH_TEMPLATE([CACHE_UMASK],[
-CACHE_UMASK:
-This symbol, if defined, is used as the umask for creating
-cachefiles for the module avail command.])dnl
-AC_ARG_WITH(cache-umask,
-	AC_HELP_STRING([--with-cache-umask=<umask>],[use cache files umask=<umask> [[000]]]),
-	if test "$withval" != "no"; then
-	    test "$withval" = "yes" && withval=0
-	    AC_DEFINE_UNQUOTED(CACHE_UMASK, ${withval})
-	fi)dnl
 dnl ---------------------------------------------------------------------------
 AH_TEMPLATE([WITH_DEBUG_INFO],[WITH_DEBUG_INFO: Debug info level if defined])dnl
 AC_ARG_WITH(debug,
@@ -521,12 +498,13 @@ this feature, but will only work if the MODULESBEGINENV env.var is
 set to a file name (e.g. '$HOME/.modulesbeginenv.$$'- modules will
 do one-level of variable expansion.)])dnl
 AC_ARG_ENABLE(beginenv,
-	AC_HELP_STRING([--enable-beginenv],[use .modulesbeginenv for initial env [[test]]]),
+	AC_HELP_STRING([--enable-beginenv],[use .modulesbeginenv for initial env [[no]]]),
 	if test "$enableval" = "yes"; then
 		AC_DEFINE(BEGINENV,1)dnl
 	elif test "$enableval" = "test"; then
 		AC_DEFINE(BEGINENV,99)dnl
-	fi, AC_DEFINE(BEGINENV,99))dnl
+	fi)dnl
+dnl	fi, AC_DEFINE(BEGINENV,99))dnl
 dnl ---------------------------------------------------------------------------
 dnl  Logging
 dnl  The following option allow switching logging on and off
@@ -726,7 +704,7 @@ dnl helpful configure --help comments
 m4_divert_once([HELP_WITH],[[
 
 The default value or disposition is listed in the square brackets above.
-Beware of new defaults for use-cache, beginenv.
+Beware of new defaults for beginenv.
 
 Depending on the above configuration options  the files are approximately
 placed in the following directory structure :

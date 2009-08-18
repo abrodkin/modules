@@ -4,49 +4,39 @@
 <!-- cxref program (c) Andrew M. Bishop 1995,96,97,98,99,2000,01,02,03,04,05,06,07. -->
 
 <!--
-Cxref: cxref -I/usr/include/tcl8.4 -block-comments -verbatim-comments -xref-all -index-all -html-src -Oxref ModuleCmd_Display.c
+Cxref: cxref -I/usr/include/tcl8.4 -block-comments -verbatim-comments -xref-all -index-all -html-src -Oxref cmdChdir.c
 CPP  : cxref-cpp -lang-c -C -dD -dI -I/usr/include/tcl8.4
 -->
 
 <HTML>
 
 <HEAD>
-<TITLE>Cross reference for ModuleCmd_Display.c of cxref.</TITLE>
+<TITLE>Cross reference for cmdChdir.c of cxref.</TITLE>
 <LINK rel="stylesheet" href="cxref.css" type="text/css">
 </HEAD>
 
 <BODY>
 
-<h1><a name="file" href="ModuleCmd_Display.c.src.html">File ModuleCmd_Display.c</a></h1>
+<h1><a name="file" href="cmdChdir.c.src.html">File cmdChdir.c</a></h1>
 <pre>
  ** ** Module Header ******************************************************* **
- ** 									     **
- **   Modules Revision 3.0						     **
- **   Providing a flexible user environment				     **
- ** 									     **
- **   File:		ModuleCmd_Display.c				     **
- **   First Edition:	1991/10/23					     **
- ** 									     **
- **   Authors:	John Furlan, jlf@behere.com				     **
- **		Jens Hamisch, jens@Strawberry.COM			     **
- ** 									     **
- **   Description:	Displays what changes a modulefile will make to the  **
- **			environment including any conflics or prerequisits.  **
- ** 									     **
- **   Exports:		ModuleCmd_Display				     **
- ** 									     **
- **   Notes:								     **
- ** 									     **
+ **									     **
+ **   File:		cmdChdir.c					     **
+ **   First Edition:	2009-06-27					     **
+ **									     **
+ **   Authors:		Gerrit Renker					     **
+ **   Description:	Implements a "chdir" command to set the working      **
+ **			directory upon module load/switch.		     **
+ **									     **
+ **   Exports:		cmdChDir					     **
+ **									     **
+ **   Attached Globals:	g_flags		These are set up accordingly before  **
+ **					this function is called in order to  **
+ **					control everything		     **
+ **			change_dir	Communicates the target directory.   **
  ** ************************************************************************ **
 </pre>
 
-<table>
-  <tr>
-    <td>References Variables:
-    <td><a href="ModuleCmd_Display.c.html#var-Id">Id</a>
-    <td><a href="ModuleCmd_Display.c.html#var-Id">ModuleCmd_Display.c</a>
-  </tr>
-</table>
 
 <hr>
 <h2>Included Files</h2>
@@ -75,18 +65,13 @@ CPP  : cxref-cpp -lang-c -C -dD -dI -I/usr/include/tcl8.4
 </ul>
 
 <hr>
-<h2><a name="var-local_line">Global Variable local_line</a></h2>
-<tt><span class="cxref-variable"><a href="ModuleCmd_Display.c.src.html#line62">char local_line[]</a></span></tt><br>
+<h2><a name="var-change_dir">Global Variable change_dir</a></h2>
+<tt><span class="cxref-variable"><a href="cmdChdir.c.src.html#line22">char* change_dir</a></span></tt><br>
 <table>
   <tr>
     <td>Visible in:
     <td>&nbsp;
     <td><span class="cxref-reference-local"><a href="ModuleCmd_Avail.c.html#file">ModuleCmd_Avail.c</a></span>
-  </tr>
-  <tr>
-    <td>&nbsp;
-    <td>&nbsp;
-    <td><span class="cxref-reference-local"><a href="ModuleCmd_Bootstrap.c.html#file">ModuleCmd_Bootstrap.c</a></span>
   </tr>
   <tr>
     <td>&nbsp;
@@ -201,11 +186,6 @@ CPP  : cxref-cpp -lang-c -C -dD -dI -I/usr/include/tcl8.4
   <tr>
     <td>&nbsp;
     <td>&nbsp;
-    <td><span class="cxref-reference-local"><a href="cmdTrace.c.html#file">cmdTrace.c</a></span>
-  </tr>
-  <tr>
-    <td>&nbsp;
-    <td>&nbsp;
     <td><span class="cxref-reference-local"><a href="cmdUlvl.c.html#file">cmdUlvl.c</a></span>
   </tr>
   <tr>
@@ -270,67 +250,32 @@ CPP  : cxref-cpp -lang-c -C -dD -dI -I/usr/include/tcl8.4
   </tr>
   <tr>
     <td>Used in:
-    <td><span class="cxref-reference-local"><a href="ModuleCmd_Display.c.html#func-ModuleCmd_Display">ModuleCmd_Display()</a></span>
-    <td><span class="cxref-reference-local"><a href="ModuleCmd_Display.c.html#func-ModuleCmd_Display">ModuleCmd_Display.c</a></span>
+    <td><span class="cxref-reference-local"><a href="utility.c.html#func-Output_Directory_Change">Output_Directory_Change()</a></span>
+    <td><span class="cxref-reference-local"><a href="utility.c.html#func-Output_Directory_Change">utility.c</a></span>
+  </tr>
+  <tr>
+    <td>&nbsp;
+    <td><span class="cxref-reference-local"><a href="cmdChdir.c.html#func-cmdChDir">cmdChDir()</a></span>
+    <td><span class="cxref-reference-local"><a href="cmdChdir.c.html#func-cmdChDir">cmdChdir.c</a></span>
   </tr>
 </table>
 
 <hr>
 <h2>Local Variables</h2>
 
-<b><a name="var-Id">Id</a></b><br>
-<tt><span class="cxref-variable"><a href="ModuleCmd_Display.c.src.html#line30">static char Id[]</a></span></tt><br>
-<table>
-  <tr>
-    <td>Used in:
-    <td>&nbsp;    <td><span class="cxref-reference-local"><a href="ModuleCmd_Display.c.html#file">ModuleCmd_Display.c</a></span>
-  </tr>
-</table>
-<p>
-<b><a name="var-UseId">UseId</a></b><br>
-<tt><span class="cxref-variable"><a href="ModuleCmd_Display.c.src.html#line31">static void* UseId[]</a></span></tt><br>
-<p>
 <b><a name="var-module_name">module_name</a></b><br>
-<tt><span class="cxref-variable"><a href="ModuleCmd_Display.c.src.html#line63">static char module_name[]</a></span></tt><br>
+<tt><span class="cxref-variable"><a href="cmdChdir.c.src.html#line21">static char module_name[]</a></span></tt><br>
 <table>
   <tr>
     <td>Used in:
-    <td><a href="#func-ModuleCmd_Display">ModuleCmd_Display()</a>
+    <td><a href="#func-cmdChDir">cmdChDir()</a>
     <td>&nbsp;
   </tr>
 </table>
 
 <hr>
-<h2><a name="func-ModuleCmd_Display">Global Function ModuleCmd_Display()</a></h2>
-<pre>
- ** ** Function-Header ***************************************************** **
- ** 									     **
- **   Function:		ModuleCmd_Display				     **
- ** 									     **
- **   Description:	Execution of the module-command 'display'	     **
- **			Display every change a module 'load' would apply to  **
- **			the environment					     **
- ** 									     **
- **   First Edition:	1991/10/23					     **
- ** 									     **
- **   Parameters:	Tcl_Interp	*interp		Attached Tcl Interp. **
- **			char 		*argv[]		Argument list	     **
- ** 									     **
- **   Result:		int	TCL_ERROR	Failure			     **
- **				TCL_OK		Successful operation	     **
- ** 									     **
- **   Attached Globals:	g_specified_module	The module name from the     **
- **						command line.		     **
- **   			g_flags		These are set up accordingly before  **
- **					this function is called in order to  **
- **					control everything		     **
- **			g_current_module	The module which is handled  **
- **						by the current command	     **
- ** 									     **
- ** ************************************************************************ **
-</pre>
-
-<tt><span class="cxref-function"><a href="ModuleCmd_Display.c.src.html#line103">int ModuleCmd_Display ( Tcl_Interp* interp, int argc, char* argv[] )</a></span></tt><br>
+<h2><a name="func-cmdChDir">Global Function cmdChDir()</a></h2>
+<tt><span class="cxref-function"><a href="cmdChdir.c.src.html#line24">int cmdChDir ( ClientData client_data, Tcl_Interp* interp, int argc, const char* argv[] )</a></span></tt><br>
 <table>
   <tr>
     <td>Prototyped in:
@@ -338,37 +283,32 @@ CPP  : cxref-cpp -lang-c -C -dD -dI -I/usr/include/tcl8.4
   </tr>
   <tr>
     <td>Calls:
-    <td><span class="cxref-reference-local"><a href="cmdModule.c.html#func-CallModuleProcedure">CallModuleProcedure()</a></span>
-    <td><span class="cxref-reference-local"><a href="cmdModule.c.html#func-CallModuleProcedure">cmdModule.c</a></span>
-  </tr>
-  <tr>
-    <td>&nbsp;
-    <td><span class="cxref-reference-local"><a href="init.c.html#func-InitializeModuleCommands">InitializeModuleCommands()</a></span>
-    <td><span class="cxref-reference-local"><a href="init.c.html#func-InitializeModuleCommands">init.c</a></span>
-  </tr>
-  <tr>
-    <td>&nbsp;
-    <td><span class="cxref-reference-local"><a href="locate_module.c.html#func-Locate_ModuleFile">Locate_ModuleFile()</a></span>
-    <td><span class="cxref-reference-local"><a href="locate_module.c.html#func-Locate_ModuleFile">locate_module.c</a></span>
-  </tr>
-  <tr>
-    <td>&nbsp;
     <td><span class="cxref-reference-local"><a href="error.c.html#func-Module_Error">Module_Error()</a></span>
     <td><span class="cxref-reference-local"><a href="error.c.html#func-Module_Error">error.c</a></span>
   </tr>
   <tr>
     <td>&nbsp;
-    <td colspan=2><span class="cxref-reference-system">Tcl_CreateInterp(), Tcl_DStringFree(), Tcl_DStringInit(), Tcl_DeleteInterp(), fprintf()</span>
+    <td><span class="cxref-reference-local"><a href="utility.c.html#func-null_free">null_free()</a></span>
+    <td><span class="cxref-reference-local"><a href="utility.c.html#func-null_free">utility.c</a></span>
   </tr>
   <tr>
-    <td>Called by:
-    <td><span class="cxref-reference-local"><a href="cmdModule.c.html#func-cmdModule">cmdModule()</a></span>
-    <td><span class="cxref-reference-local"><a href="cmdModule.c.html#func-cmdModule">cmdModule.c</a></span>
+    <td>&nbsp;
+    <td><span class="cxref-reference-local"><a href="utility.c.html#func-stringer">stringer()</a></span>
+    <td><span class="cxref-reference-local"><a href="utility.c.html#func-stringer">utility.c</a></span>
+  </tr>
+  <tr>
+    <td>&nbsp;
+    <td colspan=2><span class="cxref-reference-system">fprintf()</span>
+  </tr>
+  <tr>
+    <td>Used in:
+    <td><span class="cxref-reference-local"><a href="init.c.html#func-InitializeModuleCommands">InitializeModuleCommands()</a></span>
+    <td><span class="cxref-reference-local"><a href="init.c.html#func-InitializeModuleCommands">init.c</a></span>
   </tr>
   <tr>
     <td>References Variables:
-    <td><span class="cxref-reference-local"><a href="main.c.html#var-g_current_module">g_current_module</a></span>
-    <td><span class="cxref-reference-local"><a href="main.c.html#var-g_current_module">main.c</a></span>
+    <td><span class="cxref-reference-local"><a href="cmdChdir.c.html#var-change_dir">change_dir</a></span>
+    <td><span class="cxref-reference-local"><a href="cmdChdir.c.html#var-change_dir">cmdChdir.c</a></span>
   </tr>
   <tr>
     <td>&nbsp;
@@ -377,18 +317,8 @@ CPP  : cxref-cpp -lang-c -C -dD -dI -I/usr/include/tcl8.4
   </tr>
   <tr>
     <td>&nbsp;
-    <td><span class="cxref-reference-local"><a href="main.c.html#var-g_specified_module">g_specified_module</a></span>
-    <td><span class="cxref-reference-local"><a href="main.c.html#var-g_specified_module">main.c</a></span>
-  </tr>
-  <tr>
-    <td>&nbsp;
-    <td><span class="cxref-reference-local"><a href="ModuleCmd_Display.c.html#var-local_line">local_line</a></span>
-    <td><span class="cxref-reference-local"><a href="ModuleCmd_Display.c.html#var-local_line">ModuleCmd_Display.c</a></span>
-  </tr>
-  <tr>
-    <td>&nbsp;
-    <td><span class="cxref-reference-local"><a href="ModuleCmd_Display.c.html#var-module_name">module_name</a></span>
-    <td><span class="cxref-reference-local"><a href="ModuleCmd_Display.c.html#var-module_name">ModuleCmd_Display.c</a></span>
+    <td><span class="cxref-reference-local"><a href="cmdChdir.c.html#var-module_name">module_name</a></span>
+    <td><span class="cxref-reference-local"><a href="cmdChdir.c.html#var-module_name">cmdChdir.c</a></span>
   </tr>
 </table>
 

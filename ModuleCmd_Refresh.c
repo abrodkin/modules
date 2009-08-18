@@ -28,7 +28,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Refresh.c,v 1.5 2009/08/03 16:23:55 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Refresh.c,v 1.7 2009/08/13 19:17:43 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -59,7 +59,7 @@ static void *UseId[] = { &UseId, Id };
 /** 				    LOCAL DATA				     **/
 /** ************************************************************************ **/
 
-static	char	module_name[] = "ModuleCmd_Refresh.c";	/** File name of this module **/
+static	char	module_name[] = __FILE__;
 #if WITH_DEBUGGING_MODULECMD
 static	char	_proc_ModuleCmd_Refresh[] = "ModuleCmd_Refresh";
 #endif
@@ -124,7 +124,7 @@ int ModuleCmd_Refresh(	Tcl_Interp	*interp,
     if (!loaded || !*loaded)
 	goto success0;
 
-    loaded = strdup(loaded);
+    loaded = stringer(NULL,0, loaded, NULL);
     if( !loaded )
 	if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
 	    goto unwind0;
@@ -141,12 +141,12 @@ int ModuleCmd_Refresh(	Tcl_Interp	*interp,
 
     count = 1;
     for( list[ 0] = xstrtok( loaded, ":");
-	 list[ count] = xstrtok( NULL, ":");
+	(list[ count] = xstrtok( NULL, ":"));
 	 count++ );
 
     count = 1;
     for( files[ 0] = xstrtok( lmenv, ":");
-	 files[ count] = xstrtok( NULL, ":");
+	(files[ count] = xstrtok( NULL, ":"));
 	 count++ );
 
     /**

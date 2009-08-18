@@ -33,7 +33,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: locate_module.c,v 1.22 2009/08/03 16:23:55 rkowen Exp $";
+static char Id[] = "@(#)$Id: locate_module.c,v 1.25 2009/08/14 22:16:16 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -64,7 +64,7 @@ static void *UseId[] = { &UseId, Id };
 /** 				    LOCAL DATA				     **/
 /** ************************************************************************ **/
 
-static	char	module_name[] = "locate_module.c";	/** File name of this module **/
+static	char	module_name[] = __FILE__;
 
 #if WITH_DEBUGGING_LOCATE
 static	char	_proc_Locate_ModuleFile[] = "Locate_ModuleFile";
@@ -192,11 +192,6 @@ int Locate_ModuleFile(	Tcl_Interp	*interp,
 	    /**
 	     **  Reinstall the 'modulefile' which has been corrupted by
 	     **   tokenization
-	     **/
-	    *p = '/';
-	    /**
-	     **  Reinstall the 'modulefile' which has been corrupted by
-	     **  tokenization
 	     **/
 	    *p = '/';
 
@@ -389,7 +384,7 @@ static	char	*GetModuleName(	Tcl_Interp	*interp,
     }
     slen = strlen( s) + 1;
     mod = s;
-    if( ver = strchr( mod, '/'))
+    if( (ver = strchr( mod, '/')) )
 	*ver++ = '\0';
     /**
      **  Allocate a buffer for full pathname building
@@ -465,7 +460,7 @@ static	char	*GetModuleName(	Tcl_Interp	*interp,
 		    goto unwind2;
 		}
 		mod = s;
-		if( ver = strchr( s, '/'))
+		if( (ver = strchr( s, '/')) )
 		    *ver++ = '\0';
 	    }
 	    /**
@@ -699,7 +694,7 @@ char	**SortedDirList(	Tcl_Interp	*interp,
      **/
     if( S_ISREG( stats.st_mode)) {
 	*listcnt = 1;
-	filelist[0] = strdup( modulename);
+	filelist[0] = stringer(NULL,0, modulename, NULL);
 
 #if WITH_DEBUGGING_UTIL_2
     ErrorLogger( NO_ERR_DEBUG, LOC, "Module '", modulename, "' found", NULL);
@@ -1089,7 +1084,9 @@ int SourceRC( Tcl_Interp *interp, char *path, char *name)
 	    ErrorLogger( ERR_MAGIC, LOC, buffer, NULL);
 	    null_free((void *) &buffer);
 	}
-    } /** if( !stat) **/
+    } else {	/** if( !stat) - presumably not found **/
+	null_free((void *) &buffer);
+    }
     /**
      **  Return our result
      **/

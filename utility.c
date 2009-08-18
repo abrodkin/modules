@@ -38,8 +38,6 @@
  **			null_free					     **
  **			countTclHash					     **
  **									     **
- **			strdup		if not defined by the system libs.   **
- ** 									     **
  **   Notes:								     **
  ** 									     **
  ** ************************************************************************ **
@@ -52,7 +50,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.27 2009/08/03 16:23:55 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.29 2009/08/13 19:17:43 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -83,7 +81,7 @@ static void *UseId[] = { &UseId, Id };
 /** 				    LOCAL DATA				     **/
 /** ************************************************************************ **/
 
-static	char	module_name[] = "utility.c";	/** File name of this module **/
+static	char	module_name[] = __FILE__;
 
 #if WITH_DEBUGGING_UTIL_2
 static	char	_proc_store_hash_value[] = "store_hash_value";
@@ -213,11 +211,11 @@ int store_hash_value(	Tcl_HashTable* htable,
     }
 
     /**
-     **  Set up the new value. strdup allocates!
+     **  Set up the new value. stringer allocates!
      **/
 
     if( value)
-        Tcl_SetHashValue( hentry, (char*) strdup((char*) value));
+        Tcl_SetHashValue( hentry, (char*) stringer(NULL,0, value,NULL));
     else
         Tcl_SetHashValue( hentry, (char*) NULL);
     
@@ -261,7 +259,7 @@ int clear_hash_value(	Tcl_HashTable	*htable,
      **  Otherwise, remove this entry from the hash table.
      **/
 
-    if( hentry = Tcl_FindHashEntry( htable, (char*) key) ) {
+    if( (hentry = Tcl_FindHashEntry( htable, (char*) key)) ) {
 
         tmp = (char*) Tcl_GetHashValue( hentry);
         if( tmp)
@@ -335,7 +333,7 @@ static	void	Clear_Global_Hash_Tables( void)
 	    val = (char*) Tcl_GetHashValue( hashEntry);
 	    if( val)
 		null_free((void *) &val);
-	} while( hashEntry = Tcl_NextHashEntry( &searchPtr));
+	} while( (hashEntry = Tcl_NextHashEntry( &searchPtr)) );
 
 	/**
 	 **  Reinitialize the hash table by unlocking it from memory and 
@@ -420,7 +418,7 @@ void Delete_Hash_Tables( Tcl_HashTable	**table_ptr)
 		val = (char*) Tcl_GetHashValue( hashEntry);
 		if( val)
 		    null_free((void *) &val);
-	    } while( hashEntry = Tcl_NextHashEntry( &searchPtr));
+	    } while( (hashEntry = Tcl_NextHashEntry( &searchPtr)) );
 
 	    /**
 	     **  Remove internal hash control structures
@@ -507,7 +505,7 @@ Tcl_HashTable	**Copy_Hash_Tables( void)
 	 **  Initialize that guy and copy it from the old table
 	 **/
 	Tcl_InitHashTable( *n_ptr, TCL_STRING_KEYS);
-        if( oldHashEntry = Tcl_FirstHashEntry( *o_ptr, &searchPtr)) {
+        if( (oldHashEntry = Tcl_FirstHashEntry( *o_ptr, &searchPtr)) ) {
 
 	    /**
 	     **  Copy all entries if there are any
@@ -520,11 +518,11 @@ Tcl_HashTable	**Copy_Hash_Tables( void)
 		newHashEntry = Tcl_CreateHashEntry( *n_ptr, key, &new);
 
 		if(val)
-		    Tcl_SetHashValue(newHashEntry, strdup(val));
+        	    Tcl_SetHashValue(newHashEntry, stringer(NULL,0, val, NULL));
 		else
 		    Tcl_SetHashValue(newHashEntry, (char *) NULL);
 
-	    } while( oldHashEntry = Tcl_NextHashEntry( &searchPtr));
+	    } while( (oldHashEntry = Tcl_NextHashEntry( &searchPtr)) );
 
 	} /** if **/
     } /** for **/
@@ -591,7 +589,7 @@ int Unwind_Modulefile_Changes(	Tcl_Interp	 *interp,
 	/** ??? What about the aliases (table 2 and 3) ??? **/
 
 	for( i = 0; i < 2; i++) {
-	    if( hashEntry = Tcl_FirstHashEntry( oldTables[i], &searchPtr)) {
+	    if( (hashEntry = Tcl_FirstHashEntry( oldTables[i], &searchPtr)) ) {
 
 		do {
 		    key = (char*) Tcl_GetHashKey( oldTables[i], hashEntry);
@@ -606,7 +604,7 @@ int Unwind_Modulefile_Changes(	Tcl_Interp	 *interp,
 		    if( val)
 			Tcl_SetVar2( interp, "env", key, val, TCL_GLOBAL_ONLY);
 
-		} while( hashEntry = Tcl_NextHashEntry( &searchPtr) );
+		} while( (hashEntry = Tcl_NextHashEntry( &searchPtr)) );
 
 	    } /** if **/
 	} /** for **/
@@ -704,11 +702,11 @@ int Output_Modulefile_Changes(	Tcl_Interp	*interp)
 
 	/* collect keys */
 	k = 0;
-	if( hashEntry = Tcl_FirstHashEntry( table[i], &searchPtr))
+	if( (hashEntry = Tcl_FirstHashEntry( table[i], &searchPtr)) )
 		do {
 			key = (char*) Tcl_GetHashKey( table[i], hashEntry);
-			list[k++] = strdup(key);
-		} while( hashEntry = Tcl_NextHashEntry( &searchPtr));
+			list[k++] = stringer(NULL,0, key, NULL);
+		} while( (hashEntry = Tcl_NextHashEntry( &searchPtr)) );
 	/* sort hash */
 	if (hcnt > 1)
 		qsort((void *) list, hcnt, sizeof(char *), keycmp);
@@ -724,8 +722,8 @@ int Output_Modulefile_Changes(	Tcl_Interp	*interp)
 		if( i == 1) {
 			output_unset_variable( (char*) key);
 		} else {
-			if(val=(char *) Tcl_GetVar2(interp,"env",
-			key,TCL_GLOBAL_ONLY))
+			if( (val=(char *) Tcl_GetVar2(interp,"env",
+			    key,TCL_GLOBAL_ONLY)) )
 				output_set_variable(interp, (char*) key, val);
 		}
 	} /** for **/
@@ -854,7 +852,7 @@ static	int Output_Modulefile_Aliases( Tcl_Interp *interp)
      **  We only need to output stuff into a temporary file if we're setting
      **  stuff.  We can unset variables and aliases by just using eval.
      **/
-    if( hashEntry = Tcl_FirstHashEntry( aliasSetHashTable, &searchPtr)) {
+    if( (hashEntry = Tcl_FirstHashEntry( aliasSetHashTable, &searchPtr)) ) {
 
 	/**
 	 **  We must use an aliasfile if EVAL_ALIAS is not defined
@@ -902,7 +900,7 @@ static	int Output_Modulefile_Aliases( Tcl_Interp *interp)
 
     for( i=0; i<2; i++) {
     
-	if( hashEntry = Tcl_FirstHashEntry( table[i], &searchPtr)) {
+	if( (hashEntry = Tcl_FirstHashEntry( table[i], &searchPtr)) ) {
 
 	    do {
 		key = (char*) Tcl_GetHashKey( table[i], hashEntry);
@@ -918,7 +916,7 @@ static	int Output_Modulefile_Aliases( Tcl_Interp *interp)
 		    output_set_alias( key, val);
 		}
 
-	    } while( hashEntry = Tcl_NextHashEntry( &searchPtr));
+	    } while( (hashEntry = Tcl_NextHashEntry( &searchPtr)) );
 
 	} /** if **/
     } /** for **/
@@ -1685,7 +1683,7 @@ char	*getLMFILES( Tcl_Interp	*interp)
 	 **  of the returned buffer into a free allocated one in order to
 	 **  avoid side effects.
 	 **/
-	char	*tmp = strdup(lmfiles);
+	char	*tmp = stringer(NULL,0, lmfiles, NULL);
 
 	if( !tmp)
 	    if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
@@ -2004,7 +2002,7 @@ intptr_t chk_marked_entry(	Tcl_HashTable	*table,
     ErrorLogger( NO_ERR_START, LOC, _proc_chk_marked_entry, NULL);
 #endif
 
-    if( hentry = Tcl_FindHashEntry( table, var))
+    if( (hentry = Tcl_FindHashEntry( table, var)) )
         return((intptr_t) Tcl_GetHashValue( hentry));
     else
         return 0;
@@ -2021,7 +2019,7 @@ void set_marked_entry(	Tcl_HashTable	*table,
     ErrorLogger( NO_ERR_START, LOC, _proc_set_marked_entry, NULL);
 #endif
 
-    if( hentry = Tcl_CreateHashEntry( table, var, &new)) {
+    if( (hentry = Tcl_CreateHashEntry( table, var, &new)) ) {
         if( val)
             Tcl_SetHashValue( hentry, val);
     }
@@ -2147,9 +2145,9 @@ int Update_LoadedList(	Tcl_Interp	*interp,
      **  the path too.
      **/
     if( g_flags & M_REMOVE) {
-	module = strdup( modulename);
+	module = stringer(NULL,0, modulename, NULL);
 	basename = module;
-	if( basename = get_module_basename( basename)) {
+	if( (basename = get_module_basename( basename)) ) {
 	argv[2] = basename;
 	argv[0] = "remove-path";
 	cmdRemovePath( 0, interp, 3, (CONST84 char **) argv);
@@ -2343,36 +2341,6 @@ static	char *chop( const char	*string)
 
 } /** End of 'chop' **/
 
-#ifndef HAVE_STRDUP
-
-/*++++
- ** ** Function-Header ***************************************************** **
- ** 									     **
- **   Function:		strdup						     **
- ** 									     **
- **   Description:	Makes new space to put a copy of the given string    **
- **			into and then copies the string into the new space.  **
- **			Just like the "standard" strdup(3).		     **
- ** 									     **
- **   First Edition:	1991/10/23					     **
- ** 									     **
- **   Parameters:							     **
- **   Result:								     **
- **   Attached Globals:							     **
- ** 									     **
- ** ************************************************************************ **
- ++++*/
-
-char	*strdup( char *str)
-{
-    char* new;
-    if ((char *) NULL) == (new = stringer(NULL,0, str, NULL))
-	if( OK != ErrorLogger( ERR_STRING, LOC, filename, NULL))
-	    return( (char*) NULL);	/** -------- EXIT (FAILURE) -------> **/
-    return( new);			/** -------- EXIT (SUCCESS) -------> **/
-}
-#endif /* HAVE_STRDUP  */
-
 
 /*++++
  ** ** Function-Header ***************************************************** **
@@ -2399,7 +2367,6 @@ char	*strdup( char *str)
 
 char *xstrtok_r(char *s, const char *delim, char **ptrptr) {
 	register char	*ptr, *lptr;
-	register int	 c,sc;
 	const char	*tok;
 
 	/* return NULL if NULL string and at end of the line */
@@ -2548,7 +2515,7 @@ char *xdup(char const *string) {
 	    if( OK != ErrorLogger( ERR_STRING, LOC, NULL))
 		return( (char*) NULL);	/** -------- EXIT (FAILURE) -------> **/
 
-	/** check for '$' else just pass strdup of it **/
+	/** check for '$' else just pass copy of it **/
 	if ((dollarptr = strchr(result, '$')) == (char *) NULL) {
 		return result;
 	} else {
@@ -2632,7 +2599,7 @@ char *xdup(char const *string) {
 			}
 		}
 		null_free((void *) &result);
-		return strdup(buffer);
+		return stringer(NULL,0, buffer, NULL);
 	}
 
 } /** End of 'xdup' **/
@@ -2781,7 +2748,6 @@ void EscapePerlString(const char* in,
 
 int tmpfile_mod(char** filename, FILE** file) {
   char* filename2;
-  FILE* f = NULL;
   int trial = 0;
 
   if ((char *) NULL == (filename2 =

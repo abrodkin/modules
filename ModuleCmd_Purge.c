@@ -26,7 +26,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Purge.c,v 1.4 2009/08/03 16:23:55 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Purge.c,v 1.6 2009/08/13 19:17:43 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -57,7 +57,7 @@ static void *UseId[] = { &UseId, Id };
 /** 				    LOCAL DATA				     **/
 /** ************************************************************************ **/
 
-static	char	module_name[] = "ModuleCmd_Purge.c";	/** File name of this module **/
+static	char	module_name[] = __FILE__;
 
 /** ************************************************************************ **/
 /**				    PROTOTYPES				     **/
@@ -124,9 +124,9 @@ int	ModuleCmd_Purge(	Tcl_Interp	*interp,
     /**
      **  Build a NULL terminated list of loaded modules
      **/
-    for( cur_module = strtok( lmodules, ":");
+    for( cur_module = xstrtok( lmodules, ":");
          cur_module && unload_argc < MOD_BUFSIZE-1;
-         cur_module = strtok( NULL, ":"))
+         cur_module = xstrtok( NULL, ":"))
         unload_argv[ unload_argc++] = cur_module;
     
     unload_argv[ unload_argc] = NULL;
