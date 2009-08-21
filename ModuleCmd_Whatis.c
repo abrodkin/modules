@@ -24,7 +24,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Whatis.c,v 1.10 2009/08/11 22:01:29 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Whatis.c,v 1.10.2.1 2009/08/21 21:47:43 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -134,7 +134,7 @@ int ModuleCmd_Whatis(	Tcl_Interp	*interp,
 	for(i=0; i<argc && argv[i]; i++) {
 
 	    whatis_interp = Tcl_CreateInterp();
-	    if( TCL_OK != (result = InitializeModuleCommands( whatis_interp))) {
+	    if( TCL_OK != (result = Module_Init( whatis_interp))) {
 		Tcl_DeleteInterp( whatis_interp);
 		result = TCL_ERROR;
 		break;
@@ -394,7 +394,7 @@ static	int	whatis_dir( char *dir, int argc, char **argv,
     for( i=0; i<tcount; i++) {
 
 	whatis_interp = Tcl_CreateInterp();
-	if( TCL_OK != (result = InitializeModuleCommands( whatis_interp))) {
+	if( TCL_OK != (result = Module_Init( whatis_interp))) {
 	    Tcl_DeleteInterp( whatis_interp);
 	    result = TCL_ERROR;
 	    break; /** for( i) **/

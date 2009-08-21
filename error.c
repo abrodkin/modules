@@ -30,7 +30,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: error.c,v 1.16 2009/08/11 22:01:29 rkowen Exp $";
+static char Id[] = "@(#)$Id: error.c,v 1.16.2.1 2009/08/21 21:47:43 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -410,11 +410,9 @@ static	ErrFacilities	*GetFacility_sub( ErrWeights Weight);
  ** 									     **
  **   First Edition:	1995/12/27					     **
  ** 									     **
- **   Parameters:	int	result	Result code of the module command    **
- **			int	argc	Number of arguments to the module    **
- **					command				     **
- **			char	**argv	Argument array			     **
- **			char	*buffer	Print buffer			     **
+ **   Parameters:	Tcl_Interp	*interp		Tcl interpretor	     **
+ **			int		 objc		Number of arguments  **
+ **			Tcl_Obj		*objv[]		Argument array	     **
  ** 									     **
  **   Result:		-						     **
  ** 									     **
@@ -424,14 +422,23 @@ static	ErrFacilities	*GetFacility_sub( ErrWeights Weight);
  ** ************************************************************************ **
  ++++*/
 
-void Module_Verbosity(	int	argc,
-		   	char	**argv)
-{
-    if( sw_verbose && argc && *argv)
-	if( !FlushError( NO_ERR_VERBOSE, g_current_module,linenum,WGHT_VERBOSE,
-	    Measurements[ MEAS_VERB_NDX].message, *argv, argc, argv)) {
-	    ErrorLogger( ERR_INTERRL, LOC, NULL);
-	}
+void Module_Verbosity(
+	Tcl_Interp * interp,
+	int objc,
+	Tcl_Obj * CONST84 objv[]
+) {
+	int             argc;
+	char          **argv;
+
+	/* convert from objv to argv */
+	Tcl_ObjvToArgv(interp, &argc, &argv, objc, objv);
+
+	if (sw_verbose && argc && *argv)
+		if (!FlushError(NO_ERR_VERBOSE, g_current_module, linenum,
+		     WGHT_VERBOSE,
+		     Measurements[MEAS_VERB_NDX].message, *argv, argc, argv)) {
+			ErrorLogger(ERR_INTERRL, LOC, NULL);
+		}
 
 } /** End of 'Module_Verbosity' **/
 

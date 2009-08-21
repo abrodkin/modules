@@ -590,37 +590,45 @@ extern	int	  cmdPrereq( ClientData, Tcl_Interp*, int, CONST84 char*[]);
 extern	int	  cmdIsLoaded(ClientData, Tcl_Interp*, int, CONST84 char*[]);
 
 /**  cmdVerbose.c  **/
-extern	int	  cmdModuleVerbose(ClientData,Tcl_Interp*,int,CONST84 char*[]);
+extern	int	  cmdModuleVerbose(ClientData,Tcl_Interp*,
+			int, Tcl_Obj * CONST84 []);
 
 /**  cmdWhatis.c  **/
 extern	char	**whatis;
 extern	void	  cmdModuleWhatisInit(void);
 extern	void	  cmdModuleWhatisShut(void);
-extern	int	  cmdModuleWhatis(ClientData,Tcl_Interp*,int,CONST84 char*[]);
+extern	int	  cmdModuleWhatis(ClientData,Tcl_Interp*,
+			int, Tcl_Obj * CONST84 []);
 
 /**  cmdInfo.c  **/
-extern	int	  cmdModuleInfo(ClientData, Tcl_Interp*, int, CONST84 char*[]);
+extern	int	  cmdModuleInfo(ClientData, Tcl_Interp*,
+			int, Tcl_Obj * CONST84 []);
 extern	char	 *module_command;
 
 /**  cmdMisc.c  **/
 extern	int	  cmdSystem( ClientData, Tcl_Interp*, int, CONST84 char*[]);
 
 /**  cmdModule.c  **/
-extern	int	  cmdModule( ClientData, Tcl_Interp*, int, CONST84 char*[]);
+extern	int	  cmdModule( ClientData, Tcl_Interp*,
+			int, Tcl_Obj * CONST84 []);
 extern	int	  Read_Modulefile( Tcl_Interp*, char*);
 extern	int	  Execute_TclFile( Tcl_Interp*, char*);
 extern	int	  CallModuleProcedure( Tcl_Interp*, Tcl_DString*, char*, char*,
 			int);
 
 /**  cmdPath.c  **/
-extern	int	  cmdSetPath( ClientData, Tcl_Interp*, int, CONST84 char*[]);
-extern	int	  cmdRemovePath( ClientData, Tcl_Interp*, int, CONST84 char*[]);
+extern	int	  cmdSetPath( ClientData, Tcl_Interp*,
+			int, Tcl_Obj * CONST84 []);
+extern	int	  cmdRemovePath( ClientData, Tcl_Interp*,
+			int, Tcl_Obj * CONST84 []);
 extern	char	 *chk_nullvars( char*);
 
 /**  cmdSetenv.c  **/
-extern	int	  cmdSetEnv( ClientData, Tcl_Interp*, int, CONST84 char*[]);
+extern	int	  cmdSetEnv( ClientData, Tcl_Interp*,
+			int, Tcl_Obj * CONST84 []);
 extern	int	  moduleSetenv( Tcl_Interp*, char	 *, char*, int);
-extern	int	  cmdUnsetEnv( ClientData, Tcl_Interp*, int, CONST84 char*[]);
+extern	int	  cmdUnsetEnv( ClientData, Tcl_Interp*,
+			int, Tcl_Obj * CONST84 []);
 extern	int	  moduleUnsetenv( Tcl_Interp*, char	 *);
 
 /**  cmdUname.c  **/
@@ -631,7 +639,8 @@ extern	int	  cmdXResource( ClientData, Tcl_Interp*, int, CONST84 char*[]);
 extern	void	  xresourceFinish( int);
 
 /**  cmdUlvl.c  **/
-extern	int	  cmdModuleUser(ClientData, Tcl_Interp*, int, CONST84 char*[]);
+extern	int	  cmdModuleUser(ClientData, Tcl_Interp*,
+			int, Tcl_Obj * CONST84 []);
 extern	int	  cmdModuleUser_sub( char *user_level);
 
 /**  cmdChdir.c **/
@@ -648,8 +657,8 @@ extern	int	  VersionLookup( char*, char**, char**);
 extern	char	 *ExpandVersions( char*);
 
 /**  init.c  **/
-extern	int	  Initialize_Tcl( Tcl_Interp**, int, char*[], char*[]);
-extern	int	  InitializeModuleCommands( Tcl_Interp*);
+extern	int	  Initialize_Module( Tcl_Interp**, int, char*[], char*[]);
+extern	int	  Module_Init( Tcl_Interp*);
 extern	int	  Setup_Environment( Tcl_Interp*);
 extern	char	**SetStartupFiles( char *shell_name);
 extern	int	  TieStdout( void);
@@ -691,10 +700,17 @@ extern	size_t	  countTclHash(Tcl_HashTable *);
 extern	EM_RetVal	ReturnValue( Tcl_Interp*, int);
 extern	void	  OutputExit();
 
+/**  utilobj.c  **/
+extern int	  Tcl_ArgvToObjv(Tcl_Interp *, int *, Tcl_Obj ***,
+			int, const char **);
+extern int	  Tcl_ObjvToArgv(Tcl_Interp *, int *, char ***,
+			int, Tcl_Obj **);
+
 /** error.c **/
 extern	char	**GetFacilityPtr( char *);
 extern	int 	  Module_Error(	ErrType, char*, int, ...);
 extern	int	  CheckFacility( char*, int*, int*);
-extern	void	  Module_Verbosity( int, char**);
+extern	void	  Module_Verbosity( Tcl_Interp*,
+			int, Tcl_Obj * CONST84 []);
 
 #endif  /**  _MODULES_DEF_H  **/

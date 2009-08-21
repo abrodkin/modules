@@ -50,7 +50,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.29 2009/08/13 19:17:43 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.29.2.1 2009/08/21 21:47:43 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -2097,68 +2097,82 @@ static	char	*get_module_basename(	char	*modulename)
  ** ************************************************************************ **
  ++++*/
 
-int Update_LoadedList(	Tcl_Interp	*interp,
-			char		*modulename,
-			char		*filename)
-{
-    char 	*argv[4];
-    char	*basename;
-    char	*module;
- 
+int Update_LoadedList(
+	Tcl_Interp * interp,
+	char *modulename,
+	char *filename
+) {
+	char           *argv[4],		/** temporary arg vector     **/
+	               *basename,		/** of module name	     **/
+	               *module;			/** module name		     **/
+	Tcl_Obj        **objv;			/** Tcl Object vector	     **/
+	int             objc;			/** Tcl Object vector count  **/
+
 #if WITH_DEBUGGING_UTIL_2
-    ErrorLogger( NO_ERR_START, LOC, _proc_Update_LoadedList, NULL);
+	ErrorLogger(NO_ERR_START, LOC, _proc_Update_LoadedList, NULL);
 #endif
 
     /**
      **  Apply changes to LOADEDMODULES first
      **/
-    argv[1] = "LOADEDMODULES";
-    argv[2] = modulename;
-    argv[3] = NULL;
-    
-    if(g_flags & M_REMOVE) {
-	argv[0] = "remove-path";
-	cmdRemovePath( 0, interp, 3, (CONST84 char **) argv);
-    } else {
-	argv[0] = "append-path";
-	cmdSetPath( 0, interp, 3, (CONST84 char **) argv);
-    }
- 
+	argv[1] = "LOADEDMODULES";
+	argv[2] = modulename;
+	argv[3] = NULL;
+
+	if (g_flags & M_REMOVE) {
+		argv[0] = "remove-path";
+	} else {
+		argv[0] = "append-path";
+	}
+	Tcl_ArgvToObjv(interp, &objc, &objv, -1, argv);
+	if (g_flags & M_REMOVE) {
+		cmdRemovePath(0, interp, objc, objv);
+	} else {
+		cmdSetPath(0, interp, objc, objv);
+	}
+
     /**
      **  Apply changes to _LMFILES_ now
      **/
-    argv[1] = "_LMFILES_";
-    argv[2] = filename;
-    argv[3] = NULL;
+	argv[1] = "_LMFILES_";
+	argv[2] = filename;
+	argv[3] = NULL;
 
-    if(g_flags & M_REMOVE) {
-	argv[0] = "remove-path";
-	cmdRemovePath( 0, interp, 3, (CONST84 char **) argv);
-    } else {
-	argv[0] = "append-path";
-	cmdSetPath( 0, interp, 3, (CONST84 char **) argv);
-    }
+	if (g_flags & M_REMOVE) {
+		argv[0] = "remove-path";
+	} else {
+		argv[0] = "append-path";
+	}
+	/* RKO: may need to clean-up objv first */
+	Tcl_ArgvToObjv(interp, &objc, &objv, -1, argv);
+	if (g_flags & M_REMOVE) {
+		cmdRemovePath(0, interp, objc, objv);
+	} else {
+		cmdSetPath(0, interp, objc, objv);
+	}
 
     /**
      **  A module with just the basename might have been added and now we're
      **  removing one of its versions. We'll want to look for the basename in
      **  the path too.
      **/
-    if( g_flags & M_REMOVE) {
-	module = stringer(NULL,0, modulename, NULL);
-	basename = module;
-	if( (basename = get_module_basename( basename)) ) {
-	argv[2] = basename;
-	argv[0] = "remove-path";
-	cmdRemovePath( 0, interp, 3, (CONST84 char **) argv);
+	if (g_flags & M_REMOVE) {
+		module = stringer(NULL, 0, modulename, NULL);
+		basename = module;
+		if ((basename = get_module_basename(basename))) {
+			argv[2] = basename;
+			argv[0] = "remove-path";
+			/* RKO: may need to clean-up objv first */
+			Tcl_ArgvToObjv(interp, &objc, &objv, -1, argv);
+			cmdRemovePath(0, interp, objc, objv);
+		}
+		null_free((void *)&module);
 	}
-	null_free((void *) &module);
-    }
 
     /**
      **  Return on success
      **/
-    return( 1);
+	return (1);
 
 } /** End of 'Update_LoadedList' **/
 

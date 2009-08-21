@@ -1,0 +1,8 @@
+--linux-style
+--tab-size8
+--use-tabs
+-bfda
+-bfde
+--braces-on-func-def-line
+--declaration-indentation16
+--indent-label0
