@@ -30,7 +30,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Use.c,v 1.9.2.1 2009/08/21 21:47:43 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Use.c,v 1.9.2.2 2009/08/23 06:26:09 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -325,7 +325,7 @@ int ModuleCmd_UnUse(
 	for (i = 0; i < argc; i++) {
 		pathargv[2] = argv[i];
 		/* convert from argv to objv */
-		Tcl_ArgvToObjv(interp, &objc, &objv, -1, pathargv);
+		Tcl_ArgvToObjv(interp, &objc, &objv, -1, (char **) pathargv);
 		if (cmdRemovePath((ClientData) 0, interp, objc, objv) ==
 		    TCL_ERROR)
 			return (TCL_ERROR); /** ------ EXIT (FAILURE) -----> **/

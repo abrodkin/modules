@@ -29,7 +29,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdWhatis.c,v 1.8.2.1 2009/08/21 21:47:43 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdWhatis.c,v 1.8.2.2 2009/08/23 06:26:09 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -164,8 +164,7 @@ int cmdModuleWhatis(
 			while (whatis_ndx + 2 >= whatis_size) {
 				whatis_size += WHATIS_FRAG;
 				if ((char **)NULL ==
-				    (whatis =
-				     realloc(whatis,
+				    (whatis = module_realloc(whatis,
 					     whatis_size * sizeof(char *)))) {
 					ErrorLogger(ERR_ALLOC, LOC, NULL);
 					return (TCL_ERROR);
@@ -227,9 +226,8 @@ void	cmdModuleWhatisShut()
     char **ptr = whatis;
 
     if( whatis) {
-	while( *ptr) {		/** go until NULL token **/
-	    free( *ptr);
-	    *ptr = (char *) NULL;
+	while(*ptr) {		/** go until NULL token **/
+	    null_free(ptr);
 	    ptr++;
 	}
 	whatis_ndx = 0;

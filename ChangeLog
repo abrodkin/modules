@@ -1,6 +1,43 @@
 Do Not Edit!  This is a generated file.
 	You should edit the NEWS file instead.
 
+2009-08-21 14:47  rkowen
+
+	* utilobj.c: file utilobj.c was initially added on branch btclobj1.
+
+2009-08-21 14:47  rkowen
+
+	* .indent.pro, Makefile.am, ModuleCmd_Clear.c, ModuleCmd_Display.c,
+	ModuleCmd_Help.c, ModuleCmd_Load.c, ModuleCmd_Refresh.c,
+	ModuleCmd_Use.c, ModuleCmd_Whatis.c, NEWS, cmdInfo.c, cmdModule.c,
+	cmdPath.c, cmdSetenv.c, cmdUlvl.c, cmdVerbose.c, cmdWhatis.c,
+	error.c, init.c, main.c, modules_def.h, utility.c, utilobj.c:
+	Converted about half of the module commands to use Tcl dual-ported
+	objects.
+
+2009-08-21 14:47  rkowen
+
+	* .indent.pro: file .indent.pro was initially added on branch
+	btclobj1.
+
+2009-08-14 15:16  rkowen
+
+	* Makefile.am: Got cxref running and regenerated the cross
+	references.
+
+2009-08-14 15:16  rkowen
+
+	* locate_module.c: Cleaned up a memory error and redundant code.
+
+2009-08-13 12:17  rkowen
+
+	* ModuleCmd_Avail.c, ModuleCmd_Init.c, ModuleCmd_Purge.c,
+	ModuleCmd_Refresh.c, ModuleCmd_Update.c, NEWS, cmdChdir.c,
+	cmdModule.c, cmdVersion.c, cmdWhatis.c, cmdXResource.c,
+	configure.ac, locate_module.c, main.c, modules_def.h, utility.c: *
+	All string allocation is performed by a common internal routine *
+	--disable-beginenv is now the configuration default
+
 2009-08-11 15:01  rkowen
 
 	* ModuleCmd_Avail.c, ModuleCmd_Clear.c, ModuleCmd_Display.c,
@@ -2907,7 +2944,7 @@ Do Not Edit!  This is a generated file.
 
 2003-08-07 14:07  harlan
 
-	* tcl/modulecmd.tcl: Add $Revision: 1.64 $ to the version
+	* tcl/modulecmd.tcl: Add $Revision: 1.64.2.1 $ to the version
 
 2003-08-07 12:52  harlan
 

@@ -37,7 +37,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: init.c,v 1.17.2.1 2009/08/21 21:47:43 rkowen Exp $";
+static char Id[] = "@(#)$Id: init.c,v 1.17.2.2 2009/08/23 06:26:09 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -213,8 +213,7 @@ int Module_Tcl_ExitCmd(
      **/
 	if ((objc < 1) || (objc > 2))
 		if (OK != ErrorLogger(ERR_USAGE, LOC,
-				      Tcl_GetString(objv[0]), "?returnCode?",
-				      NULL))
+			Tcl_GetString(objv[0]), "?returnCode?", NULL))
 			goto unwind0;
 
     /**
@@ -225,7 +224,7 @@ int Module_Tcl_ExitCmd(
 		value = 0;
 	} else if (Tcl_GetIntFromObj(interp, objv[1], &value) != TCL_OK) {
 		if (OK != ErrorLogger(ERR_PARAM, LOC,
-				      Tcl_GetString(objv[1]), NULL))
+			Tcl_GetString(objv[1]), NULL))
 			goto unwind0;
 	}
 
@@ -555,46 +554,46 @@ int Module_Init(
 	Tcl_CreateObjCommand(interp, "module-user", cmdModuleUser,
 			  (ClientData) shell_derelict,
 			  (void (*)(ClientData))NULL);
-	Tcl_CreateCommand(interp, "module-log", cmdModuleLog,
+	Tcl_CreateObjCommand(interp, "module-log", cmdModuleLog,
 			  (ClientData) shell_derelict,
 			  (void (*)(ClientData))NULL);
 
-	Tcl_CreateCommand(interp, "module-alias", cmdModuleAlias,
+	Tcl_CreateObjCommand(interp, "module-alias", cmdModuleAlias,
 			  (ClientData) shell_derelict,
 			  (void (*)(ClientData))NULL);
-	Tcl_CreateCommand(interp, "module-version", cmdModuleVersion,
-			  (ClientData) shell_derelict,
-			  (void (*)(ClientData))NULL);
-
-	Tcl_CreateCommand(interp, "set-alias", cmdSetAlias,
-			  (ClientData) shell_derelict,
-			  (void (*)(ClientData))NULL);
-	Tcl_CreateCommand(interp, "unset-alias", cmdSetAlias,
+	Tcl_CreateObjCommand(interp, "module-version", cmdModuleVersion,
 			  (ClientData) shell_derelict,
 			  (void (*)(ClientData))NULL);
 
-	Tcl_CreateCommand(interp, "conflict", cmdConflict,
+	Tcl_CreateObjCommand(interp, "set-alias", cmdSetAlias,
 			  (ClientData) shell_derelict,
 			  (void (*)(ClientData))NULL);
-	Tcl_CreateCommand(interp, "prereq", cmdPrereq,
-			  (ClientData) shell_derelict,
-			  (void (*)(ClientData))NULL);
-
-	Tcl_CreateCommand(interp, "is-loaded", cmdIsLoaded,
+	Tcl_CreateObjCommand(interp, "unset-alias", cmdSetAlias,
 			  (ClientData) shell_derelict,
 			  (void (*)(ClientData))NULL);
 
-	Tcl_CreateCommand(interp, "chdir", cmdChDir,
+	Tcl_CreateObjCommand(interp, "conflict", cmdConflict,
 			  (ClientData) shell_derelict,
 			  (void (*)(ClientData))NULL);
-	Tcl_CreateCommand(interp, "system", cmdSystem,
-			  (ClientData) shell_derelict,
-			  (void (*)(ClientData))NULL);
-	Tcl_CreateCommand(interp, "uname", cmdUname,
+	Tcl_CreateObjCommand(interp, "prereq", cmdPrereq,
 			  (ClientData) shell_derelict,
 			  (void (*)(ClientData))NULL);
 
-	Tcl_CreateCommand(interp, "x-resource", cmdXResource,
+	Tcl_CreateObjCommand(interp, "is-loaded", cmdIsLoaded,
+			  (ClientData) shell_derelict,
+			  (void (*)(ClientData))NULL);
+
+	Tcl_CreateObjCommand(interp, "chdir", cmdChDir,
+			  (ClientData) shell_derelict,
+			  (void (*)(ClientData))NULL);
+	Tcl_CreateObjCommand(interp, "system", cmdSystem,
+			  (ClientData) shell_derelict,
+			  (void (*)(ClientData))NULL);
+	Tcl_CreateObjCommand(interp, "uname", cmdUname,
+			  (ClientData) shell_derelict,
+			  (void (*)(ClientData))NULL);
+
+	Tcl_CreateObjCommand(interp, "x-resource", cmdXResource,
 			  (ClientData) shell_derelict,
 			  (void (*)(ClientData))NULL);
 

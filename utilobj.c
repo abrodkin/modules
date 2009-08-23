@@ -28,7 +28,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utilobj.c,v 1.1.2.1 2009/08/21 21:47:43 rkowen Exp $";
+static char Id[] = "@(#)$Id: utilobj.c,v 1.1.2.2 2009/08/23 06:26:09 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -166,7 +166,7 @@ int Tcl_ObjvToArgv(
 	int *argc,
 	char ***argv,
 	int objc,
-	Tcl_Obj ** objv
+	Tcl_Obj * CONST84 * objv
 ) {
 	Tcl_Obj		**optr = objv;
 	char    	**aptr;

@@ -27,7 +27,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdVerbose.c,v 1.6.2.1 2009/08/21 21:47:43 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdVerbose.c,v 1.6.2.2 2009/08/23 06:26:09 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -135,8 +135,13 @@ int cmdModuleVerbose(
 		sw_verbose = 1;
 	else if (!strcmp(Tcl_GetString(objv[1]), "off"))
 		sw_verbose = 0;
-	else
-		Module_Verbosity(interp, --objc, ++objv);
+	else {
+		int	argc = --objc;
+		char	**argv;
+
+		Tcl_ObjvToArgv(interp, &argc, &argv, argc,++objv);
+		Module_Verbosity(argc, argv);
+	}
 
 #if WITH_DEBUGGING_CALLBACK
 	ErrorLogger(NO_ERR_END, LOC, _proc_cmdModuleVerbose, NULL);

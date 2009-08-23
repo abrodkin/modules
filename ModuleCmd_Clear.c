@@ -28,7 +28,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Clear.c,v 1.5.2.1 2009/08/21 21:47:42 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Clear.c,v 1.5.2.2 2009/08/23 06:26:09 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -116,7 +116,7 @@ int ModuleCmd_Clear(	Tcl_Interp	*interp,
     } else {
 	fprintf( stderr,
             "\nAre you sure you want to clear all loaded modules!? [n] ");
-	fgets( buf, 10, stdin);
+	fgets(buf, 10, stdin);
     }
 
     /**
@@ -130,7 +130,7 @@ int ModuleCmd_Clear(	Tcl_Interp	*interp,
         clearargv[2] = "";
         clearargv[3] = NULL;
 	/* convert fomr argv to objv */
-	Tcl_ArgvToObjv(interp, &objc, &objv, -1, clearargv);
+	Tcl_ArgvToObjv(interp, &objc, &objv, -1, (char **) clearargv);
         cmdSetEnv( (ClientData) 0, interp, objc, objv);
 
         clearargv[0] = "setenv";
@@ -138,7 +138,7 @@ int ModuleCmd_Clear(	Tcl_Interp	*interp,
         clearargv[2] = "";
         clearargv[3] = NULL;
 	/* convert fomr argv to objv */
-	Tcl_ArgvToObjv(interp, &objc, &objv, -1, clearargv);
+	Tcl_ArgvToObjv(interp, &objc, &objv, -1, (char **) clearargv);
         cmdSetEnv( (ClientData) 0, interp, objc, objv);
 
     } else {
