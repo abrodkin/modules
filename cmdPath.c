@@ -9,7 +9,7 @@
  ** 									     **
  **   Authors:	John Furlan, jlf@behere.com				     **
  **		Jens Hamisch, jens@Strawberry.COM			     **
- **		R.K. Owen, rk@owen.sj.ca.us				     **
+ **		R.K. Owen, <rk@owen.sj.ca.us> or <rkowen@nersc.gov>	     **
  ** 									     **
  **   Description:	The path manipulation routines. Much of the heart of **
  **			Modules is contained in this file. These routines    **
@@ -31,7 +31,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdPath.c,v 1.18 2009/08/23 23:30:42 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdPath.c,v 1.18.2.1 2009/08/27 22:07:13 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -225,8 +225,8 @@ int cmdSetPath(
      **  directory can be checked to see whether it is already in the 
      **  existing path.
      **/
-	if (!(pathlist = SplitIntoList(interp,
-			Tcl_GetString(objv[arg1 + 1]), &numpaths, delim)))
+	if (!(pathlist = uvec_vector(SplitIntoList(
+			Tcl_GetString(objv[arg1 + 1]), &numpaths, delim))))
 		goto unwind0;
 
     /**
@@ -386,13 +386,13 @@ int cmdSetPath(
 	null_free((void *)&newpath);
 success1:
 	null_free((void *)&qualifiedpath);
-	FreeList(pathlist, numpaths);
+	/* FreeList(pathlist, numpaths); */
 success0:
 	return (TCL_OK);		/** -------- EXIT (SUCCESS) -------> **/
 unwind2:
 	null_free((void *)&qualifiedpath);
 unwind1:
-	FreeList(pathlist, numpaths);
+	/* FreeList(pathlist, numpaths); */
 unwind0:
 	return (TCL_ERROR);		/** -------- EXIT (FAILURE) -------> **/
 }
@@ -505,8 +505,8 @@ int cmdRemovePath(
      **  individually from the variable.
      **/
 	if (! (pathlist =
-	     SplitIntoList(interp, Tcl_GetString(objv[arg1 + 1]), &numpaths,
-			   delim)))
+	     uvec_vector(SplitIntoList(Tcl_GetString(objv[arg1 + 1]), &numpaths,
+			   delim))))
 		goto unwind0;
 
     /**
@@ -520,13 +520,13 @@ int cmdRemovePath(
     /**
      ** Free resources
      **/
-	FreeList(pathlist, numpaths);
+	/* FreeList(pathlist, numpaths); */
 
 success0:
 	return (TCL_OK);		/** -------- EXIT (SUCCESS) -------> **/
 
 unwind1:
-	FreeList(pathlist, numpaths);
+	/* FreeList(pathlist, numpaths); */
 unwind0:
 	return (TCL_ERROR);		/** -------- EXIT (FAILURE) -------> **/
 

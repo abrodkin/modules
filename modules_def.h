@@ -38,6 +38,7 @@
 #include <stdarg.h>
 #include <tcl.h>
 #include "config.h"
+#include "uvec.h"
 
 #ifndef CONST84
 #  define CONST84	/* const */
@@ -154,6 +155,12 @@ extern	int	  errno;
 /** ************************************************************************ **/
 
 /**
+ **  Module list type - list of strings, uses Tcl_List*() underneath
+ **/
+
+typedef Tcl_Obj *	MList;
+
+/**
  **  Structure to store information about a file.  Includes its name
  **  and the structure to store information from the stat system call.
  **/
@@ -205,6 +212,7 @@ typedef	enum	{
 	ERR_UNLINK,			/** Cannot unlink file		     **/
 	ERR_RENAME,			/** Cannot rename file		     **/
 	ERR_ALLOC = 70,			/** Out of memory		     **/
+	ERR_UVEC,			/** general UVEC error		     **/
 	ERR_SOURCE,			/** Error while sourcing ...	     **/
 	ERR_UNAME,			/** Uname failed		     **/
 	ERR_GETHOSTNAME,		/** gethostname failed		     **/
@@ -256,7 +264,7 @@ typedef	enum	{
 typedef	enum	{
 	OK	= 0,			/** Everything's up and running	     **/
 	WARN	= 2,			/** A warning (mapped to OK by the   **/
-					/** Errorlogger			     **/
+					/** Errorlogger)		     **/
 	PROBLEM	= 5,			/** Problem ... program might cont.  **/
 	ERROR	= 7,			/** Error .. try gracefull aborting  **/
 	FATAL	= 10,			/** The following will lead to the   **/
@@ -383,7 +391,7 @@ typedef enum	{
 
 #ifndef USE_FREE
 #  define  free( x)  
-#  define  FreeList( x, y)  
+#  define  FreeList( x)  
 #endif
 
 /** 
@@ -500,12 +508,12 @@ extern	char	 long_header[];
 
 /**  locate_module.c  **/
 extern	int	  Locate_ModuleFile( Tcl_Interp*, char*, char*, char*);
-extern	char	**SortedDirList( Tcl_Interp*, char*, char*, int*);
-extern	char	**SplitIntoList( Tcl_Interp*, char*, int*, const char*);
+extern	uvec	 *SortedDirList(char*, char*, int*);
+extern	uvec	 *SplitIntoList(const char*, int*, const char*);
 extern	int	  SourceVers( Tcl_Interp*, char*, char*);
 extern	int	  SourceRC( Tcl_Interp *interp, char *, char *);
 #ifdef USE_FREE
-extern	void	  FreeList( char**, int);
+extern	void	  FreeList( uvec**);
 #endif
 
 /**  main.c  **/
@@ -695,10 +703,8 @@ extern	void	 *module_calloc(size_t,size_t);
 extern	void	  null_free(void **);
 
 /**  utilobj.c  **/
-extern int	  Tcl_ArgvToObjv(Tcl_Interp *, int *, Tcl_Obj ***,
-			int, char * const *);
-extern int	  Tcl_ObjvToArgv(Tcl_Interp *, int *, char ***,
-			int, Tcl_Obj * CONST84 *);
+extern int	  Tcl_ArgvToObjv(int *, Tcl_Obj ***, int, char * const *);
+extern int	  Tcl_ObjvToArgv(int *, char ***, int, Tcl_Obj * CONST84 *);
 
 /** error.c **/
 extern	char	**GetFacilityPtr( char *);

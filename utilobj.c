@@ -7,7 +7,7 @@
  **   File:		utilobj.c					     **
  **   First Edition:	2009/08/20					     **
  ** 									     **
- **   Authors:	R.K. Owen, rk@owen.sj.ca.us				     **
+ **   Authors:	R.K. Owen, <rk@owen.sj.ca.us> or <rkowen@nersc.gov>	     **
  ** 									     **
  **   Description:	General Tcl_Obj related routines		     **
  **			which are not necessarily specific to any single     **
@@ -15,6 +15,7 @@
  ** 									     **
  **   Exports:		Tcl_ArgvToObjv					     **
  **			Tcl_ObjvToArgv					     **
+ **			mlist_*	(see below)				     **
  **									     **
  **   Notes:								     **
  ** 									     **
@@ -28,7 +29,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utilobj.c,v 1.3 2009/08/23 23:30:42 rkowen Exp $";
+static char Id[] = "@(#)$Id: utilobj.c,v 1.3.2.1 2009/08/27 22:07:13 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -77,8 +78,7 @@ static	char	module_name[] = __FILE__;
  ** 									     **
  **   First Edition:	2009/08/23					     **
  ** 									     **
- **   Parameters:	Tcl_Interp	*interp		Tcl Interpreter	     **
- **			int		*objc		objv element count   **
+ **   Parameters:	int		*objc		objv element count   **
  **			Tcl_Obj 	**objv[]	objv vector	     **
  **			int		argc		argv element count   **
  **			const char	*argv[]		argv vector	     **
@@ -91,7 +91,6 @@ static	char	module_name[] = __FILE__;
  ++++*/
 
 int Tcl_ArgvToObjv(
-	Tcl_Interp * interp,
 	int *objc,
 	Tcl_Obj *** objv,
 	int argc,
@@ -139,8 +138,7 @@ int Tcl_ArgvToObjv(
  ** 									     **
  **   First Edition:	2009/08/23					     **
  ** 									     **
- **   Parameters:	Tcl_Interp	*interp		Tcl Interpreter	     **
- **			int		*argc		argv element count   **
+ **   Parameters:	int		*argc		argv element count   **
  **			const char	**argv[]	argv vector	     **
  **			int		objc		objv element count   **
  **			Tcl_Obj 	*objv[]		objv vector	     **
@@ -153,7 +151,6 @@ int Tcl_ArgvToObjv(
  ++++*/
 
 int Tcl_ObjvToArgv(
-	Tcl_Interp * interp,
 	int *argc,
 	char ***argv,
 	int objc,
@@ -188,4 +185,3 @@ int Tcl_ObjvToArgv(
 	return (TCL_OK);		      /** ----- EXIT (SUCCESS) ----> **/
 
 } /** End of 'Tcl_ObjvToArgv' **/
-

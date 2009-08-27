@@ -9,6 +9,7 @@
  ** 									     **
  **   Authors:	John Furlan, jlf@behere.com				     **
  **		Jens Hamisch, jens@Strawberry.COM			     **
+ **		R.K. Owen, <rk@owen.sj.ca.us> or <rkowen@nersc.gov>	     **
  ** 									     **
  **   Description:	General routines that are called throughout Modules  **
  **			which are not necessarily specific to any single     **
@@ -39,6 +40,8 @@
  **			ReturnValue					     **
  **			OutputExit					     **
  **			module_malloc					     **
+ **			module_realloc					     **
+ **			module_calloc					     **
  **			null_free					     **
  **									     **
  **   Notes:								     **
@@ -53,7 +56,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.31 2009/08/23 23:30:42 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.31.2.1 2009/08/27 22:07:13 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -877,10 +880,10 @@ static	int Output_Modulefile_Aliases( Tcl_Interp *interp)
  ++++*/
 static	int Output_Directory_Change(Tcl_Interp *interp)
 {
-	int rc = TCL_OK;
+	int retval = TCL_OK;
 
 	if (change_dir == NULL)
-		return rc;
+		return retval;
 
 	assert(shell_derelict != NULL);
 	if(!strcmp(shell_derelict, "csh") || !strcmp(shell_derelict, "sh")) {
@@ -890,12 +893,12 @@ static	int Output_Directory_Change(Tcl_Interp *interp)
 	} else if( !strcmp( shell_derelict, "python")) {
 		fprintf(stdout, "os.chdir('%s')\n", change_dir);
 	} else {
-		rc = TCL_ERROR;
+		retval = TCL_ERROR;
 	}
 
 	null_free((void *) &change_dir);
 
-	return rc;
+	return retval;
 }
 
 
@@ -2007,7 +2010,7 @@ int Update_LoadedList(
 	} else {
 		argv[0] = "append-path";
 	}
-	Tcl_ArgvToObjv(interp, &objc, &objv, -1, (char **) argv);
+	Tcl_ArgvToObjv(&objc, &objv, -1, (char **) argv);
 	if (g_flags & M_REMOVE) {
 		cmdRemovePath(0, interp, objc, objv);
 	} else {
@@ -2027,7 +2030,7 @@ int Update_LoadedList(
 		argv[0] = "append-path";
 	}
 	/* RKO: may need to clean-up objv first */
-	Tcl_ArgvToObjv(interp, &objc, &objv, -1, (char **) argv);
+	Tcl_ArgvToObjv(&objc, &objv, -1, (char **) argv);
 	if (g_flags & M_REMOVE) {
 		cmdRemovePath(0, interp, objc, objv);
 	} else {
@@ -2046,7 +2049,7 @@ int Update_LoadedList(
 			argv[2] = basename;
 			argv[0] = "remove-path";
 			/* RKO: may need to clean-up objv first */
-			Tcl_ArgvToObjv(interp, &objc, &objv, -1,(char **) argv);
+			Tcl_ArgvToObjv(&objc, &objv, -1,(char **) argv);
 			cmdRemovePath(0, interp, objc, objv);
 		}
 		null_free((void *)&module);
@@ -2893,9 +2896,16 @@ void OutputExit() {
  ** ************************************************************************ **
  ++++*/
 
+#define USE_CKALLOC
+
 void *module_malloc(size_t size) {
 
+#ifdef USE_CKALLOC
+	Tcl_ValidateAllMemory(__FILE__,__LINE__);
 	return ckalloc(size > 0 ? size : 1);
+#else
+	return malloc(size > 0 ? size : 1);
+#endif
 
 } /** End of 'module_malloc' **/
 
@@ -2921,7 +2931,11 @@ void *module_malloc(size_t size) {
 
 void *module_realloc(void *ptr, size_t size) {
 
+#ifdef USE_CKALLOC
 	return ckrealloc(ptr, size > 0 ? size : 1);
+#else
+	return realloc(ptr, size > 0 ? size : 1);
+#endif
 
 } /** End of 'module_realloc' **/
 
@@ -2985,7 +2999,11 @@ void null_free(void ** var) {
 	if (! *var) return;	/* passed in a NULL ptr */
 
 #ifdef USE_FREE
+#  ifdef USE_CKALLOC
 	ckfree( *var);
+#  else
+	free( *var);
+#  endif
 #endif
 	*var = NULL;
 

@@ -9,7 +9,7 @@
  ** 									     **
  **   Authors:	John Furlan, jlf@behere.com				     **
  **		Jens Hamisch, jens@Strawberry.COM			     **
- **		R.K. Owen, rk@owen.sj.ca.us				     **
+ **		R.K. Owen, <rk@owen.sj.ca.us> or <rkowen@nersc.gov>	     **
  ** 									     **
  **   Description: 	Contains the routines which locate the actual	     **
  **			modulefile given a modulefilename by looking in all  **
@@ -34,7 +34,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: locate_module.c,v 1.27 2009/08/23 23:30:42 rkowen Exp $";
+static char Id[] = "@(#)$Id: locate_module.c,v 1.27.2.1 2009/08/27 22:07:13 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -42,6 +42,7 @@ static void *UseId[] = { &UseId, Id };
 /** ************************************************************************ **/
 
 #include "modules_def.h"
+#include "uvec.h"
 
 /** ************************************************************************ **/
 /** 				  LOCAL DATATYPES			     **/
@@ -66,7 +67,7 @@ static void *UseId[] = { &UseId, Id };
 /** ************************************************************************ **/
 
 static	char	module_name[] = __FILE__;
-static	char	buf[ MOD_BUFSIZE];
+static	char	strbuffer[ MOD_BUFSIZE];
 static	char	modfil_buf[ MOD_BUFSIZE];
 
 /** ************************************************************************ **/
@@ -137,173 +138,191 @@ static int  filename_compare(	const void	*fi1,
  ** ************************************************************************ **
  ++++*/
 
-int Locate_ModuleFile(	Tcl_Interp	*interp,
-                  	char		*modulename,
-                  	char		*realname,
-                  	char		*filename)
-{
-    char	*p;			/** Tokenization pointer	     **/
-    char	*result = NULL;		/** This functions result	     **/
-    char	**pathlist;		/** List of paths to scan	     **/
-    int		  numpaths,		/** Size of this list		     **/
-    		  i;			/** Loop counter		     **/
-    char	*modulespath;		/** Buffer for the contents of the   **/
+int Locate_ModuleFile(
+	Tcl_Interp * interp,
+	char *modulename,
+	char *realname,
+	char *filename
+) {
+	char           *p;		/** Tokenization pointer	     **/
+	char           *result = NULL;	/** This functions result	     **/
+	uvec           *pathvec;	/** Vector of paths to scan	     **/
+	char          **pathlist;	/** List of paths to scan	     **/
+	int             numpaths,	/** Size of this list		     **/
+	                i;		/** Loop counter		     **/
+	char           *modulespath;	/** Buffer for the contents of the   **/
 					/** environment variable MODULEPATH  **/
-    char	*mod, *vers;		/** Module and version name for sym- **/
+	char           *mod, *vers;	/** Module and version name for sym- **/
 					/** bolic name lookup		     **/
     /**
      **  If it is a full path name, that's the module file to load.
      **/
-    if( !modulename) 
-	if( OK != ErrorLogger( ERR_PARAM, LOC, "modulename", NULL))
-	    goto unwind0;
-	
-    if( modulename[0] == '/' || modulename[0] == '.') {
+	if (!modulename)
+		if (OK != ErrorLogger(ERR_PARAM, LOC, "modulename", NULL))
+			goto unwind0;
 
-	p = (char*) strrchr( modulename, '/');
-        if(p) {
-            *p = '\0';
+	if (modulename[0] == '/' || modulename[0] == '.') {
+		p = (char *)strrchr(modulename, '/');
+		if (p) {
+			*p = '\0';
 	    /**
 	     **  Check, if what has been specified is a valid version of
 	     **  the specified module ...
 	     **/
-            if((char *) NULL ==
-		(result = GetModuleName(interp, modulename, NULL,(p+1)))) 
-		goto unwind0;
+			if ((char *)NULL == (result =
+			     GetModuleName(interp, modulename, NULL, (p + 1))))
+				goto unwind0;
 	    /**
 	     **  Reinstall the 'modulefile' which has been corrupted by
 	     **   tokenization
 	     **/
-	    *p = '/';
-
+			*p = '/';
 	    /**
 	     **  ... Looks good! Conditionally (if there has been no version
 	     **  specified) we have to add the default version
 	     **/
-            if( !strcmp((p + 1), result)) {
-                if ((char *) NULL == stringer( filename, MOD_BUFSIZE,
-		modulename, NULL))
-		    goto unwind1;
-            } else {
-                if ((char *) NULL == stringer( filename, MOD_BUFSIZE,
-		modulename,"/",result, NULL))
-		    goto unwind1;
-            }
-        } else {
+			if (!strcmp((p + 1), result)) {
+				if ((char *)NULL ==
+				    stringer(filename, MOD_BUFSIZE, modulename,
+					     NULL))
+					goto unwind1;
+			} else {
+				if ((char *)NULL ==
+				    stringer(filename, MOD_BUFSIZE, modulename,
+					     "/", result, NULL))
+					goto unwind1;
+			}
+		} else {
 	    /**
 	     **  Hmm! There's no backslash in 'modulename'. So it MUST begin
 	     **  on '.' and MUST be part of the current directory
 	     **/
-            if( NULL == (result = GetModuleName( interp, modulename, NULL,
-		modulename)))
-		goto unwind0;
-	
-            if( !strcmp( modulename, result) ||
-		(strlen( modulename) + 1 + strlen( result) + 1 > MOD_BUFSIZE)) {
-                if ((char *) NULL == stringer( filename, MOD_BUFSIZE,
-		modulename, NULL))
-		    goto unwind1;
-            } else {
-                if ((char *) NULL == stringer( filename, MOD_BUFSIZE,
-		modulename,"/",result, NULL))
-		    goto unwind1;
-            }
-        }
+			if (NULL ==
+			    (result =
+			     GetModuleName(interp, modulename, NULL,
+					   modulename)))
+				goto unwind0;
+
+			if (!strcmp(modulename, result) ||
+			    (strlen(modulename) + 1 + strlen(result) + 1 >
+			     MOD_BUFSIZE)) {
+				if ((char *)NULL ==
+				    stringer(filename, MOD_BUFSIZE, modulename,
+					     NULL))
+					goto unwind1;
+			} else {
+				if ((char *)NULL ==
+				    stringer(filename, MOD_BUFSIZE, modulename,
+					     "/", result, NULL))
+					goto unwind1;
+			}
+		}
     /**
      **  So it is not a full path name what has been specified. Scan the 
      **  MODULESPATH
      **/
-    } else {
+	} else {
 	/**
 	 **  If I don't find a path in MODULEPATH, there's nothing to search.
 	 **/
-	if( !( modulespath = (char *) getenv( "MODULEPATH"))) {
-	    if( OK != ErrorLogger( ERR_MODULE_PATH, LOC, NULL)) {
-		g_current_module = NULL;
-		goto unwind0;
-	    }
-	}
+		if (!(modulespath = (char *)getenv("MODULEPATH"))) {
+			if (OK != ErrorLogger(ERR_MODULE_PATH, LOC, NULL)) {
+				g_current_module = NULL;
+				goto unwind0;
+			}
+		}
 	/**
 	 ** strip off any extraneous new lines
 	 **/
-	{ char *end;
-	if ((char *) NULL != (end = strrchr(modulespath, '\n'))) *end = '\0';
-	}
+		{
+			char           *end;
+			if ((char *)NULL != (end = strrchr(modulespath, '\n')))
+				*end = '\0';
+		}
 	/**
 	 **  Expand the module name (in case it is a symbolic one). This must
 	 **  be done once here in order to expand any aliases
 	 **/
-	if( VersionLookup( modulename, &mod, &vers)) {
-	    if ((char *) NULL == stringer( buf, MOD_BUFSIZE,
-	    mod,"/",vers, NULL))
-		goto unwind0;
-	    modulename = buf;
-	}
+		if (VersionLookup(modulename, &mod, &vers)) {
+			if ((char *)NULL == stringer(strbuffer, MOD_BUFSIZE,
+						     mod, "/", vers, NULL))
+				goto unwind0;
+			modulename = strbuffer;
+		}
 	/**
 	 **  Split up the MODULEPATH values into multiple directories
 	 **/
-	if( NULL == (pathlist = SplitIntoList(interp, modulespath, &numpaths,
-	_colon)))
-	    goto unwind0;
+		if (NULL == (pathvec = SplitIntoList(modulespath, &numpaths,
+						     _colon)))
+			goto unwind0;
+		pathlist = uvec_vector(pathvec);
 	/**
 	 **  Check each directory to see if it contains the module
 	 **/
-	for(i=0; i<numpaths; i++) {
-	    /* skip empty paths */
-	    if(*pathlist[i] && (NULL != (result =
-		GetModuleName( interp, pathlist[i], NULL, modulename)))) {
+		for (i = 0; i < numpaths; i++) {
+			/* skip empty paths */
+			if (*pathlist[i] && (NULL != (result =
+				GetModuleName(interp, pathlist[i],
+				    NULL, modulename)))) {
 
-		if( strlen( pathlist[i]) + 2 + strlen( result) > MOD_BUFSIZE) {
-		    if ((char *) NULL == stringer( filename, MOD_BUFSIZE,
-		    pathlist[i], NULL))
-			goto unwind1;
-		} else {
-		    if ((char *) NULL == stringer( filename, MOD_BUFSIZE,
-		    pathlist[i],"/",result, NULL))
-			goto unwind1;
-		}
-		break;
-	    }
+				if (strlen(pathlist[i]) + 2 + strlen(result) >
+				    MOD_BUFSIZE) {
+					if ((char *)NULL ==
+					    stringer(filename, MOD_BUFSIZE,
+						     pathlist[i], NULL))
+						goto unwind1;
+				} else {
+					if ((char *)NULL ==
+					    stringer(filename, MOD_BUFSIZE,
+						     pathlist[i], "/", result,
+						     NULL))
+						goto unwind1;
+				}
+				break;
+			}
 	    /**
 	     **  If we havn't found it, we should try to re-expand the module
 	     **  name, because some rc file have been sourced
 	     **/
-	    if( VersionLookup( modulename, &mod, &vers)) {
-                if ((char *) NULL == stringer( buf, MOD_BUFSIZE,
-		mod,"/",vers, NULL))
-		    goto unwind1;
-		modulename = buf;
-	    }
-	} /** for **/
+			if (VersionLookup(modulename, &mod, &vers)) {
+				if ((char *)NULL ==
+				    stringer(strbuffer, MOD_BUFSIZE, mod, "/",
+					     vers, NULL))
+					goto unwind1;
+				modulename = strbuffer;
+			}
+		}
+	  /** for **/
 	/**
 	 **  Free the memory created from the call to SplitIntoList()
 	 **/
-	FreeList( pathlist, numpaths);
+		FreeList(&pathvec);
 	/**
 	 **  If result still NULL, then we really never found it and we should
 	 **  return ERROR and clear the full_path array for cleanliness.
 	 **/
-	if( !result) {
-	    filename[0] = '\0';
-	    goto unwind0;
+		if (!result) {
+			filename[0] = '\0';
+			goto unwind0;
+		}
 	}
-    } /** not a full path name **/	
+      /** not a full path name **/
     /**
      **  Free up what has been allocated and pass the result back to
      **  the caller and save the real module file name returned by
      **  GetModuleName
      **/
-    strncpy( realname, result, MOD_BUFSIZE);
-    if ((char *) NULL == stringer( realname, MOD_BUFSIZE, result, NULL))
-	goto unwind1;
-    null_free((void *) &result);
+	strncpy(realname, result, MOD_BUFSIZE);
+	if ((char *)NULL == stringer(realname, MOD_BUFSIZE, result, NULL))
+		goto unwind1;
+	null_free((void *)&result);
 
-    return( TCL_OK);
+	return (TCL_OK);
 
 unwind1:
-    null_free((void *) &result);
+	null_free((void *)&result);
 unwind0:
-    return( TCL_ERROR);
+	return (TCL_ERROR);
 }
 
 /*++++
@@ -340,7 +359,7 @@ static	char	*GetModuleName(	Tcl_Interp	*interp,
     struct stat	  stats;		/** Buffer for the stat() systemcall **/
     char	 *fullpath = NULL;	/** Buffer for creating path names   **/
     char	 *Result = NULL;	/** Our return value		     **/
-    char	**filelist = NULL;	/** Buffer for a list of possible    **/
+    uvec	 *filelist = NULL;	/** Buffer for a list of possible    **/
 					/** module files		     **/
     int		  numlist;		/** Size of this list		     **/
     int		  i, slen, is_def;
@@ -488,8 +507,7 @@ unwindt:
 	    if( is_def) {
 		if( !prefix)
 		    prefix = ".";
-		if( NULL == (filelist = SortedDirList( interp, path, prefix,
-		&numlist)))
+		if( NULL == (filelist = SortedDirList( path, prefix,&numlist)))
 		    goto unwind1;
 
 		prefix = (char *) NULL;
@@ -501,25 +519,26 @@ unwindt:
 		 **  If it's a directory, we delve into it.
 		 **/
 		for( i=0; i<numlist && Result==NULL; i++) {
+	char	 *filename;
 		    /**
 		     **  Build the full path name and check if it is a
 		     **  directory. If it is, recursively try to find there what
 		     **  we're seeking for
 		     **/
+			filename = uvec_vector(filelist)[i];
 		    if ((char *)NULL == stringer(fullpath, MOD_BUFSIZE,
-			path, "/", filelist[i], NULL))
+			path, "/", filename, NULL))
 			    goto unwind2;
 
 		    if( !stat( fullpath, &stats) && S_ISDIR( stats.st_mode)) {
-			Result = GetModuleName( interp, path, prefix,
-			    filelist[ i]);
+			Result = GetModuleName( interp, path, prefix, filename);
 		    } else {
 			/**
 			 **  Otherwise check the file for a magic cookie ...
 			 **/
 			if( check_magic( fullpath, MODULES_MAGIC_COOKIE, 
 			    MODULES_MAGIC_COOKIE_LENGTH)) 
-			    Result = filelist[ i];
+			    Result = filename;
 		    } /** if( !stat) **/
 		} /** for **/
 	    } else {  /** default **/
@@ -570,7 +589,7 @@ unwindt2:
      **/
     null_free((void*) &fullpath);
     null_free((void*) &s);
-    FreeList( filelist, numlist);
+    FreeList( &filelist);
     
     return( Result);			/** -------- EXIT (SUCCESS) -------> **/
 
@@ -596,14 +615,13 @@ unwind0:
  ** 									     **
  **   First Edition:	1991/10/23					     **
  ** 									     **
- **   Parameters:	Tcl_Interp	*interp		According Tcl Interp.**
- **			char		*path		Path to start seeking**
+ **   Parameters:	char		*path		Path to start seeking**
  **			char		*modulename	Name of the module   **
  **			int		*listcnt	Buffer to return the **
  **							size of the created  **
  **							list in elements     **
  ** 									     **
- **   Result:		char**		NULL	Any failure (alloc, param)   **
+ **   Result:		uvec*		NULL	Any failure (alloc, param)   **
  **					else	Base pointer to the newly    **
  **						created list.		     **
  **			*listcnt		Number of elements in the    **
@@ -615,7 +633,7 @@ unwind0:
  ** ************************************************************************ **
  ++++*/
 
-char	**SortedDirList(	Tcl_Interp	*interp,
+uvec	*SortedDirList(
 		     		char		*path,
 		     		char		*modulename,
 		     		int		*listcnt)
@@ -624,18 +642,19 @@ char	**SortedDirList(	Tcl_Interp	*interp,
     struct stat    	 stats;		/** Stat buffer			     **/
     DIR			*subdirp;	/** Subdirectoy handle		     **/
     char		*full_path;	/** Sugg. full path (path + module)  **/
-    char		**filelist;	/** Temp. base pointer of the list   **/
+    uvec		*filelist;	/** Temp. uvec list		     **/
     int			 i,		/** Number of entries in the subdir  **/
 			 j,		/** Counts the number of list-entries**/
 			 n,		/** Size of the allocated array	     **/
 			 pathlen;	/** String length of 'fullpath'	     **/
  
+
     /**
      **  Allocate memory for the list to be created. Suggest a list size of
-     **  100 Elements. This may be changed later on.
+     **  20 Elements. This may be changed later on.
      **/
-    if( NULL == (filelist = (char**) module_calloc( n = 100, sizeof(char*))))
-	if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
+    if( NULL == (filelist =  uvec_ctor(20)))
+	if( OK != ErrorLogger( ERR_UVEC, LOC, NULL))
 	    goto unwind0;
     /**
      **  Form the suggested module file name out of the passed path and 
@@ -644,7 +663,7 @@ char	**SortedDirList(	Tcl_Interp	*interp,
     if((char *) NULL == (full_path = stringer(NULL, 0,
 	path,"/",modulename, NULL)))
 	if( OK != ErrorLogger( ERR_STRING, LOC, NULL))
-	    goto unwind0;
+	    goto unwind1;
     pathlen = strlen(full_path);
     
     /**
@@ -658,10 +677,10 @@ char	**SortedDirList(	Tcl_Interp	*interp,
      **  seeked for. Put it on the top of the list and return.
      **/
     if( S_ISREG( stats.st_mode)) {
+	if (uvec_add(filelist, modulename))
+		if( OK != ErrorLogger( ERR_UVEC, LOC, NULL))
+		    goto unwind2;
 	*listcnt = 1;
-	filelist[0] = stringer(NULL,0, modulename, NULL);
-
-	null_free((void*) &full_path);
 	return( filelist);		/** --- EXIT PROCEDURE (SUCCESS) --> **/
     }
     /**
@@ -695,18 +714,9 @@ char	**SortedDirList(	Tcl_Interp	*interp,
 	/**
 	 **  Now scan all entries of the just opened directory
 	 **/
-	for( file = readdir( subdirp), i = 0, j = 0;
+	for( file = readdir( subdirp);
 	     file != NULL;
-	     file = readdir( subdirp), i++) {
-	    /**
-	     **  Oops! This one exceeds our array. Enlarge it.
-	     **/
-	    if( j == n)
-		if( NULL == (filelist =
-		    (char**) module_realloc((char*) filelist,
-			(n*=2)*sizeof(char*))))
-		    if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
-			goto unwindt;
+	     file = readdir( subdirp)) {
 	    /**
 	     **  Now, if we got a real entry which is not '.*' or '..' and
 	     **  finally is not a temporary file (which are defined to end
@@ -728,19 +738,19 @@ char	**SortedDirList(	Tcl_Interp	*interp,
 		    /**
 		     **  Yep! Found! Put it on the list
 		     **/
-                    if((char *) NULL == (filelist[j] = stringer(NULL,0,
-			modulename,"/",file->d_name, NULL)))
-			if( OK != ErrorLogger( ERR_STRING, LOC, NULL))
-			    goto unwindt;
-		    j++;
+	if (uvec_add(filelist, 
+	stringer(NULL,0, modulename,"/",file->d_name, NULL)))
+		if( OK != ErrorLogger( ERR_UVEC, LOC, NULL))
+		    goto unwindt;
                 } /** if( mag. cookie or directory) **/
 	    } /** if( not a dotfile) **/
 	} /** for **/
 	/**
 	 **  Put a terminator at the lists end and then sort the list
 	 **/
-        filelist[ j] = NULL;
-	qsort( (void*) filelist, (size_t) j, sizeof(char*), filename_compare);
+	if (uvec_qsort(filelist, filename_compare)) 
+		if( OK != ErrorLogger( ERR_UVEC, LOC, NULL))
+		    goto unwind2;
 	/**
 	 **  Free up temporary values ...
 	 **/
@@ -753,7 +763,7 @@ char	**SortedDirList(	Tcl_Interp	*interp,
 	/**
 	 **  Set up return values and pass the created list to the caller
 	 **/
-	*listcnt = j;
+	*listcnt = uvec_number(filelist);
 	return( filelist);		/** --- EXIT PROCEDURE (SUCCESS) --> **/
 	
 	if(0) {	
@@ -763,21 +773,18 @@ unwindt:
 	}
     }
     /**
-     **  If it is nor a regular file, neither a directory, we don't support
+     **  If it is not a regular file, neither a directory, we don't support
      **  it at all ...
      **/
-/** ??? What about links ??? **/
-
 unwind3:
     if( -1 == closedir( subdirp))
 	ErrorLogger( ERR_CLOSEDIR, LOC, full_path, NULL);
 unwind2:
     null_free((void*) &full_path);
 unwind1:
-    FreeList( filelist, n);
-
+    FreeList( &filelist);
 unwind0:
-
+    *listcnt = -1;
     return( NULL);			/** --- EXIT PROCEDURE (FAILURE) --> **/
 
 } /** End of 'SortedDirList' **/
@@ -792,11 +799,11 @@ unwind0:
  ** 									     **
  **   First Edition:	1991/10/23					     **
  ** 									     **
- **   Parameters:	Tcl_Interp	*interp		According Tcl Interp.**
- **			char		*pathenv	Path to split 	     **
+ **   Parameters:	char		*pathenv	Path to split 	     **
  **			int		*numpaths	Buffer to write the  **
  **							number of array ele- **
  **							ments to.	     **
+ **			char		*delim		Path delimiter	     **
  ** 									     **
  **   Result:		char**		NULL	Any failure (alloc, param.)  **
  **					else	Base pointer of the created  **
@@ -810,83 +817,63 @@ unwind0:
  ** ************************************************************************ **
  ++++*/
 
-char	**SplitIntoList(	Tcl_Interp	*interp,
-		     		char		*pathenv, 
-		     		int		*numpaths,
-				const char	*delim) 
-{
-    char	**pathlist = NULL;	/** Temporary base pointer for the   **/
-					/** array to be created		     **/
-    char	 *givenpath = NULL;	/** Temporary buffer used to tokenize**/
-					/** the passed input path	     **/
-    char	 *dirname = NULL;	/** Token pointer		     **/
-    int     	  i, 			/** Counts the number of elements    **/
-		  n;			/** Size of the array		     **/
-
+uvec *SplitIntoList(
+	const char *pathenv,
+	int *numpaths,
+	const char *delim
+) {
+	uvec		*pathlist = NULL;	/** Temporary uvec	     **/
+	char		*givenpath = NULL,	/** modifiable buffer	     **/
+			*dirname = NULL;	/** Token ptr		     **/
     /** 
-     **  Paramter check
+     **  Parameter check
      **/
-    if( !pathenv)
-	if( OK != ErrorLogger( ERR_PARAM, LOC, "pathenv", NULL))
-	    goto unwind0;
+	if (!pathenv)
+		if (OK != ErrorLogger(ERR_PARAM, LOC, "pathenv", NULL))
+			goto unwind0;
+    /** 
+     **  Need a copy of pathenv for tokenization
+     **/
+	if (!(givenpath = stringer(NULL,0,pathenv,NULL)))
+		if (OK != ErrorLogger(ERR_PARAM, LOC, "pathenv", NULL))
+			goto unwind0;
     /**
-     **  Allocate space to copy in the value of the path value to
-     **  split. Thus this procedure doesn't change its input parameters.
+     **  Split the path, first allocate a new vector
      **/
-    if( (char *) NULL == (givenpath = stringer(NULL,0, pathenv,NULL)))
-	if( OK != ErrorLogger( ERR_STRING, LOC, NULL))
-	    goto unwind0;
+	if (!(pathlist = uvec_ctor(uvec_count_tok(delim,pathenv)+1))) {
+		if( OK != ErrorLogger( ERR_UVEC, LOC, NULL))
+			goto unwind1;
+	}
     /**
-     **  Allocate the list which is an array of char*.  n is used to
-     **  manage the array's growth if there are more than 100 paths in
-     **  the list.
-     **  Copy the passed path into the new buffer.
+     **  Split the given path environment variable into its components
+     **	 May need to expand internal variables
      **/
-    if((char **) NULL ==
-	(pathlist = (char**) module_calloc(n = 100,sizeof( char*))))
-	if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
-	    goto unwind1;
+	for (dirname = xstrtok(givenpath, delim);
+	     dirname;
+	     dirname = xstrtok( NULL, delim)) {
+		if(uvec_add(pathlist,xdup(dirname))) {
+			if( OK != ErrorLogger( ERR_UVEC, LOC, NULL))
+				goto unwind2;
+		}
+	}
     /**
-     **  Split the given path environment variable into its components.
+     **  Free up the temporary string buffer
      **/
-    for( i=0, dirname = xstrtok( givenpath, delim);
-         dirname;
-	 dirname = xstrtok( NULL, delim)) {
-	/**
-	 **  Oops! The number of tokens exceed my array - reallocate it
-	 **  and double its size!
-	 **/
-	if( i == n )
-	    if((char **) NULL == (pathlist = (char**) module_realloc(
-		(char*) pathlist, (n *= 2)*sizeof(char*))))
-		if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
-		    goto unwind1;
-	/**
-	 **  Put the token into the array. Therefor a new area is allocated for
-	 **  the token using 'xdup' - which expands 1 level of env.vars.
-	 **/
-	if( NULL == (pathlist[ i++] = xdup( dirname)))
-	    if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL)) {
-		FreeList( pathlist, --i);
-		goto unwind1;
-	    }
-    } /** for **/
-    /**
-     **  Free up the temporary working array
-     **/
-    if( givenpath)
-	null_free((void*) &givenpath);
+	if (givenpath)
+		null_free((void *) &givenpath);
     /**
      **  Set up the return value (Number of elements allocated) and pass
-     **  the arrays base pointer to the caller
+     **  the uvec to the caller
      **/
-    *numpaths = i;
-    return( pathlist);
+	*numpaths = uvec_number(pathlist);
+	return (pathlist);
 
+unwind2:
+	uvec_dtor(&pathlist);
 unwind1:
-    null_free((void *) &givenpath);
+	null_free((void *) &givenpath);
 unwind0:
-    return( NULL);			/** -------- EXIT FAILURE -------> **/
+	return (NULL);			/** -------- EXIT FAILURE -------> **/
 } /** End of 'SplitIntoList' **/
 
 #ifndef FreeList
@@ -910,26 +897,10 @@ unwind0:
  ** ************************************************************************ **
  ++++*/
 
-void FreeList(	char	**list,
-		int	  numelem)
+void FreeList(	uvec	**list)
 {
-    register int j;
     
-    /**
-     **  Nothing to do ?
-     **/
-    if( !list)
-	return;
-    /**
-     **  Free all elements of the list
-     **/
-    for( j = 0; j < numelem; j++)
-	if( list[j] != NULL)
-	    null_free((void *) (list + j));
-    /**
-     **  Free the entire list
-     **/
-    null_free((void *) &list);
+	uvec_dtor(list);
 
 } /** End of 'FreeList' **/
 
@@ -1135,7 +1106,7 @@ int SourceVers( Tcl_Interp *interp, char *path, char *name)
 		new_argv[0] = "module-version";
 		new_argv[1] = buffer;
 		new_argv[2] = _(em_default);
-		Tcl_ArgvToObjv(interp, &objc, &objv, 3, new_argv);
+		Tcl_ArgvToObjv(&objc, &objv, 3, new_argv);
 		/**
 		 **  Define the default version
 		 **/

@@ -9,7 +9,7 @@
  ** 									     **
  **   Authors:	John Furlan, jlf@behere.com				     **
  **		Jens Hamisch, jens@Strawberry.COM			     **
- **		R.K. Owen, rk@owen.sj.ca.us				     **
+ **		R.K. Owen, <rk@owen.sj.ca.us> or <rkowen@nersc.gov>	     **
  ** 									     **
  **   Description:	The main routine of Tcl Modules including all of     **
  **			the global data.				     **
@@ -30,7 +30,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: main.c,v 1.27 2009/08/23 23:30:42 rkowen Exp $";
+static char Id[] = "@(#)$Id: main.c,v 1.27.2.1 2009/08/27 22:07:13 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -301,7 +301,7 @@ int	main( int argc, char *argv[], char *environ[]) {
      **/
 
     g_flags = 0;
-    Tcl_ArgvToObjv(interp, &objc, &objv, argc-1, argv+1);
+    Tcl_ArgvToObjv(&objc, &objv, argc-1, argv+1);
     return_val = cmdModule((ClientData) 0,interp,objc, objv);
 
     /**
