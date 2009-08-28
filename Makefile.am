@@ -1,7 +1,7 @@
 ###########################################################################
 ##
 ## File:        ./Makefile.am
-## Versions:    $Id: Makefile.am,v 1.31.4.1 2009/08/27 22:07:13 rkowen Exp $
+## Versions:    $Id: Makefile.am,v 1.31.4.2 2009/08/28 14:54:41 rkowen Exp $
 ## Created:     2002/06/14
 ##
 ###########################################################################
@@ -38,7 +38,7 @@ modulecmd_SOURCES =							\
 	cmdIsLoaded.c cmdInfo.c cmdMisc.c cmdModule.c cmdPath.c		\
 	cmdSetenv.c cmdUname.c cmdXResource.c cmdUlvl.c cmdLog.c	\
 	cmdChdir.c cmdVersion.c cmdVerbose.c cmdWhatis.c init.c		\
-	locate_module.c utility.c utilobj.c main.c error.c		\
+	locate_module.c utility.c utilobj.c utilmem.c main.c error.c	\
 	getopt.c version.c uvec.c
 
 localedir = $(datadir)/locale
