@@ -56,7 +56,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.31.2.3 2009/08/28 19:28:12 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.31.2.4 2009/08/28 20:14:35 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -509,7 +509,7 @@ uvec *ModulePathList(
 		return NULL;
 	}
 	modulevec = SplitIntoList(modulepath, &numpaths, _colon);
-	null_free(&modulepath);
+	null_free((void *) &modulepath);
 	return modulevec;
 }
 

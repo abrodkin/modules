@@ -20,6 +20,7 @@ modules 3.3.0
 	* Removed the old debugging code ... use a debugger instead
 	* Added a unix vector package to ease list handling
 	* Consolidated the MODULEPATH list code
+	* Included another modulefile to add $HOME to the *PATH hierarchy
 
 ****************************   Release 3.2 ******************************
 Modules 3.2.7
