@@ -15,7 +15,11 @@
  **			which are not necessarily specific to any single     **
  **			block of functionality.				     **
  ** 									     **
- **   Exports:		store_hash_value				     **
+ **   Exports:		SortedDirList					     **
+ **			SplitIntoList					     **
+ **			FreeList					     **
+ **			ModulePathList					     **
+ **			store_hash_value				     **
  **			clear_hash_value				     **
  **			Delete_Global_Hash_Tables			     **
  **			Delete_Hash_Tables				     **
@@ -52,7 +56,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.31.2.2 2009/08/28 14:54:41 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.31.2.3 2009/08/28 19:28:12 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -133,6 +137,381 @@ static  void     EscapeShString(const char* in,
 static  void     EscapePerlString(const char* in,
 				 char* out);
 
+
+
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
+ **   Function:		filename_compare				     **
+ ** 									     **
+ **   Description: 	This is a reverse compare function to reverse the    **
+ **			filename list. The function is used as compare func- **
+ **			tion for qsort.					     **
+ ** 									     **
+ **   First Edition:	1991/10/23					     **
+ ** 									     **
+ **   Parameters:	const void	*fi1	First filename to compare    **
+ **			const void	*fi2	Second filename to compare   **
+ ** 									     **
+ **   Result:		int	-1	filename 1 > filename 2		     **
+ **				0	filename 1 == filename 2	     **
+ **				1	filename 1 < filename 2		     **
+ ** 									     **
+ **   Attached Globals:							     **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
+
+static int filename_compare(
+	const void *fi1,
+	const void *fi2
+) {
+	return strcmp(*(char **)fi2, *(char **)fi1);
+}
+
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
+ **   Function:		SortedDirList					     **
+ ** 									     **
+ **   Description:	Checks the given path for the given modulefile.	     **
+ **			If the path + the module filename is the modulefile, **
+ **			then it is returned as the first element in the list.**
+ **			If the path + the module filename is a directory, the**
+ **			directory is read and sorted as the list.	     **
+ ** 									     **
+ **   First Edition:	1991/10/23					     **
+ ** 									     **
+ **   Parameters:	char		*path		Path to start seeking**
+ **			char		*modulename	Name of the module   **
+ **			int		*listcnt	Buffer to return the **
+ **							size of the created  **
+ **							list in elements     **
+ ** 									     **
+ **   Result:		uvec*		NULL	Any failure (alloc, param)   **
+ **					else	Base pointer to the newly    **
+ **						created list.		     **
+ **			*listcnt		Number of elements in the    **
+ **						list if one was created, un- **
+ **						changed otherwise	     **
+ ** 									     **
+ **   Attached Globals:	-						     **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
+
+uvec           *SortedDirList(
+	char *path,
+	char *modulename,
+	int *listcnt
+) {
+	struct dirent  *file;		/** Directory entry		     **/
+	struct stat     stats;		/** Stat buffer			     **/
+	DIR            *subdirp;	/** Subdirectoy handle		     **/
+	char           *full_path;	/** Sugg. full path (path + module)  **/
+	uvec           *filelist;	/** Temp. uvec list		     **/
+	int             i,		/** Number of entries in the subdir  **/
+	                j,		/** Counts the number of list-entries**/
+	                n,		/** Size of the allocated array	     **/
+	                pathlen;	/** String length of 'fullpath'	     **/
+
+    /**
+     **  Allocate memory for the list to be created. Suggest a list size of
+     **  20 Elements. This may be changed later on.
+     **/
+	if (NULL == (filelist = uvec_ctor(20)))
+		if (OK != ErrorLogger(ERR_UVEC, LOC, NULL))
+			goto unwind0;
+    /**
+     **  Form the suggested module file name out of the passed path and 
+     **  the name of the module. Alloc memory in order to do this.
+     **/
+	if ((char *)NULL == (full_path = stringer(NULL, 0,
+				  path, "/", modulename, NULL)))
+		if (OK != ErrorLogger(ERR_STRING, LOC, NULL))
+			goto unwind1;
+	pathlen = strlen(full_path);
+    /**
+     **  Check whether this file exists. If it doesn't free up everything
+     **  and return on failure
+     **/
+	if (stat(full_path, &stats))
+		goto unwind2;
+    /**
+     **  If the suggested module file is a regular one, we've found what we've
+     **  seeked for. Put it on the top of the list and return.
+     **/
+	if (S_ISREG(stats.st_mode)) {
+		if (uvec_add(filelist, modulename))
+			if (OK != ErrorLogger(ERR_UVEC, LOC, NULL))
+				goto unwind2;
+		*listcnt = 1;
+		return (filelist);	/** --- EXIT PROCEDURE (SUCCESS) --> **/
+	}
+    /**
+     **  What we've found is a directory
+     **/
+	if (S_ISDIR(stats.st_mode)) {
+		char           *tbuf;
+				/** Buffer for the whole filename for each   **/
+				/** content of the directory		     **/
+		char           *mpath;
+				/** Pointer into *tbuf where to write the dir**/
+				/** entry				     **/
+	/**
+	 **  Open the directory for reading
+	 **/
+		if (NULL == (subdirp = opendir(full_path))) {
+#if 0
+	/* if you can't open the directory ... is that really an error? */
+			if (OK !=
+			    ErrorLogger(ERR_OPENDIR, LOC, full_path, NULL))
+#endif
+				goto unwind2;
+		}
+	/**
+	 **  Allocate a buffer for constructing complete file names
+	 **  and initialize it with the directory part we do already know.
+	 **/
+		if (NULL ==
+		    (tbuf = stringer(NULL, MOD_BUFSIZE, full_path, "/", NULL)))
+			if (OK != ErrorLogger(ERR_STRING, LOC, NULL))
+				goto unwind3;
+
+		mpath = (tbuf + pathlen + 1);
+	/**
+	 **  Now scan all entries of the just opened directory
+	 **/
+		for (file = readdir(subdirp);
+		     file != NULL;
+		     file = readdir(subdirp)) {
+	    /**
+	     **  Now, if we got a real entry which is not '.*' or '..' and
+	     **  finally is not a temporary file (which are defined to end
+	     **  on '~' ...
+	     **/
+			if (file->d_name && *file->d_name != '.' &&
+			    strcmp(file->d_name, "..") &&
+			    file->d_name[NLENGTH(file) - 1] != '~') {
+		/**
+		 **  ... build the full pathname and check for the magic
+		 **  cookie or for another directory level in order to
+		 **  validate this as a modulefile entry we're seeking for.
+		 **/
+				strcpy(mpath, file->d_name);
+				if (check_magic(tbuf, MODULES_MAGIC_COOKIE,
+						MODULES_MAGIC_COOKIE_LENGTH) ||
+				    !stat(tbuf, &stats)) {
+		    /**
+		     **  Yep! Found! Put it on the list
+		     **/
+					if (uvec_add(filelist, stringer(NULL, 0,
+					 modulename, "/", file->d_name, NULL)))
+						if (OK !=
+						    ErrorLogger(ERR_UVEC, LOC,
+								NULL))
+							goto unwindt;
+				} /** if( mag. cookie or directory) **/
+			} /** if( not a dotfile) **/
+		} /** for **/
+	/**
+	 **  Put a terminator at the lists end and then sort the list
+	 **/
+		if (uvec_qsort(filelist, filename_compare))
+			if (OK != ErrorLogger(ERR_UVEC, LOC, NULL))
+				goto unwindt;
+	/**
+	 **  Free up temporary values ...
+	 **/
+		if (closedir(subdirp) < 0)
+			if (OK !=
+			    ErrorLogger(ERR_CLOSEDIR, LOC, full_path, NULL)) {
+				goto unwindt;
+			}
+		null_free((void *)&full_path);
+		null_free((void *)&tbuf);
+	/**
+	 **  Set up return values and pass the created list to the caller
+	 **/
+		*listcnt = uvec_number(filelist);
+		return (filelist);	/** --- EXIT PROCEDURE (SUCCESS) --> **/
+
+		if (0) {
+unwindt:
+			null_free((void *)&tbuf);
+			goto unwind3;
+		}
+	}
+    /**
+     **  If it is not a regular file, neither a directory, we don't support
+     **  it at all ...
+     **/
+unwind3:
+	if (closedir(subdirp) < 0)
+		ErrorLogger(ERR_CLOSEDIR, LOC, full_path, NULL);
+unwind2:
+	null_free((void *)&full_path);
+unwind1:
+	FreeList(&filelist);
+unwind0:
+	*listcnt = -1;
+	return (NULL);			/** --- EXIT PROCEDURE (FAILURE) --> **/
+
+} /** End of 'SortedDirList' **/
+
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
+ **   Function:		SplitIntoList					     **
+ ** 									     **
+ **   Description: 	Splits a path-type environment variable into an array**
+ **			of char* list.					     **
+ ** 									     **
+ **   First Edition:	1991/10/23					     **
+ ** 									     **
+ **   Parameters:	char		*pathenv	Path to split 	     **
+ **			int		*numpaths	Buffer to write the  **
+ **							number of array ele- **
+ **							ments to.	     **
+ **			char		*delim		Path delimiter	     **
+ ** 									     **
+ **   Result:		char**		NULL	Any failure (alloc, param.)  **
+ **					else	Base pointer of the created  **
+ **						array			     **
+ **			*numpaths		Number of elements if an ar- **
+ **						ray has been created, unchan-**
+ **						ged otherwise.		     **
+ ** 									     **
+ **   Attached Globals:	-						     **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
+
+uvec *SplitIntoList(
+	const char *pathenv,
+	int *numpaths,
+	const char *delim
+) {
+	uvec		*pathlist = NULL;	/** Temporary uvec	     **/
+	char		*givenpath = NULL,	/** modifiable buffer	     **/
+			*dirname = NULL;	/** Token ptr		     **/
+    /** 
+     **  Parameter check
+     **/
+	if (!pathenv)
+		if (OK != ErrorLogger(ERR_PARAM, LOC, "pathenv", NULL))
+			goto unwind0;
+    /** 
+     **  Need a copy of pathenv for tokenization
+     **/
+	if (!(givenpath = stringer(NULL,0,pathenv,NULL)))
+		if (OK != ErrorLogger(ERR_PARAM, LOC, "pathenv", NULL))
+			goto unwind0;
+    /**
+     **  Split the path, first allocate a new vector
+     **/
+	if (!(pathlist = uvec_ctor(uvec_count_tok(delim,pathenv)+1))) {
+		if( OK != ErrorLogger( ERR_UVEC, LOC, NULL))
+			goto unwind1;
+	}
+    /**
+     **  Split the given path environment variable into its components
+     **	 May need to expand internal variables
+     **/
+	for (dirname = xstrtok(givenpath, delim);
+	     dirname;
+	     dirname = xstrtok( NULL, delim)) {
+		if(uvec_add(pathlist,xdup(dirname))) {
+			if( OK != ErrorLogger( ERR_UVEC, LOC, NULL))
+				goto unwind2;
+		}
+	}
+    /**
+     **  Free up the temporary string buffer
+     **/
+	if (givenpath)
+		null_free((void *) &givenpath);
+    /**
+     **  Set up the return value (Number of elements allocated) and pass
+     **  the uvec to the caller
+     **/
+	*numpaths = uvec_number(pathlist);
+	return (pathlist);
+
+unwind2:
+	uvec_dtor(&pathlist);
+unwind1:
+	null_free((void *) &givenpath);
+unwind0:
+	return (NULL);			/** -------- EXIT FAILURE -------> **/
+} /** End of 'SplitIntoList' **/
+
+#ifndef FreeList
+
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
+ **   Function:		FreeList					     **
+ ** 									     **
+ **   Description:	Frees a char* array type list.			     **
+ ** 									     **
+ **   First Edition:	1991/10/23					     **
+ ** 									     **
+ **   Parameters:	char	**list		Pointer to the list	     **
+ **			int	  numelem	Number of elements in the    **
+ ** 						list			     **
+ **   Result:		-						     **
+ ** 									     **
+ **   Attached Globals:	-						     **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
+
+void FreeList(	uvec	**list)
+{
+	uvec_dtor(list);
+
+} /** End of 'FreeList' **/
+
+#endif
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
+ **   Function:		ModulePathList					     **
+ ** 									     **
+ **   Description: 	Splits a MODULEPATH environment variable into	     **
+ **			of vector list.					     **
+ **			Memory must be released manually with FreeList().    **
+ ** 									     **
+ **   First Edition:	2009/08/28					     **
+ ** 									     **
+ **   Parameters:	(none)						     **
+ ** 									     **
+ **   Result:		uvec*		NULL	If env.var. does not exist   **
+ **						or any failure		     **
+ **					else	Base pointer of the created  **
+ **						vector			     **
+ **   Attached Globals:	-						     **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
+uvec *ModulePathList(
+	void
+) {
+	char	*modulepath;			/** modulepath env.var.	     **/
+	uvec	*modulevec;			/** modulepath vector	     **/
+	int	numpaths;			/** number of paths	     **/
+    /**
+     **  Load the MODULEPATH and split it into a list of paths
+     **/
+	if (!(modulepath = xgetenv("MODULEPATH"))) {
+		ErrorLogger(ERR_MODULE_PATH, LOC, NULL);
+		return NULL;
+	}
+	modulevec = SplitIntoList(modulepath, &numpaths, _colon);
+	null_free(&modulepath);
+	return modulevec;
+}
 
 /*++++
  ** ** Function-Header ***************************************************** **
@@ -2134,8 +2513,8 @@ int check_magic( char	*filename,
  **   First Edition:	1991/10/23					     **
  ** 									     **
  **   Parameters:	const char   *path	Original path		     **
- **			      char   *newpath	Buffer for to copy the new   **
- **						path in			     **
+ **			      char   *newpath	Buffer for copy of the new   **
+ **						path			     **
  **			      int     len	Max length of the new path   **
  **									     **
  **   Result:		newpath		will be filled up with the new, de-  **

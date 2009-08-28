@@ -508,13 +508,8 @@ extern	char	 long_header[];
 
 /**  locate_module.c  **/
 extern	int	  Locate_ModuleFile( Tcl_Interp*, char*, char*, char*);
-extern	uvec	 *SortedDirList(char*, char*, int*);
-extern	uvec	 *SplitIntoList(const char*, int*, const char*);
 extern	int	  SourceVers( Tcl_Interp*, char*, char*);
 extern	int	  SourceRC( Tcl_Interp *interp, char *, char *);
-#ifdef USE_FREE
-extern	void	  FreeList( uvec**);
-#endif
 
 /**  main.c  **/
 extern  void	  module_usage(FILE *output);
@@ -665,7 +660,12 @@ extern	int	  TieStdout( void);
 extern	int	  UnTieStdout( int);
 
 /**  utility.c  **/
-extern	char	 *getLMFILES( Tcl_Interp *interp);
+extern	uvec	 *SortedDirList(char*, char*, int*);
+extern	uvec	 *SplitIntoList(const char*, int*, const char*);
+#ifdef USE_FREE
+extern	void	  FreeList( uvec**);
+#endif
+extern	uvec	 *ModulePathList(void);
 extern	int	  store_hash_value( Tcl_HashTable*, const char*, const char*);
 extern	int	  clear_hash_value( Tcl_HashTable*, const char*);
 extern	int	  store_old_shell_variable( Tcl_HashTable*, const char*,
@@ -682,6 +682,7 @@ extern	void	  set_marked_entry( Tcl_HashTable*, char*, intptr_t);
 extern	intptr_t  chk_marked_entry( Tcl_HashTable*, char*);
 extern	Tcl_HashTable*  environ_changes;
 extern	Tcl_HashTable*  alias_changes;
+extern	char	 *getLMFILES( Tcl_Interp *interp);
 extern	int	  IsLoaded( Tcl_Interp*, char*, char**, char*);
 extern	int	  IsLoaded_ExactMatch( Tcl_Interp*, char*, char	**, char*);
 extern	int	  Update_LoadedList( Tcl_Interp*, char*, char*);
@@ -697,12 +698,14 @@ extern	char	 *stringer(char *, int, ...);
 extern	size_t	  countTclHash(Tcl_HashTable *);
 extern	EM_RetVal	ReturnValue( Tcl_Interp*, int);
 extern	void	  OutputExit();
+
+/** utilmem.c **/
 extern	void	 *module_malloc(size_t);
 extern	void	 *module_realloc(void *, size_t);
 extern	void	 *module_calloc(size_t,size_t);
 extern	void	  null_free(void **);
 
-/**  utilobj.c  **/
+/** utilobj.c **/
 extern int	  Tcl_ArgvToObjv(int *, Tcl_Obj ***, int, char * const *);
 extern int	  Tcl_ObjvToArgv(int *, char ***, int, Tcl_Obj * CONST84 *);
 

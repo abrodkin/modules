@@ -28,7 +28,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdConflict.c,v 1.17.2.1 2009/08/27 22:07:13 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdConflict.c,v 1.17.2.2 2009/08/28 19:28:12 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -219,7 +219,6 @@ int cmdConflict(
 ) {
 	uvec           *pathlist,	/** List of module-pathes	     **/
 	               *modulelist;	/** List of modules		     **/
-	char           *modulepath;	/** Contents of MODULEPATH	     **/
 	int             i, j,		/** Loop counters		     **/
 	                numpaths, nummodules;
 					/** Size of the according arrays     **/
@@ -244,13 +243,11 @@ int cmdConflict(
      **  Load the MODULEPATH and split it into a list of paths. Assume success
      **  if no list to be built...
      **/
-	if ((char *)NULL == (modulepath = xgetenv("MODULEPATH")))
-		if (OK != ErrorLogger(ERR_MODULE_PATH, LOC, NULL))
-			goto unwind0;
-
-	pathlist = SplitIntoList(modulepath, &numpaths, _colon);
-	if (!uvec_number(pathlist))
-		goto success2;
+	if (!(pathlist = ModulePathList()))
+		goto unwind0;
+	numpaths = uvec_number(pathlist);
+	if (!numpaths)
+		goto success1;
     /**
      **  Non-persist mode?
      **/
@@ -265,7 +262,7 @@ int cmdConflict(
 		while (--objc)
 			fprintf(stderr, "%s ", Tcl_GetString(*objv++));
 		fprintf(stderr, "\n");
-		goto success2;
+		goto success1;
 	}
     /**
      **  Now check/display all passed modules ...
@@ -287,7 +284,7 @@ int cmdConflict(
 				if (OK != ErrorLogger(ERR_CONFLICT, LOC,
 				g_current_module, error_module, NULL)) {
 					FreeList(&modulelist);
-					goto unwind2;
+					goto unwind1;
 				}
 	    /**
 	     **  Free the list of modules used in the loops body above.
@@ -298,16 +295,12 @@ int cmdConflict(
     /**
      ** free resources
      **/
-success2:
-	FreeList(&pathlist);
 success1:
-	null_free((void *)&modulepath);
+	FreeList(&pathlist);
 success0:
 	return (TCL_OK);		/** -------- EXIT (SUCCESS) -------> **/
-unwind2:
-	FreeList(&pathlist);
 unwind1:
-	null_free((void *)&modulepath);
+	FreeList(&pathlist);
 unwind0:
 	return (TCL_ERROR);		/** -------- EXIT (FAILURE) -------> **/
 } /** End of 'cmdConflict' **/
@@ -346,8 +339,7 @@ int cmdPrereq(
 	int            *savedlens = (int *)NULL;
 	uvec           *pathlist,		/** module path list **/
 	               *modulelist;		/** sorted module list **/
-	char           *modulepath,		/** modulepath env.var **/
-	               *notloaded_flag;		/** missing module **/
+	char           *notloaded_flag;		/** missing module **/
 	int             i, j, k, numpaths, nummodules, listcnt = 0,
 	    Result = TCL_OK;
 	char            buffer[MOD_BUFSIZE];
@@ -384,26 +376,22 @@ int cmdPrereq(
      **  Load the MODULEPATH and split it into a list of paths. Assume success
      **  if no list to be built...
      **/
-	if (!(modulepath = xgetenv("MODULEPATH")))
-		if (OK != ErrorLogger(ERR_MODULE_PATH, LOC, NULL))
-			goto unwind0;
-
-	pathlist = SplitIntoList(modulepath, &numpaths, _colon);
-	if (!uvec_number(pathlist)) {
-		goto success2;
-	}
+	if (!(pathlist = ModulePathList()))
+		goto unwind0;
+	numpaths = uvec_number(pathlist);
+	if (!numpaths)
+		goto success1;
     /**
      **  Allocate memory for the lists of conflict modules
      **/
-	if ((uvec **)NULL == (savedlists = (uvec **)
-	module_malloc(numpaths * (objc - 1) * sizeof(uvec *))))
+	if (!(savedlists
+	= (uvec **) module_malloc(numpaths * (objc - 1) * sizeof(uvec *))))
+		if (OK != ErrorLogger(ERR_ALLOC, LOC, NULL))
+			goto unwind0;
+	if (!(savedlens
+	= (int *)module_malloc(numpaths * (objc - 1) * sizeof(int))))
 		if (OK != ErrorLogger(ERR_ALLOC, LOC, NULL))
 			goto unwind1;
-	if ((int *)NULL ==
-	    (savedlens = (int *)module_malloc(numpaths * (objc - 1)
-					      * sizeof(int))))
-		if (OK != ErrorLogger(ERR_ALLOC, LOC, NULL))
-			goto unwind2;
     /**
      **  Check/Display all passed modules
      **/
@@ -452,13 +440,12 @@ int cmdPrereq(
 
 			*buffer = '\0';
 			for (i = 0; listptr && i < savedlens[k];i++) {
-				if ((char *)NULL ==
-				    stringer(buffer + strlen(buffer),
+				if (!stringer(buffer + strlen(buffer),
 					MOD_BUFSIZE - strlen(buffer),
 					uvec_vector(listptr)[i], " ", NULL)) {
 					if (OK != ErrorLogger(ERR_STRING, LOC,
 							      NULL)) {
-						FreeList(savedlists + k);
+						/* not completely clean */
 						goto unwind2;
 					}
 				}
@@ -485,19 +472,15 @@ int cmdPrereq(
 	null_free((void *)&savedlens);
 	null_free((void *)&savedlists);
 
-success2:
-	FreeList(&pathlist);
 success1:
-	null_free((void *)&modulepath);
+	FreeList(&pathlist);
 success0:
 	return (Result);		/** -------- EXIT (Result)  -------> **/
 
-unwind3:
-	null_free((void *)&savedlens);
 unwind2:
-	null_free((void *)&savedlists);
+	null_free((void *)&savedlens);
 unwind1:
-	null_free((void *)&modulepath);
+	null_free((void *)&savedlists);
 unwind0:
 	return (TCL_ERROR);		/** -------- EXIT (FAILURE) -------> **/
 } /** End of 'cmdPrereq' **/
