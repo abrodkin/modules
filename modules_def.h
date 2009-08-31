@@ -1,7 +1,7 @@
 /*****
  ** ** Module Header ******************************************************* **
  ** 									     **
- **   Modules Revision 3.2						     **
+ **   Modules Revision 3.3						     **
  **   Providing a flexible user environment				     **
  ** 									     **
  **   File:		modules_def.h					     **
@@ -9,7 +9,7 @@
  ** 									     **
  **   Authors:	John Furlan, jlf@behere.com				     **
  **		Jens Hamisch, jens@Strawberry.COM			     **
- **		R.K. Owen, rk@owen.sj.ca.us				     **
+ **		R.K. Owen, <rk@owen.sj.ca.us> or <rkowen@nersc.gov>	     **
  ** 									     **
  **   Description:							     **
  ** 									     **
@@ -155,10 +155,23 @@ extern	int	  errno;
 /** ************************************************************************ **/
 
 /**
- **  Module list type - list of strings, uses Tcl_List*() underneath
+ **  Module hash type - uses Tcl_*Hash*() underneath
  **/
+typedef enum {
+	MHashNULL = 0,				/** invalid value	**/
+	MHashStrings,				/** string storage	**/
+	MHashRefCounts,				/** strings &		**/
+						/**   reference counts	**/
+	MHashFiles				/** files & dirs	**/
+} MHashType;
 
-typedef Tcl_Obj *	MList;
+typedef struct _mhash {
+	MHashType	mhashtype;		/** what type is this	**/
+	uvec		*keys;			/** vector of keys	**/
+	Tcl_HashTable	*hash;			/** hash container	**/
+	int		(*add)(void **,va_list);/** fn copy/create data	**/
+	int		(*del)(void **,va_list);/** fn delete data	**/
+} MHash;
 
 /**
  **  Structure to store information about a file.  Includes its name
@@ -213,6 +226,7 @@ typedef	enum	{
 	ERR_RENAME,			/** Cannot rename file		     **/
 	ERR_ALLOC = 70,			/** Out of memory		     **/
 	ERR_UVEC,			/** general UVEC error		     **/
+	ERR_MHASH,			/** general MHash error		     **/
 	ERR_SOURCE,			/** Error while sourcing ...	     **/
 	ERR_UNAME,			/** Uname failed		     **/
 	ERR_GETHOSTNAME,		/** gethostname failed		     **/
@@ -253,7 +267,7 @@ typedef	enum	{
 	ERR_INVAL,			/** Invalid parameter to the error   **/
 	ERR_INVWGHT,			/** logger			     **/
 	ERR_INVFAC,			/** Invalid error facility	     **/
-        ERR_ENVVAR,                     /** env. variables are inconsistent  **/
+        ERR_ENVVAR			/** env. variables are inconsistent  **/
 } ErrType;
 
 /**
@@ -706,8 +720,16 @@ extern	void	 *module_calloc(size_t,size_t);
 extern	void	  null_free(void **);
 
 /** utilobj.c **/
-extern int	  Tcl_ArgvToObjv(int *, Tcl_Obj ***, int, char * const *);
-extern int	  Tcl_ObjvToArgv(int *, char ***, int, Tcl_Obj * CONST84 *);
+extern	int	  Tcl_ArgvToObjv(int *, Tcl_Obj ***, int, char * const *);
+extern	int	  Tcl_ObjvToArgv(int *, char ***, int, Tcl_Obj * CONST84 *);
+extern	MHash	 *mhash_ctor(MHashType);
+extern	int	  mhash_dtor(MHash **);
+extern	int	  mhash_del_(MHash *, const char *key, ...);
+extern	int	  mhash_del(MHash *, const char *key, ...);
+extern	int	  mhash_add(MHash *, const char *key, ...);
+extern	uvec	 *mhash_keys_uvec(MHash *);
+extern	char	**mhash_keys(MHash *);
+extern	void	 *mhash_value(MHash *, const char *key);
 
 /** error.c **/
 extern	char	**GetFacilityPtr( char *);

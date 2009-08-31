@@ -56,7 +56,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.31.2.4 2009/08/28 20:14:35 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.31.2.5 2009/08/31 15:51:27 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -3015,88 +3015,6 @@ int tmpfile_mod(char** filename, FILE** file) {
   return 1;
 }
 
-
-/*++++
- ** ** Function-Header ***************************************************** **
- ** 									     **
- **   Function:		stringer					     **
- ** 									     **
- **   Description:	Safely copies and concats series of strings	     **
- **			until it hits a NULL argument.			     **
- **			Either a buffer & length are given or if the buffer  **
- **			pointer is NULL then it will allocate memory to the  **
- **			given length. If the length is 0 then get the length **
- **			from the series of strings.			     **
- **			The resultant buffer is returned unless there	     **
- **			is an error then NULL is returned.		     **
- **			(Therefore, one of the main uses of stringer is to   **
- **			 allocate string memory.)			     **
- ** 									     **
- ** 									     **
- **   First Edition:	2001/08/08	R.K.Owen <rk@owen.sj.ca.us>	     **
- ** 									     **
- **   Parameters:	char		*buffer	string buffer (if not NULL)  **
- **			int		 len	maximum length of buffer     **
- **			const char	*str1	1st string to copy to buffer **
- **			const char	*str2	2nd string to cat  to buffer **
- ** 			...						     **
- **			const char	*strN	Nth string to cat  to buffer **
- **			const char	*NULL	end of arguments	     **
- ** 									     **
- **   Result:		char		*buffer	if successful completion    **
- ** 					else NULL			     **
- ** 									     **
- **   Attached Globals:	-						     **
- ** 									     **
- ** ************************************************************************ **
- ++++*/
-
-char *stringer(	char *		buffer,
-		int		len,
-		... )
-{
-	va_list	 argptr;	/** stdarg argument ptr			**/
-	char	*ptr;		/** argument string ptr			**/
-	char	*tbuf = buffer;	/** tempory buffer  ptr			**/
-	int	 sumlen = 0;	/** length of all the concat strings	**/
-	char	*(*strfn)(char*,const char*) = strcpy;
-				/** ptr to 1st string function		**/
-
-	/* get start of optional arguments and sum string lengths */
-	va_start(argptr, len);
-	while ((ptr = va_arg(argptr, char *))) {
-		sumlen += strlen(ptr);
-	}
-	va_end(argptr);
-
-	/* can we even proceed? */
-	if (tbuf && (sumlen >= len || len < 0)) {
-		return (char *) NULL;
-	}
-
-	/* do we need to allocate memory? */
-	if (tbuf == (char *) NULL) {
-		if (len == 0) {
-			len = sumlen + 1;
-		}
-		if ((char *) NULL == (tbuf = (char*) module_malloc(len))) {
-			if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
-				return (char *) NULL;
-		}
-	}
-
-	/* concat all the strings to buffer */
-	va_start(argptr, len);
-	while ((ptr = va_arg(argptr, char *))) {
-		strfn(tbuf, ptr);
-		strfn = strcat;
-	}
-	va_end(argptr);
-
-	/* got here successfully - return buffer */
-	return tbuf;
-
-} /** End of 'stringer' **/
 
 /*++++
  ** ** Function-Header ***************************************************** **

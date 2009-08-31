@@ -31,7 +31,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: error.c,v 1.18.2.1 2009/08/27 22:07:13 rkowen Exp $";
+static char Id[] = "@(#)$Id: error.c,v 1.18.2.2 2009/08/31 15:51:27 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -293,6 +293,7 @@ static	ErrTransTab	TransTab[] = {
     { ERR_RENAME,	WGHT_PROB,  N_("Cannot rename '$1' to '$2'") },
     { ERR_ALLOC,	WGHT_FATAL, N_("Out of memory.") },
     { ERR_UVEC,		WGHT_FATAL, N_("General uvec error.") },
+    { ERR_MHASH,	WGHT_FATAL, N_("General MHash error.") },
     { ERR_SOURCE,	WGHT_WARN,  N_("Error sourcing file '$1'") },
     { ERR_UNAME,	WGHT_FATAL, N_("'uname (2)' failed.") },
     { ERR_GETHOSTNAME,	WGHT_FATAL, N_("'gethostname (2)' failed.") },
