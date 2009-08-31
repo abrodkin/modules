@@ -166,7 +166,7 @@ typedef enum {
 } MHashType;
 
 typedef struct _mhash {
-	MHashType	mhashtype;		/** what type is this	**/
+	MHashType	type;			/** what type is this	**/
 	uvec		*keys;			/** vector of keys	**/
 	Tcl_HashTable	*hash;			/** hash container	**/
 	int		(*add)(void **,va_list);/** fn copy/create data	**/
@@ -724,6 +724,7 @@ extern	int	  Tcl_ArgvToObjv(int *, Tcl_Obj ***, int, char * const *);
 extern	int	  Tcl_ObjvToArgv(int *, char ***, int, Tcl_Obj * CONST84 *);
 extern	MHash	 *mhash_ctor(MHashType);
 extern	int	  mhash_dtor(MHash **);
+extern	MHash	 *mhash_copy(MHash *);
 extern	int	  mhash_del_(MHash *, const char *key, ...);
 extern	int	  mhash_del(MHash *, const char *key, ...);
 extern	int	  mhash_add(MHash *, const char *key, ...);

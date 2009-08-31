@@ -29,7 +29,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utilobj.c,v 1.3.2.2 2009/08/31 15:51:27 rkowen Exp $";
+static char Id[] = "@(#)$Id: utilobj.c,v 1.3.2.3 2009/08/31 18:26:27 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -205,6 +205,7 @@ int Tcl_ObjvToArgv(
  **   Exports:								     **
  **	mhash_ctor		constructs MHash object			     **
  **	mhash_dtor		destructs  Mhash object			     **
+ **	mhash_copy		constructs a copy of a Mhash object	     **
  **	mhash_add		add    a key/value pair			     **
  **	mhash_del		delete a key/value pair			     **
  **	mhash_number		number of key/value pairs		     **
@@ -250,7 +251,7 @@ MHash *mhash_ctor(MHashType type) {
 			return (MHash *) NULL; 	/** ---- EXIT (FAILURE) ---> **/
 
 	/* set some struct elements */
-	mhp->mhashtype = type;
+	mhp->type = type;
 	if (!(mhp->hash =(Tcl_HashTable *)module_malloc(sizeof(Tcl_HashTable))))
 		if (OK != ErrorLogger(ERR_ALLOC, LOC, NULL))
 			return (MHash *) NULL; 	/** ---- EXIT (FAILURE) ---> **/
@@ -304,6 +305,33 @@ int mhash_dtor(MHash **mhp) {
 	null_free((void *) mhp);
 
 	return TCL_OK;
+}
+
+/* -------------------------------------------------------------------------- */
+/* mhash_copy: MHash copy constructor function
+ */
+MHash *mhash_copy(MHash *mh) {
+	MHash *mhc = (MHash *) NULL;
+	char **keys = mhash_keys(mh);
+	int retval = 0;
+
+	/* construct a new MHash object */
+	if (!(mhc = mhash_ctor(mh->type)))
+		goto unwind0;
+
+	while (keys && *keys) {
+		if (TCL_OK != mhash_add(mhc, *keys, mhash_value(mh, *keys)))
+			goto unwind1;
+		keys++;
+	}
+
+	return mhc;
+
+unwind1:
+	mhash_dtor(&mhc);
+unwind0:
+	return (MHash *) NULL;
+
 }
 
 /* -------------------------------------------------------------------------- */
