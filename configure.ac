@@ -1,6 +1,6 @@
 dnl
 dnl File:        configure.in
-dnl Revision:    $Id: configure.ac,v 1.33.2.1 2009/08/28 20:14:35 rkowen Exp $
+dnl Revision:    $Id: configure.ac,v 1.33.2.2 2009/09/01 19:12:17 rkowen Exp $
 dnl Created:     1994/06/18
 dnl Author:      Leif Hedstrom<hedstrom@inf.ethz.ch>
 dnl		 Martin S. Utesch <wstd@hl.siemens.de>
@@ -199,6 +199,7 @@ dnl ---------------------------------------------------------------------------
 AC_C_CONST
 AC_TYPE_UID_T
 AC_TYPE_SIZE_T
+AC_TYPE_INTPTR_T
 AC_STRUCT_TM
 dnl ---------------------------------------------------------------------------
 dnl Checks for library functions.

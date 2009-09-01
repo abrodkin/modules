@@ -31,7 +31,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdPath.c,v 1.18.2.1 2009/08/27 22:07:13 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdPath.c,v 1.18.2.2 2009/09/01 19:12:17 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -586,7 +586,7 @@ static int	Remove_Path(	Tcl_Interp	*interp,
     if( NULL == (tmppath = (char *) Tcl_GetVar2( interp, "env", variable,
 	TCL_GLOBAL_ONLY))) {
 	_TCLCHK(interp);
-	return( TCL_OK);		/** -------- EXIT (SUCCESS) -------> **/
+	goto success0;			/** -------- EXIT (SUCCESS) -------> **/
     }    
 
     /**
@@ -705,8 +705,8 @@ static int	Remove_Path(	Tcl_Interp	*interp,
 		     **  Secondly, I actually mark the the environment variable
 		     **  to be unset when output.
 		     **/
-		    clear_hash_value( setenvHashTable, variable);
-		    moduleUnsetenv( interp, variable);
+		    mhash_del(setenvHashTable, variable);
+		    moduleUnsetenv(interp, variable);
 
 		    /**
 		     **  moduleUnsetenv doesn't unset the variable in the Tcl
@@ -791,8 +791,8 @@ static int	Remove_Path(	Tcl_Interp	*interp,
 	 **  Cache the set.  Clear the variable from the unset table just
 	 **  in case it was previously unset.
 	 **/
-	store_hash_value( setenvHashTable, variable, oldpath);
-	clear_hash_value( unsetenvHashTable, variable);
+	mhash_add(setenvHashTable, variable, oldpath);
+	mhash_del(unsetenvHashTable, variable);
 
 	/**
 	 **  Store the new PATH value into the environment.

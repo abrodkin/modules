@@ -32,7 +32,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdModule.c,v 1.21.2.1 2009/08/27 22:07:13 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdModule.c,v 1.21.2.2 2009/09/01 19:12:16 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -123,7 +123,6 @@ int cmdModule(
 	int             num_modulefiles = objc - 2;
 	char          **modulefile_list;
 	int             argc;
-	char          **argv;
 
 #if 0
 	int             x = 0;

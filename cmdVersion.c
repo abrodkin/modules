@@ -48,7 +48,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdVersion.c,v 1.17.2.1 2009/08/27 22:07:13 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdVersion.c,v 1.17.2.2 2009/09/01 19:12:17 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -639,7 +639,7 @@ int cmdModuleAlias(
 			return (TCL_ERROR); /** ------ EXIT (FAILURE) -----> **/
 		}
 
-		if (trg_alias && !strcmp(ptr->ptr->name, Tcl_GetString(objv[2]))
+		if((trg_alias && !strcmp(ptr->ptr->name,Tcl_GetString(objv[2])))
 		    || (!trg_alias && !strcmp(ptr->ptr->name, version)
 			&& !strcmp(ptr->ptr->module->module, module)))
 			return (TCL_OK);/** -------- EXIT (SUCCESS) -------> **/

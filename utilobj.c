@@ -29,7 +29,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utilobj.c,v 1.3.2.4 2009/09/01 18:18:20 rkowen Exp $";
+static char Id[] = "@(#)$Id: utilobj.c,v 1.3.2.5 2009/09/01 19:12:17 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -333,7 +333,6 @@ int mhash_dtor(MHash **mhp) {
 MHash *mhash_copy(MHash *mh) {
 	MHash *mhc = (MHash *) NULL;
 	char **keys = mhash_keys(mh);
-	int retval = 0;
 
 	/* construct a new MHash object */
 	if (!(mhc = mhash_ctor(mh->type)))
@@ -351,7 +350,6 @@ unwind1:
 	mhash_dtor(&mhc);
 unwind0:
 	return (MHash *) NULL;
-
 }
 
 /* -------------------------------------------------------------------------- */

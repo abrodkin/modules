@@ -35,7 +35,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Avail.c,v 1.18.2.1 2009/08/28 19:28:12 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Avail.c,v 1.18.2.2 2009/09/01 19:12:15 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -187,7 +187,7 @@ int ModuleCmd_Avail(
 	 **  print the contents of each directory specified (if it exists ;-)
 	 **/
 		if (sw_format & SW_LONG)
-			fprintf(stderr, _(long_header));
+			fprintf(stderr,"%s", _(long_header));
 
 	/**
 	 **  If a module category is specified check whether it is part
@@ -231,7 +231,6 @@ int ModuleCmd_Avail(
 	if (Result < 0)
 		Result = TCL_OK;
 
-unwind1:
 	FreeList(&modpath);
 
 unwind0:
@@ -299,126 +298,111 @@ int check_dir(	char	*dirname)
  ** ************************************************************************ **
  ++++*/
 
-static	int	print_dir(	Tcl_Interp	*interp,
-				char		*dir,
-				char		*module)
-{
-    fi_ent	 *dirlst_head = NULL;	/** Directory list base pointer	     **/
-    int		  count = 0;		/** Number of elements in the top    **/
+static int print_dir(
+	Tcl_Interp * interp,
+	char *dir,
+	char *module
+) {
+	fi_ent         *dirlst_head = NULL;
+					/** Directory list base pointer	     **/
+	int             count = 0,	/** Number of elements in the top    **/
 					/** level directory list	     **/
-    int		  tcount = 0;		/** Total number of files to print   **/
-    int	 	  start = 0;
-    int		  dirlen;
-    char	**cache_list = NULL;
-    char	 *selection, *s;
+			tcount = 0,	/** Total number of files to print   **/
+			start = 0,
+			dirlen;
+	char          **cache_list = NULL;
+	char           *selection, *s;
 
     /**
      **  Print the directory name
      **/
-    if( (sw_format & (SW_PARSE | SW_TERSE | SW_LONG))
-    && !(sw_format & (SW_HUMAN | SW_LIST)) ) {
-	/* char *base = strrchr( dir, '/');
-	fprintf( stderr, "%s:\n", base ? ++base : dir);
-	*/
-	fprintf( stderr, "%s:\n", dir);
-    }
+	if ((sw_format & (SW_PARSE | SW_TERSE | SW_LONG))
+	    && !(sw_format & (SW_HUMAN | SW_LIST))) {
+		fprintf(stderr, "%s:\n", dir);
+	}
 
-    if( dir)
-	dirlen = strlen( dir) + 1;
-    else
-	dirlen = 0;
+	if (dir)
+		dirlen = strlen(dir) + 1;
+	else
+		dirlen = 0;
 
     /**
      **  If the is a module selection given, build the whole selected path
      **/
 
-    if( module) {
-
-	if( dir) {
-	    if((char *) NULL == (selection = stringer(NULL, 0,
-		dir,"/",module, NULL))) {
-		ErrorLogger( ERR_STRING, LOC, NULL);
-		return( TCL_ERROR);     /** --- EXIT (FAILURE) --------> **/
-	    }
-
+	if (module) {
+		if (dir) {
+			if ((char *)NULL == (selection = stringer(NULL, 0,
+					  dir, "/", module, NULL))) {
+				ErrorLogger(ERR_STRING, LOC, NULL);
+				goto unwind0;	/** ---- EXIT (FAILURE) ---> **/
+			}
+		} else
+			selection = module;
 	} else
-	    selection = module;
+		selection = (char *)NULL;
 
-    } else
-	selection = (char *) NULL;
-
-    if( !cache_list) {
-
+	if (!cache_list) {
 	/**
 	 **  Normal reading of the files
 	 **/
+		if (NULL == (dirlst_head = get_dir(dir, NULL, &count, &tcount)))
+			if (OK != ErrorLogger(ERR_READDIR, LOC, dir, NULL))
+				goto unwind1;
+		if (NULL == (cache_list =
+		     (char **)module_malloc(tcount * sizeof(char **))))
+			if (OK != ErrorLogger(ERR_ALLOC, LOC, NULL))
+				goto unwind1;
+		(void)memset(cache_list, 0, tcount * sizeof(char **));
 
-	if( NULL == (dirlst_head = get_dir( dir, NULL, &count, &tcount)))
-	    if( OK != ErrorLogger( ERR_READDIR, LOC, dir, NULL))
-		goto unwind1;
-
-	if( NULL ==
-		(cache_list = (char**) module_malloc(tcount * sizeof(char**))))
-	    if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
-		goto unwind1;
-	(void) memset(cache_list, 0, tcount * sizeof( char **));
-
-	start=0;
-	dirlst_to_list( cache_list, dirlst_head, count, &start, dir, selection);
-
-    }
-
+		start = 0;
+		dirlst_to_list(cache_list, dirlst_head, count, &start, dir,
+			       selection);
+	}
     /**
      **  In case of any selection, we have to force all .modulrc's and .versions
      **  on the path
      **/
+	if (dir) {
+		s = dir;
+		while (s) {
+			if ((s = strchr(s, '/')))
+				*s = '\0';
+			else
+				break;
 
-    if( dir) {
+			SourceRC(interp, dir, modulerc_file);
+			SourceVers(interp, dir, module);
 
-	s = dir;
-	while( s) {
-	    if( (s = strchr( s, '/')) )
-	    	*s = '\0';
-	    else
-		break;
-
-	    SourceRC( interp, dir, modulerc_file);
-	    SourceVers( interp, dir, module);
-
-	    if( s)
-		*s++ = '/';
-	}
-
+			if (s)
+				*s++ = '/';
+		}
 	/**
 	 **  Finally source the rc files in the directory itself
 	 **/
+		SourceRC(interp, dir, modulerc_file);
+		SourceVers(interp, dir, module);
+	}
 
-	SourceRC( interp, dir, modulerc_file);
-	SourceVers( interp, dir, module);
-    }
-
-    if( dir && selection)
-	null_free((void *) &selection);
-
+	if (dir && selection)
+		null_free((void *)&selection);
     /**
      **  Print and remove the cache list
      **/
+	delete_dirlst(dirlst_head, count);
+	print_aligned_files(interp, dir, dir, cache_list, tcount,
+			    (sw_format & SW_LIST ? 1 : -1));
+	delete_cache_list(cache_list, start);
 
-    delete_dirlst( dirlst_head, count);
-    print_aligned_files( interp, dir, dir, cache_list, tcount,
-	(sw_format & SW_LIST ? 1 : -1));
-    delete_cache_list( cache_list, start);
-
-    if( sw_format & SW_LONG)
-	fprintf( stderr, "\n");
-    return( TCL_OK);     		/** ------- EXIT (SUCCESS) --------> **/
+	if (sw_format & SW_LONG)
+		fprintf(stderr, "\n");
+	return (TCL_OK);		/** ------- EXIT (SUCCESS) --------> **/
 
 unwind1:
-    if( dir && selection)
-	null_free((void *) &selection);
-
+	if (dir && selection)
+		null_free((void *)&selection);
 unwind0:
-    return( TCL_ERROR);     		/** ------- EXIT (FAILURE) --------> **/
+	return (TCL_ERROR);		/** ------- EXIT (FAILURE) --------> **/
 
 } /** End of 'print_dir' **/
 

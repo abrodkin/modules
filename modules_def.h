@@ -495,8 +495,8 @@ extern	MHash	*setenvHashTable;
 extern	MHash	*unsetenvHashTable;
 extern	MHash	*aliasSetHashTable;
 extern	MHash	*aliasUnsetHashTable;
-extern	Tcl_HashTable	*markVariableHashTable;
-extern	Tcl_HashTable	*markAliasHashTable;
+extern	MHash	*markVariableHashTable;
+extern	MHash	*markAliasHashTable;
 extern	MHash	*GlobalHashTables[5];
 
 extern	char    _fil_stdin[];
@@ -692,13 +692,11 @@ extern	uvec	 *ModulePathList(void);
 extern	int	  store_old_shell_variable( Tcl_HashTable*, const char*,
 			const char*);
 extern	int	  clear_old_shell_variable( Tcl_HashTable*, const char*);
-extern	MHash	**Global_Hash_Table(GHashAction, MHash **);
+extern	MHash	**Global_Hash_Tables(GHashAction, MHash **);
 extern	int	  Unwind_Modulefile_Changes( Tcl_Interp*, MHash **);
 extern	int	  Output_Modulefile_Changes( Tcl_Interp*);
 extern	int	  store_env( void);
 extern	int	  free_stored_env( void);
-extern	void	  set_marked_entry( Tcl_HashTable*, char*, intptr_t);
-extern	intptr_t  chk_marked_entry( Tcl_HashTable*, char*);
 extern	Tcl_HashTable*  environ_changes;
 extern	Tcl_HashTable*  alias_changes;
 extern	char	 *getLMFILES( Tcl_Interp *interp);

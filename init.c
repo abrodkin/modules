@@ -37,7 +37,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: init.c,v 1.19.2.1 2009/08/27 22:07:13 rkowen Exp $";
+static char Id[] = "@(#)$Id: init.c,v 1.19.2.2 2009/09/01 19:12:17 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -289,32 +289,25 @@ int Initialize_Module(	Tcl_Interp	**interp,
     /**
      **  Now set up the hash-tables for shell environment modifications.
      **  For a description of these tables have a look at main.c, where
-     **  they're defined.  The tables have to be allocated and thereafter
-     **  initialized. Exit from the whole program in case allocation fails.
+     **  they're defined.
+     **  Exit from the whole program in case allocation fails.
      **/
-    if( ( ! ( setenvHashTable = 
-	    (Tcl_HashTable*) module_malloc( sizeof(Tcl_HashTable))) ) ||
-        ( ! ( unsetenvHashTable = 
-	    (Tcl_HashTable*) module_malloc( sizeof(Tcl_HashTable))) ) ||
-        ( ! ( aliasSetHashTable = 
-	    (Tcl_HashTable*) module_malloc( sizeof(Tcl_HashTable))) ) ||
-        ( ! ( aliasUnsetHashTable = 
-	    (Tcl_HashTable*) module_malloc( sizeof(Tcl_HashTable))) ) ||
-        ( ! ( markVariableHashTable = 
-	    (Tcl_HashTable*) module_malloc( sizeof(Tcl_HashTable))) ) ||
-        ( ! ( markAliasHashTable = 
-	    (Tcl_HashTable*) module_malloc( sizeof(Tcl_HashTable))) ) ) {
+    if( ( !(setenvHashTable		= mhash_ctor(MHashStrings)))
+    ||  ( !(unsetenvHashTable		= mhash_ctor(MHashStrings)))
+    ||  ( !(aliasSetHashTable		= mhash_ctor(MHashStrings)))
+    ||  ( !(aliasUnsetHashTable		= mhash_ctor(MHashStrings)))
+    ||  ( !(markVariableHashTable	= mhash_ctor(MHashInt)))
+    ||  ( !(markAliasHashTable		= mhash_ctor(MHashInt))) ) {
 
 	if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
 	    goto unwind0;
     }
 
-    Tcl_InitHashTable( setenvHashTable, TCL_STRING_KEYS);
-    Tcl_InitHashTable( unsetenvHashTable, TCL_STRING_KEYS);
-    Tcl_InitHashTable( aliasSetHashTable, TCL_STRING_KEYS);
-    Tcl_InitHashTable( aliasUnsetHashTable, TCL_STRING_KEYS);
-    Tcl_InitHashTable( markVariableHashTable, TCL_STRING_KEYS);
-    Tcl_InitHashTable( markAliasHashTable, TCL_STRING_KEYS);
+	GlobalHashTables[0] = setenvHashTable;
+	GlobalHashTables[1] = unsetenvHashTable;
+	GlobalHashTables[2] = aliasSetHashTable;
+	GlobalHashTables[3] = aliasUnsetHashTable;
+	GlobalHashTables[4] = NULL;
 
 #ifdef BEGINENV
 #  if BEGINENV == 99
@@ -383,7 +376,7 @@ int Initialize_Module(	Tcl_Interp	**interp,
 	    if( OK != ErrorLogger( ERR_STRING, LOC, NULL))
 		goto unwind0;
 
-            if( file = fopen(buffer, "w+")) {
+            if( (file = fopen(buffer, "w+")) ) {
                 int i=0;
                 while( environ[i]) {
                     fprintf( file, "%s\n", environ[i++]);

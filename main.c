@@ -30,7 +30,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: main.c,v 1.27.2.1 2009/08/27 22:07:13 rkowen Exp $";
+static char Id[] = "@(#)$Id: main.c,v 1.27.2.2 2009/09/01 19:12:17 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -121,15 +121,16 @@ char
   
 /**
  **  Hash-Tables for all changes to the environment.
- **  ??? What do we save here, the old or the new setup ???
  **/
 
-Tcl_HashTable	*setenvHashTable,
+MHash		*setenvHashTable,
 		*unsetenvHashTable,
 		*aliasSetHashTable,
 		*aliasUnsetHashTable,
 		*markVariableHashTable,
 		*markAliasHashTable;
+
+MHash		*GlobalHashTables[5];
 
 /**
  **  A buffer for reading a single line
@@ -221,7 +222,6 @@ int	main( int argc, char *argv[], char *environ[]) {
      **  Check the command line syntax. There will be no return from the
      **  initialization function in case of invalid command line arguments.
      **/
-
     if( TCL_OK != Initialize_Module( &interp, argc, argv, environ))
 	goto unwind0;
 
@@ -331,7 +331,7 @@ int	main( int argc, char *argv[], char *environ[]) {
      **  allocated areas.
      **/
 
-    Delete_Global_Hash_Tables();
+    Global_Hash_Tables(GHashDelete, NULL);
 
     if( line)
 	null_free((void *) &line);
@@ -344,8 +344,8 @@ int	main( int argc, char *argv[], char *environ[]) {
     OutputExit();
     return ( return_val ? return_val : g_retval);
 
-unwind2:
-    null_free((void *) &rc_path);
+/* unwind2:
+    null_free((void *) &rc_path); */
 unwind1:
     null_free((void *) &rc_name);
 unwind0:

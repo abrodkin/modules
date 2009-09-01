@@ -25,7 +25,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Whatis.c,v 1.12.2.2 2009/08/28 19:28:12 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Whatis.c,v 1.12.2.3 2009/09/01 19:12:16 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -425,8 +425,8 @@ static	int	whatis_dir( char *dir, int argc, char **argv,
 
     return( result);			/** ------- EXIT (result) --------> **/
 
-unwind2:
-    delete_cache_list( list, start);
+/* unwind2:
+    delete_cache_list( list, start); */
 unwind1:
     delete_dirlst( dirlst_head, count);
 unwind0:

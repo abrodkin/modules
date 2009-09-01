@@ -19,11 +19,7 @@
  **			SplitIntoList					     **
  **			FreeList					     **
  **			ModulePathList					     **
- **			store_hash_value				     **
- **			clear_hash_value				     **
- **			Delete_Global_Hash_Tables			     **
- **			Delete_Hash_Tables				     **
- **			Copy_Hash_Tables				     **
+ **			Global_Hash_Tables				     **
  **			Unwind_Modulefile_Changes			     **
  **			Output_Modulefile_Changes			     **
  **			IsLoaded_ExactMatch				     **
@@ -56,7 +52,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.31.2.5 2009/08/31 15:51:27 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.31.2.6 2009/09/01 19:12:17 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -118,7 +114,6 @@ static	const int   bourne_alias = 	/** HAS_BOURNE_FUNCS macro	     **/
 /**				    PROTOTYPES				     **/
 /** ************************************************************************ **/
 
-static	void	 Clear_Global_Hash_Tables( void);
 static	int	 Output_Modulefile_Aliases( Tcl_Interp *interp);
 static	int	 Output_Directory_Change(Tcl_Interp *interp);
 static	int	 output_set_variable( Tcl_Interp *interp, const char*,
@@ -210,10 +205,7 @@ uvec           *SortedDirList(
 	DIR            *subdirp;	/** Subdirectoy handle		     **/
 	char           *full_path;	/** Sugg. full path (path + module)  **/
 	uvec           *filelist;	/** Temp. uvec list		     **/
-	int             i,		/** Number of entries in the subdir  **/
-	                j,		/** Counts the number of list-entries**/
-	                n,		/** Size of the allocated array	     **/
-	                pathlen;	/** String length of 'fullpath'	     **/
+	int		pathlen;	/** String length of 'fullpath'	     **/
 
     /**
      **  Allocate memory for the list to be created. Suggest a list size of
@@ -516,358 +508,79 @@ uvec *ModulePathList(
 /*++++
  ** ** Function-Header ***************************************************** **
  ** 									     **
- **   Function:		store_hash_value				     **
+ **   Function:		Global_Hash_Tables				     **
  ** 									     **
- **   Description:	Keeps the old value of the variable around if it is  **
- **			touched in the modulefile to enable undoing a	     **
- **			modulefile by resetting the evironment to it started.**
+ **   Description: 	Process the global hash tables in fell swoop	     **
  ** 									     **
- **			This is the same for unset_shell_variable()	     **
+ **   First Edition:	2009/09/01					     **
  ** 									     **
- **   First Edition:	1992/10/14					     **
+ **   Parameters:	GlobalHashAction	action			     **
+ **   				 Clear		reinitialize hashes	     **
+ **				 Delete		destroy them all	     **
+ **				 Copy		return a copy of each	     **
+ **			MHash **		globalhashtables	     **
  ** 									     **
- **   Parameters:	Tcl_HashTable	*htable		Hash table to be used**
- **			const char	*key		Attached key	     **
- **			const char	*value		Alias value	     **
+ **   Result:		MHash **		newtables (copy only)	     **
  ** 									     **
- **   Result:		int	TCL_OK		Successful completion	     **
- ** 									     **
- **   Attached Globals:	-						     **
+ **   Attached Globals:	GlobalHashTables	(if null input)		     **
  ** 									     **
  ** ************************************************************************ **
  ++++*/
 
-int store_hash_value(	Tcl_HashTable* htable,
-        		const char*    key,
-        		const char*    value)
-{
-    int   		 new;		/** Return from Tcl_CreateHashEntry  **/
-					/** which indicates creation or ref- **/
-					/** ference to an existing entry     **/
-    char		*tmp;		/** Temp pointer used for disalloc.  **/
-    Tcl_HashEntry	*hentry;	/** Hash entry reference	     **/
+MHash **Global_Hash_Tables(
+	GHashAction	action,
+	MHash		**globalhashtables
+) {
+	MHash	**newtable,
+		**t_ptr = globalhashtables,
+		**newt_ptr,
+		*tmp;
 
     /**
-     **  Create a hash entry for the key to be stored. If there exists one
-     **  so far, its value has to be unlinked.
-     **  All values in this hash are pointers to allocated memory areas.
-     **/
-    hentry = Tcl_CreateHashEntry( htable, (char*) key, &new);
-    if( !new) {
-	tmp = (char *) Tcl_GetHashValue( hentry);
-    	if( tmp)
-	    null_free((void *) &tmp);
-    }
-
-    /**
-     **  Set up the new value. stringer allocates!
-     **/
-
-    if( value)
-        Tcl_SetHashValue( hentry, (char*) stringer(NULL,0, value,NULL));
-    else
-        Tcl_SetHashValue( hentry, (char*) NULL);
-    
-    return( TCL_OK);
-
-} /** End of 'store_hash_value' **/
-
-/*++++
- ** ** Function-Header ***************************************************** **
- ** 									     **
- **   Function:		clear_hash_value				     **
- ** 									     **
- **   Description:	Remove the specified shell variable from the passed  **
- **			hash table					     **
- ** 									     **
- **   First Edition:	1991/10/23					     **
- ** 									     **
- **   Parameters:	Tcl_HashTable	*htable		Hash table to be used**
- **			const char	*key		Attached key	     **
- ** 									     **
- **   Result:		int	TCL_OK		Successful completion	     **
- ** 									     **
- **   Attached Globals:	-						     **
- ** 									     **
- ** ************************************************************************ **
- ++++*/
-
-int clear_hash_value(	Tcl_HashTable	*htable,
-                       	const char	*key)
-{
-    char		*tmp;		/** Temp pointer used for dealloc.   **/
-    Tcl_HashEntry	*hentry;	/** Hash entry reference	     **/
-
-    /**
-     **  If I haven't already created an entry for keeping this environment
-     **  variable's value, then just leave.
-     **  Otherwise, remove this entry from the hash table.
-     **/
-    if( (hentry = Tcl_FindHashEntry( htable, (char*) key)) ) {
-
-        tmp = (char*) Tcl_GetHashValue( hentry);
-        if( tmp)
-	    null_free((void *) &tmp);
-
-        Tcl_DeleteHashEntry( hentry);
-    }
-    
-    return( TCL_OK);
-
-} /** End of 'clear_hash_value' **/
-
-/*++++
- ** ** Function-Header ***************************************************** **
- ** 									     **
- **   Function:		Clear_Global_Hash_Tables			     **
- ** 									     **
- **   Description: 	Deletes and reinitializes our env. hash tables.	     **
- ** 									     **
- **   First Edition:	1992/10/14					     **
- ** 									     **
- **   Parameters:	-						     **
- **   Result:		-						     **
- ** 									     **
- **   Attached Globals:	setenvHashTable,				     **
- **			unsetenvHashTable,				     **
- **			aliasSetHashTable,				     **
- **			aliasUnsetHashTable				     **
- ** 									     **
- ** ************************************************************************ **
- ++++*/
-
-static	void	Clear_Global_Hash_Tables( void)
-{
-    Tcl_HashSearch	 searchPtr;	/** Tcl hash search handle	     **/
-    Tcl_HashEntry	*hashEntry;	/** Result from Tcl hash search      **/
-    char		*val = NULL;	/** Stored value (is a pointer!)     **/
-
-    /**
-     **  The following hash tables are to be initialized
-     **/
-
-    Tcl_HashTable	*table[5],
-			**table_ptr = table;
-
-    table[0] = setenvHashTable;
-    table[1] = unsetenvHashTable;
-    table[2] = aliasSetHashTable;
-    table[3] = aliasUnsetHashTable;
-    table[4] = NULL;
-
-    /**
-     **  Loop for all the hash tables named above. If there's no value stored
+     **  Loop for all the global hash tables. If there's no value stored
      **  in a hash table, skip to the next one. 
      **/
-    for( ; *table_ptr; table_ptr++) {
+	if (!globalhashtables)
+		t_ptr = GlobalHashTables;
 
-	if( ( hashEntry = Tcl_FirstHashEntry( *table_ptr, &searchPtr)) == NULL) 
-	    continue;
-	
-	/**
-	 **  Otherwise remove all values stored in the table
-	 **/
-
-	do {
-	    val = (char*) Tcl_GetHashValue( hashEntry);
-	    if(val)
-		null_free((void *) &val);
-	} while( (hashEntry = Tcl_NextHashEntry( &searchPtr)) );
-
-	/**
-	 **  Reinitialize the hash table by unlocking it from memory and 
-	 **  thereafter initializing it again.
-	 **/
-
-	Tcl_DeleteHashTable( *table_ptr);
-	Tcl_InitHashTable( *table_ptr, TCL_STRING_KEYS);
-
-    } /** for **/
-
-} /** End of 'Clear_Global_Hash_Tables' **/
-
-/*++++
- ** ** Function-Header ***************************************************** **
- ** 									     **
- **   Function:		Delete_Global_Hash_Tables			     **
- **			Delete_Hash_Tables				     **
- ** 									     **
- **   Description: 	Deletes our environment hash tables.		     **
- ** 									     **
- **   First Edition:	1992/10/14					     **
- ** 									     **
- **   Parameters:	Tcl_HashTable	**table_ptr	NULL-Terminated list **
- **							of hash tables to be **
- **							deleted		     **
- **   Result:		-						     **
- ** 									     **
- **   Attached Globals:	setenvHashTable,				     **
- **			unsetenvHashTable,				     **
- **			aliasSetHashTable,				     **
- **			aliasUnsetHashTable				     **
- ** 									     **
- ** ************************************************************************ **
- ++++*/
-
-void Delete_Global_Hash_Tables( void) {
-
-    /**
-     **  The following hash tables are to be initialized
-     **/
-
-    Tcl_HashTable	*table[5];
-
-    table[0] = setenvHashTable;
-    table[1] = unsetenvHashTable;
-    table[2] = aliasSetHashTable;
-    table[3] = aliasUnsetHashTable;
-    table[4] = NULL;
-
-    Delete_Hash_Tables( table);
-
-} /** End of 'Delete_Global_Hash_Tables' **/
-
-void Delete_Hash_Tables( Tcl_HashTable	**table_ptr)
-{
-
-    Tcl_HashSearch	 searchPtr;	/** Tcl hash search handle	     **/
-    Tcl_HashEntry	*hashEntry;	/** Result from Tcl hash search      **/
-    char		*val = NULL;	/** Stored value (is a pointer!)     **/
-
-    /**
-     **  Loop for all the hash tables named above. Remove all values stored in
-     **  the table and then free up the whole table
-     **/
-    for( ; *table_ptr; table_ptr++) {
-
-        if( ( hashEntry = Tcl_FirstHashEntry( *table_ptr, &searchPtr))) {
-
-	    /**
-	     **  Remove all values stored in the table
-	     **/
-	    do {
-		val = (char*) Tcl_GetHashValue( hashEntry);
-		if( val)
-		    null_free((void *) &val);
-	    } while( (hashEntry = Tcl_NextHashEntry( &searchPtr)) );
-
-	    /**
-	     **  Remove internal hash control structures
-	     **/
-	    Tcl_DeleteHashTable( *table_ptr);
+	if (action == GHashCopy) {
+		if (!(newt_ptr = newtable =
+		(MHash **) module_malloc(5 * sizeof(MHash *))))
+			if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
+				return (MHash **) NULL;
 	}
+	while (t_ptr && *t_ptr) {
+		switch (action) {
+		case GHashClear:
+			tmp = mhash_ctor(mhash_type(*t_ptr));
+			mhash_dtor(t_ptr);
+			*t_ptr = tmp;
+			break;
+		case GHashDelete:
+			mhash_dtor(t_ptr);
+			break;
+		case GHashCopy:
+			*newt_ptr++ = mhash_copy(*t_ptr);
+			break;
+		default:
+			return (MHash **) NULL;
+		}
+		t_ptr++;
+	}
+	if (action == GHashCopy) {
+		*newt_ptr = (MHash *) NULL;
+		return newtable;
+	} else
+		return globalhashtables;
 
-	null_free((void *) table_ptr);
-
-    } /** for **/
-} /** End of 'Delete_Hash_Tables' **/
-
-/*++++
- ** ** Function-Header ***************************************************** **
- ** 									     **
- **   Function:		Copy_Hash_Tables				     **
- ** 									     **
- **   Description:	Allocate new hash tables for the global environment, **
- **			initialize them and copy the contents of the current **
- **			tables into them.				     **
- ** 									     **
- **   First Edition:	1991/10/23					     **
- ** 									     **
- **   Parameters:	-						     **
- **   Result:		Tcl_HashTable**		Pointer to the new list of   **
- **						hash tables		     **
- **   Attached Globals:	setenvHashTable,				     **
- **			unsetenvHashTable,				     **
- **			aliasSetHashTable,				     **
- **			aliasUnsetHashTable				     **
- ** 									     **
- ** ************************************************************************ **
- ++++*/
-
-Tcl_HashTable	**Copy_Hash_Tables( void)
-{
-    Tcl_HashSearch	  searchPtr;	/** Tcl hash search handle	     **/
-    Tcl_HashEntry	 *oldHashEntry,	/** Hash entries to be copied	     **/
-			 *newHashEntry;
-    char		 *val = NULL,	/** Stored value (is a pointer!)     **/
-    			 *key = NULL;	/** Hash key			     **/
-    int			  new;		/** Tcl inidicator, if the new hash  **/
-					/** entry has been created or ref.   **/
-
-    Tcl_HashTable	 *oldTable[5],
-			**o_ptr, **n_ptr,
-			**newTable;	/** Destination hash table	     **/
-
-    oldTable[0] = setenvHashTable;
-    oldTable[1] = unsetenvHashTable;
-    oldTable[2] = aliasSetHashTable;
-    oldTable[3] = aliasUnsetHashTable;
-    oldTable[4] = NULL;
-
-    /**
-     **  Allocate storage for the new list of hash tables
-     **/
-    if( !(newTable = (Tcl_HashTable**) module_malloc( sizeof( oldTable))))
-	if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
-	    goto unwind0;
-
-    /**
-     **  Now copy each hashtable out of the list
-     **/
-    for( o_ptr = oldTable, n_ptr = newTable; *o_ptr; o_ptr++, n_ptr++) {
-
-	/**
-	 **  Allocate memory for a single hash table
-	 **/
-	if( !(*n_ptr = (Tcl_HashTable*) module_malloc( sizeof( Tcl_HashTable))))
-	    if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
-		goto unwind1;
-
-	/**
-	 **  Initialize that guy and copy it from the old table
-	 **/
-	Tcl_InitHashTable( *n_ptr, TCL_STRING_KEYS);
-        if( (oldHashEntry = Tcl_FirstHashEntry( *o_ptr, &searchPtr)) ) {
-
-	    /**
-	     **  Copy all entries if there are any
-	     **/
-	    do {
-
-		key = (char*) Tcl_GetHashKey( *o_ptr, oldHashEntry);
-		val = (char*) Tcl_GetHashValue( oldHashEntry);
-
-		newHashEntry = Tcl_CreateHashEntry( *n_ptr, key, &new);
-
-		if(val)
-        	    Tcl_SetHashValue(newHashEntry, stringer(NULL,0, val, NULL));
-		else
-		    Tcl_SetHashValue(newHashEntry, (char *) NULL);
-
-	    } while( (oldHashEntry = Tcl_NextHashEntry( &searchPtr)) );
-
-	} /** if **/
-    } /** for **/
-
-    /**
-     **  Put a terminator at the end of the new table
-     **/
-    *n_ptr = NULL;
-
-    return( newTable);
-
-unwind1:
-    null_free((void *) &newTable);
-unwind0:
-    return( NULL);			/** -------- EXIT (FAILURE) -------> **/
-} /** End of 'Copy_Hash_Tables' **/
+} /** End of 'Global_Hash_Tables' **/
 
 /*++++
  ** ** Function-Header ***************************************************** **
  ** 									     **
  **   Function:								     **
  ** 									     **
- **   Description:	Once a the loading or unloading of a modulefile	     **
+ **   Description:	Once the loading or unloading of a modulefile	     **
  **			fails, any changes it has made to the environment    **
  **			must be undone and reset to its previous state. This **
  **			function is responsible for unwinding any changes a  **
@@ -876,7 +589,7 @@ unwind0:
  **   First Edition:	1991/10/23					     **
  ** 									     **
  **   Parameters:	Tcl_Interp	 *interp	According TCL interp.**
- **			Tcl_HashTable	**oldTables	Hash tables storing  **
+ **			MHash		**oldTables	Hash tables storing  **
  **							the former environm. **
  **   Result:								     **
  **   Attached Globals:							     **
@@ -884,63 +597,51 @@ unwind0:
  ** ************************************************************************ **
  ++++*/
 
-int Unwind_Modulefile_Changes(	Tcl_Interp	 *interp, 
-				Tcl_HashTable	**oldTables )
-{
-    Tcl_HashSearch	 searchPtr;	/** Tcl hash search handle	     **/
-    Tcl_HashEntry	*hashEntry;	/** Result from Tcl hash search      **/
-    char		*val = NULL,	/** Stored value (is a pointer!)     **/
-			*key;		/** Tcl hash key		     **/
-    int			 i;		/** Loop counter		     **/
+int Unwind_Modulefile_Changes(
+	Tcl_Interp * interp,
+	MHash ** oldTables
+) {
+	char           *val = NULL,	/** Stored value (is a pointer!)     **/
+	    **keys;			/** Tcl hash key		     **/
+	int             i;		/** Loop counter		     **/
 
-    if( oldTables) {
+	if (oldTables) {
 	/**
 	 **  Use only entries 0 and 1 which do contain all changes to the 
 	 **  shell varibles (setenv and unsetenv)
 	 **/
-
 	/** ??? What about the aliases (table 2 and 3) ??? **/
 
-	for( i = 0; i < 2; i++) {
-	    if( (hashEntry = Tcl_FirstHashEntry( oldTables[i], &searchPtr)) ) {
-
-		do {
-		    key = (char*) Tcl_GetHashKey( oldTables[i], hashEntry);
-
-		    /**
-		     **  The hashEntry will contain the appropriate value for the
-		     **  specified 'key' because it will have been aquired depending
-		     **  upon whether the unset or set table was used.
-		     **/
-
-		    val = (char*) Tcl_GetHashValue( hashEntry);
-		    if( val)
-			Tcl_SetVar2( interp, "env", key, val, TCL_GLOBAL_ONLY);
-
-		} while( (hashEntry = Tcl_NextHashEntry( &searchPtr)) );
-
-	    } /** if **/
-	} /** for **/
-
+		for (i = 0; i < 2; i++) {
+	    /**
+	     **  The hash entry will contain the appropriate value for the
+	     **  specified 'key' because it will have been acquired depending
+	     **  upon whether the unset or set table was used.
+	     **/
+			keys = mhash_keys(oldTables[i]);
+			while (keys && *keys) {
+				val = mhash_value(oldTables[i], *keys);
+				if (val)
+					Tcl_SetVar2(interp, "env", *keys, val,
+						    TCL_GLOBAL_ONLY);
+				keys++;
+			}
+		} /** for **/
 	/**
-	 **  Delete and reset the hash tables now that the current contents have been
+	 **  Delete and reset the hash tables now the current contents have been
 	 **  flushed.
 	 **/
+		Global_Hash_Tables(GHashDelete, NULL);
 
-	Delete_Global_Hash_Tables();
+		setenvHashTable = oldTables[0];
+		unsetenvHashTable = oldTables[1];
+		aliasSetHashTable = oldTables[2];
+		aliasUnsetHashTable = oldTables[3];
+	} else {
+		Global_Hash_Tables(GHashClear, NULL);
+	}
 
-	setenvHashTable     = oldTables[0];
-	unsetenvHashTable   = oldTables[1];
-	aliasSetHashTable   = oldTables[2];
-	aliasUnsetHashTable = oldTables[3];
-
-    } else {
-
-	Clear_Global_Hash_Tables();
-
-    }
-
-    return( TCL_OK);
+	return (TCL_OK);
 
 } /** End of 'Unwind_Modulefile_Changes' **/
 
@@ -964,7 +665,7 @@ static int keycmp(const void *a, const void *b) {
  ** 									     **
  **   Result:		int	TCL_OK		Successful operation	     **
  ** 									     **
- **   Attached Globals:	setenvHashTable,				     **
+ **   Attached Globals:	GlobalHashTable,				     **
  **			unsetenvHashTable,				     **
  **			aliasSetHashTable,	via Output_Modulefile_Aliases**
  **			aliasUnsetHashTable	via Output_Modulefile_Aliases**
@@ -973,91 +674,59 @@ static int keycmp(const void *a, const void *b) {
  ** ************************************************************************ **
  ++++*/
 
-int Output_Modulefile_Changes(	Tcl_Interp	*interp)
-{
-    Tcl_HashSearch	  searchPtr;	/** Tcl hash search handle	     **/
-    Tcl_HashEntry	 *hashEntry;	/** Result from Tcl hash search      **/
-    char		 *val = NULL,	/** Stored value (is a pointer!)     **/
-			 *key,		/** Tcl hash key		     **/
-			**list;		/** list of keys		     **/
-    int			  i,k;		/** Loop counter		     **/
-    size_t		  hcnt;		/** count of hash entries	     **/
+int Output_Modulefile_Changes(
+	Tcl_Interp * interp
+) {
+	char           *val = NULL,	/** Stored value (is a pointer!)     **/
+		      **keys;		/** hash keys			     **/
+	uvec           *uvkeys;		/** vector of keys		     **/
+	int             i;		/** Loop counter		     **/
+	MHash	       *table[2];	/** setenv & unsetenv hashes	     **/
 
     /**
      **  The following hash tables do contain all changes to be made on
      **  shell variables
      **/
+	table[0] = setenvHashTable;
+	table[1] = unsetenvHashTable;
 
-    Tcl_HashTable	*table[2];
-
-    table[0] = setenvHashTable;
-    table[1] = unsetenvHashTable;
-
-    aliasfile = stdout;
-
+	aliasfile = stdout;
     /**
      **  Scan both tables that are of interest for shell variables
      **/
+	for (i = 0; i < 2; i++) {
+		uvkeys = mhash_keys_uvec(table[i]);
+		uvec_qsort(uvkeys, keycmp);
 
-    for(i = 0; i < 2; i++) {
-	/* count hash */
-	hcnt = countTclHash(table[i]);
-
-	/* allocate array for keys */
-	if( !(list = (char **) module_malloc(hcnt * sizeof(char *)))) {
-		if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
-	    		return(TCL_ERROR);/** ------- EXIT (FAILURE) ------> **/
-	}
-
-	/* collect keys */
-	k = 0;
-	if( (hashEntry = Tcl_FirstHashEntry( table[i], &searchPtr)) )
-		do {
-			key = (char*) Tcl_GetHashKey( table[i], hashEntry);
-			list[k++] = stringer(NULL,0, key, NULL);
-		} while( (hashEntry = Tcl_NextHashEntry( &searchPtr)) );
-	/* sort hash */
-	if (hcnt > 1)
-		qsort((void *) list, hcnt, sizeof(char *), keycmp);
-
-	/* output key/values */
-	for (k = 0; k < hcnt; ++k) {
-		key = list[k];
-    		hashEntry = Tcl_FindHashEntry( table[i], key);
-		/**
-		 **  The table list indicator is used in order to differ
-		 **  between the setenv and unsetenv operation
-		 **/
-		if( i == 1) {
-			output_unset_variable( (char*) key);
-		} else {
-			if( (val=(char *) Tcl_GetVar2(interp,"env",
-			    key,TCL_GLOBAL_ONLY)) )
-				output_set_variable(interp, (char*) key, val);
+		/* output key/values */
+		keys = uvec_vector(uvkeys);
+		while (keys && *keys) {
+			if (i == 1) {
+				output_unset_variable(*keys);
+			} else {
+				if ((val = (char *)Tcl_GetVar2(interp, "env",
+						       *keys, TCL_GLOBAL_ONLY)))
+					output_set_variable(interp, *keys, val);
+			}
+			keys++;
 		}
 	} /** for **/
-	/* delloc list */
-	for (k = 0; k < hcnt; ++k)
-		null_free((void **) list + k);
-	null_free((void *) &list);
-    } /** for **/
 
-    if( EOF == fflush( stdout))
-	if( OK != ErrorLogger( ERR_FLUSH, LOC, _fil_stdout, NULL))
-	    return( TCL_ERROR);		/** -------- EXIT (FAILURE) -------> **/
+	if (EOF == fflush(stdout))
+		if (OK != ErrorLogger(ERR_FLUSH, LOC, _fil_stdout, NULL))
+			return (TCL_ERROR); /** ------ EXIT (FAILURE) -----> **/
 
-    Output_Modulefile_Aliases( interp);
-    Output_Directory_Change( interp);
+	Output_Modulefile_Aliases(interp);
+	Output_Directory_Change(interp);
 
     /**
      **  Delete and reset the hash tables since the current contents have been
      **  flushed.
      **/
+	Global_Hash_Tables(GHashClear, NULL);
 
-    Clear_Global_Hash_Tables();
-    return( TCL_OK);
-
-} /* End of 'Output_Modulefile_Changes' */ 
+	return (TCL_OK);
+} /* End of 'Output_Modulefile_Changes' */
 
 /*++++
  ** ** Function-Header ***************************************************** **
@@ -1081,25 +750,27 @@ int Output_Modulefile_Changes(	Tcl_Interp	*interp)
  ** ************************************************************************ **
  ++++*/
 
-static	int Open_Aliasfile(int action)
-{
-    if (action) {
+static int Open_Aliasfile(
+	int action
+) {
+	if (action) {
 	/**
 	 **  Open the file ...
 	 **/
-	if( tmpfile_mod(&aliasfilename,&aliasfile))
-	    if(OK != ErrorLogger( ERR_OPEN, LOC, aliasfilename,
-		_(em_appending), NULL))
-		return( TCL_ERROR);	/** -------- EXIT (FAILURE) -------> **/
-    } else {
-	if( EOF == fclose( aliasfile))
-	    if( OK != ErrorLogger( ERR_CLOSE, LOC, aliasfilename, NULL))
-		return( TCL_ERROR);	/** -------- EXIT (FAILURE) -------> **/
-    }
+		if (tmpfile_mod(&aliasfilename, &aliasfile))
+			if (OK != ErrorLogger(ERR_OPEN, LOC, aliasfilename,
+					      _(em_appending), NULL))
+				return (TCL_ERROR); /** -- EXIT (FAILURE) -> **/
+	} else {
+		if (EOF == fclose(aliasfile))
+			if (OK !=
+			    ErrorLogger(ERR_CLOSE, LOC, aliasfilename, NULL))
+				return (TCL_ERROR); /** -- EXIT (FAILURE) -> **/
+	}
 
-    return( TCL_OK);
-
+	return (TCL_OK);
 } /** End of 'Open_Aliasfile' **/
+
 /*++++
  ** ** Function-Header ***************************************************** **
  ** 									     **
@@ -1126,24 +797,23 @@ static	int Open_Aliasfile(int action)
  ** ************************************************************************ **
  ++++*/
 
-static	int Output_Modulefile_Aliases( Tcl_Interp *interp)
-{
-    Tcl_HashSearch	 searchPtr;	/** Tcl hash search handle	     **/
-    Tcl_HashEntry	*hashEntry;	/** Result from Tcl hash search      **/
-    char		*val = NULL,	/** Stored value (is a pointer!)     **/
-			*key;		/** Tcl hash key		     **/
-    int			 i,		/** Loop counter		     **/
-			 openfile = 0;	/** whether using a file or not	     **/
-    char		*sourceCommand; /** Command used to source the alias **/
+static int Output_Modulefile_Aliases(
+	Tcl_Interp * interp
+) {
+	char           *val = NULL,	/** Stored value (is a pointer!)     **/
+		      **keys,		/** hash keys			     **/
+		       *sourceCommand;	/** Command used to source the alias **/
+	int             i,		/** Loop counter		     **/
+	                openfile = 0;	/** whether using a file or not	     **/
 
     /**
      **  The following hash tables do contain all changes to be made on
      **  shell aliases
      **/
-    Tcl_HashTable	*table[2];
+	MHash  *table[2];
 
-    table[0] = aliasSetHashTable;
-    table[1] = aliasUnsetHashTable;
+	table[0] = aliasSetHashTable;
+	table[1] = aliasUnsetHashTable;
 
     /**
      **  If configured so, all changes to aliases are written into a temporary
@@ -1151,89 +821,84 @@ static	int Output_Modulefile_Aliases( Tcl_Interp *interp)
      **  In this case a temporary filename has to be assigned for the alias
      **  source file. The file has to be opened as 'aliasfile'.
      **  The default for aliasfile, if no shell sourcing is used, is stdout.
-    **
+     **
      **  We only need to output stuff into a temporary file if we're setting
      **  stuff.  We can unset variables and aliases by just using eval.
      **/
-    if( (hashEntry = Tcl_FirstHashEntry( aliasSetHashTable, &searchPtr)) ) {
-
+	keys = mhash_keys(aliasSetHashTable);
+	while (keys && *keys) {
 	/**
 	 **  We must use an aliasfile if EVAL_ALIAS is not defined
 	 **  or the sh shell does not do aliases (HAS_BOURNE_ALIAS)
 	 **  and that the sh shell does do functions (HAS_BOURNE_FUNCS)
 	 **/
-	if (!eval_alias
-	|| (!strcmp(shell_name,"sh") && !bourne_alias && bourne_funcs)) {
-	    if (OK != Open_Aliasfile(1))
-		if(OK != ErrorLogger(ERR_OPEN,LOC,aliasfilename,
-		    _(em_appending),NULL))
-		    return( TCL_ERROR);	/** -------- EXIT (FAILURE) -------> **/
-	    openfile = 1;
-	}
+		if (!eval_alias || (!strcmp(shell_name, "sh") && !bourne_alias
+			&& bourne_funcs)) {
+			if (OK != Open_Aliasfile(1))
+				if (OK !=
+				    ErrorLogger(ERR_OPEN, LOC, aliasfilename,
+						_(em_appending), NULL))
+					return (TCL_ERROR);
+					/** -------- EXIT (FAILURE) -------> **/
+			openfile = 1;
 	/**
 	 **  We only support sh and csh variants for aliases.  If not either
 	 **  sh or csh print warning message and return
 	 **/
-	assert(shell_derelict != NULL);
-	if( !strcmp( shell_derelict, "csh")) {
-	    sourceCommand = "source %s%s";
-	} else if( !strcmp( shell_derelict, "sh")) {
-	    sourceCommand = ". %s%s";
-	} else {
-	    return( TCL_ERROR);	/** -------- EXIT (FAILURE) -------> **/
-	}
-
-	if (openfile) {
+			assert(shell_derelict != NULL);
+			if (!strcmp(shell_derelict, "csh")) {
+				sourceCommand = "source %s%s";
+			} else if (!strcmp(shell_derelict, "sh")) {
+				sourceCommand = ". %s%s";
+			} else {
+				return (TCL_ERROR); /** -- EXIT (FAILURE) -> **/
+			}
+		} /* if */
+		if (openfile) {
 	    /**
 	     **  Only the source command has to be flushed to stdout. After
 	     **  sourcing the alias definition (temporary) file, the source
 	     **  file is to be removed.
 	     **/
-	    alias_separator = '\n';
+			alias_separator = '\n';
 
-	    fprintf( stdout, sourceCommand, aliasfilename, shell_cmd_separator);
-	    fprintf( stdout, "/bin/rm -f %s%s",
-		aliasfilename, shell_cmd_separator);
-	} /** openfile **/
-    } /** if( alias to set) **/
-
+			fprintf(stdout, sourceCommand, aliasfilename,
+				shell_cmd_separator);
+			fprintf(stdout, "/bin/rm -f %s%s", aliasfilename,
+				shell_cmd_separator);
+		} /** openfile **/
+		keys++;
+	} /* while */
     /**
      **  Scan the hash tables involved in changing aliases
      **/
-
-    for( i=0; i<2; i++) {
-    
-	if( (hashEntry = Tcl_FirstHashEntry( table[i], &searchPtr)) ) {
-
-	    do {
-		key = (char*) Tcl_GetHashKey( table[i], hashEntry);
-		val = (char*) Tcl_GetHashValue( hashEntry);
-
+	for (i = 0; i < 2; i++) {
+		keys = mhash_keys(table[i]);
+		while (keys && *keys) {
 		/**
 		 **  The hashtable list index is used to differ between aliases
 		 **  to be set and aliases to be reset
 		 **/
-		if(i == 1) {
-		    output_unset_alias( key, val);
-		} else {
-		    output_set_alias( key, val);
+			val = mhash_value(table[i], *keys);
+			if (i == 1) {
+				output_unset_alias(*keys, val);
+			} else {
+				output_set_alias(*keys, val);
+			}
+			keys++;
 		}
+	} /** for **/
 
-	    } while( (hashEntry = Tcl_NextHashEntry( &searchPtr)) );
+	if (openfile) {
+		if (OK != Open_Aliasfile(0))
+			if (OK !=
+			    ErrorLogger(ERR_CLOSE, LOC, aliasfilename, NULL))
+				return (TCL_ERROR); /** -- EXIT (FAILURE) -> **/
 
-	} /** if **/
-    } /** for **/
+		null_free((void *)&aliasfilename);
+	}
 
-
-    if(openfile) {
-	if( OK != Open_Aliasfile(0))
-	    if( OK != ErrorLogger( ERR_CLOSE, LOC, aliasfilename, NULL))
-		return( TCL_ERROR);	/** -------- EXIT (FAILURE) -------> **/
-
-	null_free((void *) &aliasfilename);
-    }
-
-    return( TCL_OK);
+	return (TCL_OK);
 
 } /** End of 'Output_Modulefile_Aliases' **/
 
@@ -1253,25 +918,27 @@ static	int Output_Modulefile_Aliases( Tcl_Interp *interp)
  **									     **
  ** ************************************************************************ **
  ++++*/
-static	int Output_Directory_Change(Tcl_Interp *interp)
-{
-	int retval = TCL_OK;
+static int Output_Directory_Change(
+	Tcl_Interp * interp
+) {
+	int             retval = TCL_OK;
 
 	if (change_dir == NULL)
 		return retval;
 
 	assert(shell_derelict != NULL);
-	if(!strcmp(shell_derelict, "csh") || !strcmp(shell_derelict, "sh")) {
+	if (!strcmp(shell_derelict, "csh") || !strcmp(shell_derelict, "sh")) {
 		fprintf(stdout, "cd '%s'%s", change_dir, shell_cmd_separator);
-	} else if(!strcmp( shell_derelict, "perl")) {
-		fprintf(stdout, "chdir '%s'%s", change_dir, shell_cmd_separator);
-	} else if( !strcmp( shell_derelict, "python")) {
+	} else if (!strcmp(shell_derelict, "perl")) {
+		fprintf(stdout, "chdir '%s'%s", change_dir,
+			shell_cmd_separator);
+	} else if (!strcmp(shell_derelict, "python")) {
 		fprintf(stdout, "os.chdir('%s')\n", change_dir);
 	} else {
 		retval = TCL_ERROR;
 	}
 
-	null_free((void *) &change_dir);
+	null_free((void *)&change_dir);
 
 	return retval;
 }
@@ -1306,7 +973,7 @@ static	int	output_set_variable(	Tcl_Interp	*interp,
 {
 
     /**
-     **  Differ between the different kinds od shells at first
+     **  Differ between the different kinds of shells at first
      **
      **  CSH
      **/
@@ -1318,7 +985,6 @@ static	int	output_set_variable(	Tcl_Interp	*interp,
     if( !strcmp((char*) shell_derelict, "csh")) {
 
 #ifdef LMSPLIT_SIZE
-
 	/**
 	 **  Many C Shells (specifically the Sun one) has a hard limit on
 	 **  the size of the environment variables around 1k.  The
@@ -1484,39 +1150,40 @@ static	int	output_set_variable(	Tcl_Interp	*interp,
  ** ************************************************************************ **
  ++++*/
 
-static	int	output_unset_variable( const char* var)
-{
-    chop( var);
+static int output_unset_variable(
+	const char *var
+) {
+	chop(var);
 
-    assert(shell_derelict != NULL);
-
+	assert(shell_derelict != NULL);
     /**
      **  Display the 'unsetenv' command according to the current invoking shell.
      **/
-    if( !strcmp( shell_derelict, "csh")) {
-	fprintf( stdout, "unsetenv %s%s", var, shell_cmd_separator);
-    } else if( !strcmp( shell_derelict, "sh")) {
-	fprintf( stdout, "unset %s%s", var, shell_cmd_separator);
-    } else if( !strcmp( shell_derelict, "emacs")) {
-	fprintf( stdout, "(setenv \"%s\" nil)\n", var);
-    } else if( !strcmp( shell_derelict, "perl")) {
-	fprintf( stdout, "delete $ENV{'%s'}%s", var, shell_cmd_separator);  
-    } else if( !strcmp( shell_derelict, "python")) {
-      fprintf( stdout, "os.environ['%s'] = ''\ndel os.environ['%s']\n",var,var);
-    } else if( !strcmp( shell_derelict, "scm")) {
-	fprintf( stdout, "(putenv \"%s\")\n", var);
-    } else if( !strcmp( shell_derelict, "mel")) {
-	fprintf( stdout, "putenv \"%s\" \"\";", var);
-    } else {
-	if( OK != ErrorLogger( ERR_DERELICT, LOC, shell_derelict, NULL))
-	    return( TCL_ERROR);		/** -------- EXIT (FAILURE) -------> **/
-    }
-
+	if (!strcmp(shell_derelict, "csh")) {
+		fprintf(stdout, "unsetenv %s%s", var, shell_cmd_separator);
+	} else if (!strcmp(shell_derelict, "sh")) {
+		fprintf(stdout, "unset %s%s", var, shell_cmd_separator);
+	} else if (!strcmp(shell_derelict, "emacs")) {
+		fprintf(stdout, "(setenv \"%s\" nil)\n", var);
+	} else if (!strcmp(shell_derelict, "perl")) {
+		fprintf(stdout, "delete $ENV{'%s'}%s", var,
+			shell_cmd_separator);
+	} else if (!strcmp(shell_derelict, "python")) {
+		fprintf(stdout, "os.environ['%s'] = ''\ndel os.environ['%s']\n",
+			var, var);
+	} else if (!strcmp(shell_derelict, "scm")) {
+		fprintf(stdout, "(putenv \"%s\")\n", var);
+	} else if (!strcmp(shell_derelict, "mel")) {
+		fprintf(stdout, "putenv \"%s\" \"\";", var);
+	} else {
+		if (OK != ErrorLogger(ERR_DERELICT, LOC, shell_derelict, NULL))
+			return (TCL_ERROR); /** ------ EXIT (FAILURE) -----> **/
+	}
     /**
-     **  Return and acknowldge success
+     **  Return and acknowledge success
      **/
-    g_output = 1;
-    return( TCL_OK);
+	g_output = 1;
+	return (TCL_OK);
 
 } /** End of 'output_unset_variable' **/
 
@@ -1544,47 +1211,45 @@ static	int	output_unset_variable( const char* var)
  ** ************************************************************************ **
  ++++*/
 
-static	void	output_function(	const char	*var,
-					const char	*val)
-{
-    const char *cptr = val;
-    int nobackslash = 1;
+static void output_function(
+	const char *var,
+	const char *val
+) {
+	const char     *cptr = val;
+	int             nobackslash = 1;
 
     /**
      **  This opens a function ...
      **/
-    fprintf(aliasfile, "%s() { ", var);
+	fprintf(aliasfile, "%s() { ", var);
 
     /**
      **  ... now print the value. Print it as a single line and remove any
      **  backslashes, and substitute a safe $*
      **/
-    while (*cptr) {
+	while (*cptr) {
+		if (*cptr == '\\') {
+			if (!nobackslash)
+				putc(*cptr, aliasfile);
+			else
+				nobackslash = 0;
+			cptr++;
+			continue;
+		} else if (*cptr == '$' && (cptr + 1) && (*(cptr + 1) == '*')) {
+			/* found $* */
+			fputs("${1+\"$@\"}", aliasfile);
+			cptr++;
+			cptr++;
+			continue;
+		} else
+			nobackslash = 1;
 
-	if (*cptr == '\\') {
-	    if (!nobackslash)
-		putc(*cptr, aliasfile);
-	    else
-		nobackslash = 0;
-	    cptr++;
-	    continue;
-	} else if (*cptr == '$' && (cptr + 1) && (*(cptr + 1) == '*')) {
-	    /* found $* */
-	    fputs("${1+\"$@\"}", aliasfile);
-	    cptr++;
-	    cptr++;
-	    continue;
-	} else
-	    nobackslash = 1;
-
-	putc(*cptr++, aliasfile);
-
-    } /** while **/
-
+		putc(*cptr++, aliasfile);
+	} /** while **/
     /**
      **  Finally close the function
      **/
-    fprintf(aliasfile, "%c}%c", alias_separator, alias_separator);
+	fprintf(aliasfile, "%c}%c", alias_separator, alias_separator);
 
 } /** End of 'output_function' **/
 
@@ -1611,139 +1276,125 @@ static	void	output_function(	const char	*var,
  ** ************************************************************************ **
  ++++*/
 
-static	int	output_set_alias(	const char	*alias,
-               			  	const char	*val)
-{
-    int nobackslash = 1;		/** Controls whether backslashes are **/
+static int output_set_alias(
+	const char *alias,
+	const char *val
+) {
+	int             nobackslash = 1;/** Controls whether backslashes are **/
 					/** to be print			     **/
-    const char *cptr = val;		/** Scan the value char by char	     **/
+	const char     *cptr = val;	/** Scan the value char by char	     **/
 
-    assert(shell_derelict != NULL);
-
+	assert(shell_derelict != NULL);
     /**
      **  Check for the shell family
      **  CSHs need to switch $* to \!* and $n to \!\!:n unless the $ has a
      **  backslash before it
      **/
-    if( !strcmp( shell_derelict, "csh")) {
-
+	if (!strcmp(shell_derelict, "csh")) {
 	/**
 	 **  On CSHs the command is 'alias <name> <value>'. Print the beginning
 	 **  of the command and then print the value char by char.
 	 **/
-        fprintf( aliasfile, "alias %s '", alias);
+		fprintf(aliasfile, "alias %s '", alias);
 
-        while( *cptr) {
-
+		while (*cptr) {
 	    /**
 	     **  Convert $n to \!\!:n
 	     **/
-            if( *cptr == '$' && nobackslash) {
-                cptr++;
-                if( *cptr == '*')
-                    fprintf( aliasfile, "\\!");
-                else
-                    fprintf( aliasfile, "\\!\\!:");
-            }
-
+			if (*cptr == '$' && nobackslash) {
+				cptr++;
+				if (*cptr == '*')
+					fprintf(aliasfile, "\\!");
+				else
+					fprintf(aliasfile, "\\!\\!:");
+			}
 	    /**
 	     **  Recognize backslashes
 	     **/
-            if( *cptr == '\\') {
-                if( !nobackslash)
-		    putc( *cptr, aliasfile);
-                else
-		    nobackslash = 0;
-                cptr++;
-                continue;
-            } else
-                nobackslash = 1;
-
+			if (*cptr == '\\') {
+				if (!nobackslash)
+					putc(*cptr, aliasfile);
+				else
+					nobackslash = 0;
+				cptr++;
+				continue;
+			} else
+				nobackslash = 1;
 	    /**
 	     **  print the read character
 	     **/
-            putc( *cptr++, aliasfile);
-
-        } /** while **/
- 
+			putc(*cptr++, aliasfile);
+		} /** while **/
 	/**
 	 **  Now close up the command using the alias command terminator as
 	 **  defined in the global variable
 	 **/
-        fprintf( aliasfile, "'%c", alias_separator);
-
+		fprintf(aliasfile, "'%c", alias_separator);
     /**
      **  Bourne shell family: The alias has to be  translated into a
      **  function using the function call 'output_function'
      **/
-    } else if( !strcmp(shell_derelict, "sh")) {
+	} else if (!strcmp(shell_derelict, "sh")) {
 	/**
 	 **  Shells supporting extended bourne shell syntax ....
 	 **/
-	if( (!strcmp( shell_name, "sh") && bourne_alias)
-		||  !strcmp( shell_name, "bash")
-                ||  !strcmp( shell_name, "zsh" )
-                ||  !strcmp( shell_name, "ksh")) {
+		if ((!strcmp(shell_name, "sh") && bourne_alias)
+		    || !strcmp(shell_name, "bash")
+		    || !strcmp(shell_name, "zsh")
+		    || !strcmp(shell_name, "ksh")) {
 	    /**
 	     **  in this case we only have to write a function if the alias
 	     **  takes arguments. This is the case if the value has '$'
 	     **  somewhere in it without a '\' in front.
 	     **/
-	    while( *cptr) {
-		if( *cptr == '\\') {
-		    if( nobackslash) {
-			nobackslash = 0;
-		    }
-		} else {
-	    	   if( *cptr == '$') {
-			if( nobackslash) {
-				output_function( alias, val);
-				return TCL_OK;
+			while (*cptr) {
+				if (*cptr == '\\') {
+					if (nobackslash)
+						nobackslash = 0;
+				} else {
+					if (*cptr == '$') {
+						if (nobackslash) {
+							output_function(alias,
+									val);
+							return TCL_OK;
+						}
+					}
+					nobackslash = 1;
+				}
+				cptr++;
 			}
-		    }
-		    nobackslash = 1;
-		}
-		cptr++;
-	    }
-
-            /**
+	    /**
              **  So, we can just output an alias with '\$' translated to '$'...
              **/
-	    fprintf( aliasfile, "alias %s='", alias);
+			fprintf(aliasfile, "alias %s='", alias);
 
-	    nobackslash = 1;
-	    cptr = val;
+			nobackslash = 1;
+			cptr = val;
 
-	    while( *cptr) {
-		if( *cptr == '\\') {
-		    if( nobackslash) {
-			nobackslash = 0;
-			cptr++;
-			continue;
-		    }
-		}
-		nobackslash = 1;
+			while (*cptr) {
+				if (*cptr == '\\') {
+					if (nobackslash) {
+						nobackslash = 0;
+						cptr++;
+						continue;
+					}
+				}
+				nobackslash = 1;
+				putc(*cptr++, aliasfile);
+			} /** while **/
 
-		putc(*cptr++, aliasfile);
+			fprintf(aliasfile, "'%c", alias_separator);
 
-	    } /** while **/
-
-	    fprintf( aliasfile, "'%c", alias_separator);
-
-        } else if( !strcmp( shell_name, "sh")
-		&&   bourne_funcs) {
+		} else if (!strcmp(shell_name, "sh") && bourne_funcs) {
 	/**
 	 **  The bourne shell itself
          **  need to write a function unless this sh doesn't support
 	 **  functions (then just punt)
 	 **/
-            output_function(alias, val);
-        }
-	/** ??? Unknown derelict ??? **/
-
-    } /** if( sh ) **/
-
-    return( TCL_OK);
+			output_function(alias, val);
+		} /** ??? Unknown derelict ??? **/
+	} /** if( sh ) **/
+	return (TCL_OK);
 
 } /** End of 'output_set_alias' **/
 
@@ -1771,106 +1422,101 @@ static	int	output_set_alias(	const char	*alias,
  ** ************************************************************************ **
  ++++*/
 
-static	int	output_unset_alias(	const char	*alias,
-					const char	*val)
-{
-    int nobackslash = 1;		/** Controls wether backslashes are  **/
+static int output_unset_alias(
+	const char *alias,
+	const char *val
+) {
+	int             nobackslash = 1;/** Controls wether backslashes are  **/
 					/** to be print			     **/
-    const char *cptr = val;	/** Need to read the value char by char      **/
+	const char     *cptr = val;	/** read the value char by char      **/
 
-    assert(shell_derelict != NULL);
-
+	assert(shell_derelict != NULL);
     /**
      **  Check for the shell family at first
      **  Ahh! CSHs ... ;-)
      **/
-    if( !strcmp( shell_derelict, "csh")) {
-        fprintf( aliasfile, "unalias %s%c", alias, alias_separator);
+	if (!strcmp(shell_derelict, "csh")) {
 
+		fprintf(aliasfile, "unalias %s%c", alias, alias_separator);
+
+	} else if (!strcmp(shell_derelict, "sh")) {
     /**
      **  Hmmm ... bourne shell types ;-(
      **  Need to unset a function in case of sh or if the alias took parameters
      **/
-    } else if( !strcmp( shell_derelict, "sh")) {
 
-        if( !strcmp( shell_name, "sh")) {
-	    if (bourne_alias) {
-		fprintf(aliasfile, "unalias %s%c", alias, alias_separator);
-	    } else if (bourne_funcs) {
-        	fprintf(aliasfile,"unset -f %s%c", alias, alias_separator);
-	    } /* else do nothing */
+		if (!strcmp(shell_name, "sh")) {
+			if (bourne_alias) {
+				fprintf(aliasfile, "unalias %s%c", alias,
+					alias_separator);
+			} else if (bourne_funcs) {
+				fprintf(aliasfile, "unset -f %s%c", alias,
+					alias_separator);
+			} /* else do nothing */
+		} else if (!strcmp(shell_name, "bash")) {
 	/**
 	 **  BASH
 	 **/
-        } else if( !strcmp( shell_name, "bash")) {
-
-            /**
+	    /**
              **  If we have what the old value should have been, then look to
              **  see if it was a function or an alias because bash spits out an
              **  error if you try to unalias a non-existent alias.
              **/
-            if(val) {
-
-                /**
+			if (val) {
+		/**
                  **  Was it a function?
                  **  Yes, if it has arguments...
                  **/
-		while( *cptr) {
-		    if( *cptr == '\\') {
-			if( nobackslash) {
-			    nobackslash = 0;
-			}
-		    } else {
-		if(*cptr == '$') {
-			    if( nobackslash) {
-				fprintf(aliasfile, "unset -f %s%c", alias,
-				        alias_separator);
-		    return TCL_OK;
-			    }
-			}
-			nobackslash = 1;
-		    }
-		    cptr++;
-		}
-
-                /**
+				while (*cptr) {
+					if (*cptr == '\\') {
+						if (nobackslash) {
+							nobackslash = 0;
+						}
+					} else {
+						if (*cptr == '$') {
+							if (nobackslash) {
+		fprintf(aliasfile,"unset -f %s%c",alias,alias_separator);
+								return TCL_OK;
+							}
+						}
+						nobackslash = 1;
+					}
+					cptr++;
+				}
+		/**
                  **  Well, it wasn't a function, so we'll put out an unalias...
                  **/
-		    fprintf( aliasfile, "unalias %s%c", alias, alias_separator);
+				fprintf(aliasfile, "unalias %s%c", alias,
+					alias_separator);
 
-            } else {	/** No value known (any more?) **/
-
-                /**
+			} else { /** No value known (any more?) **/
+		/**
                  **  We'll assume it was a function because the unalias command
                  **  in bash produces an error.  It's possible that the alias
                  **  will not be cleared properly here because it was an
                  **  unset-alias command.
                  **/
-                fprintf( aliasfile, "unset -f %s%c", alias, alias_separator);
-            }
-
+				fprintf(aliasfile, "unset -f %s%c", alias,
+					alias_separator);
+			}
 	/**
 	 **  ZSH or KSH
 	 **  Put out both because we it could be either a function or an
 	 **  alias.  This will catch both.
 	 **/
-
-        } else if( !strcmp( shell_name, "zsh")){
-
-            fprintf(aliasfile, "unalias %s%c", alias, alias_separator);
-
-        } else if( !strcmp( shell_name, "ksh")) {
-
-            fprintf(aliasfile, "unalias %s%c", alias, alias_separator);
-            fprintf(aliasfile, "unset -f %s%c", alias, alias_separator);
-
-        } /** if( bash, zsh, ksh) **/
-
-	/** ??? Unknown derelict ??? **/
-
-    } /** if( sh-family) **/
-    
-    return( TCL_OK);
+		} else if (!strcmp(shell_name, "zsh")) {
+			fprintf(aliasfile, "unalias %s%c", alias,
+				alias_separator);
+		} else if (!strcmp(shell_name, "ksh")) {
+			fprintf(aliasfile, "unalias %s%c", alias,
+				alias_separator);
+			fprintf(aliasfile, "unset -f %s%c", alias,
+				alias_separator);
+		} /** if( bash, zsh, ksh) **/
+	 /** ??? Unknown derelict ??? **/
+	}
+	  /** if( sh-family) **/
+	return (TCL_OK);
 
 } /** End of 'output_unset_alias' **/
 
@@ -2248,58 +1894,6 @@ success0:
 /*++++
  ** ** Function-Header ***************************************************** **
  ** 									     **
- **   Function:		chk_marked_entry, set_marked_entry		     **
- ** 									     **
- **   Description:	When switching, the variables are marked with a mar- **
- **			ker that is tested to see if the variable was changed**
- **			in the second modulefile. If it was not, then the    **
- **			variable is unset.				     **
- ** 									     **
- **   First Edition:	1992/10/25					     **
- ** 									     **
- **   Parameters:	Tcl_HashTable   *table	Attached hash table	     **
- **			char            *var	According variable name	     **
- **			int              val	Value to be set.	     **
- **									     **
- **   Result:		int	0	Mark not set (or the value of the    **
- **					mark was 0 ;-)			     **
- **				else	Value of the mark that has been set  **
- **					with set_marked_entry.		     **
- **   Attached Globals:	-						     **
- ** 									     **
- ** ************************************************************************ **
- ++++*/
-
-intptr_t chk_marked_entry(	Tcl_HashTable	*table,
-				char		*var)
-{
-    Tcl_HashEntry 	*hentry;
-
-    if( (hentry = Tcl_FindHashEntry( table, var)) )
-        return((intptr_t) Tcl_GetHashValue( hentry));
-    else
-        return 0;
-}
-
-void set_marked_entry(	Tcl_HashTable	*table,
-			char		*var,
-			intptr_t 	 val)
-{
-    Tcl_HashEntry	*hentry;
-    int    		 new;
-
-    if( (hentry = Tcl_CreateHashEntry( table, var, &new)) ) {
-        if( val)
-            Tcl_SetHashValue( hentry, val);
-    }
-
-    /**  ??? Shouldn't there be an error return in case of hash creation
-	     failing ??? **/
-}
-
-/*++++
- ** ** Function-Header ***************************************************** **
- ** 									     **
  **   Function:		get_module_basename				     **
  ** 									     **
  **   Description:	Get the name of a module without its version.	     **
@@ -2316,24 +1910,23 @@ void set_marked_entry(	Tcl_HashTable	*table,
  ** ************************************************************************ **
  ++++*/
 
-static	char	*get_module_basename(	char	*modulename)
-{
-    char *version;			/** Used to locate the version sep.  **/
-
+static char    *get_module_basename(
+	char *modulename
+) {
+	char           *version;	/** Used to locate the version sep.  **/
     /**
      **  Use strrchr to locate the very last version string on the module
      **  name.
      **/
-    if((version = strrchr( modulename, '/'))) {
-	*version = '\0';
-    } else {
-	modulename = NULL;
-    }
- 
+	if ((version = strrchr(modulename, '/'))) {
+		*version = '\0';
+	} else {
+		modulename = NULL;
+	}
     /**
      **  Return the *COPIED* string
      **/
-    return( modulename);
+	return (modulename);
 
 } /** End of 'get_module_basename' **/
 
@@ -3015,40 +2608,6 @@ int tmpfile_mod(char** filename, FILE** file) {
   return 1;
 }
 
-
-/*++++
- ** ** Function-Header ***************************************************** **
- ** 									     **
- **   Function:		countTclHash					     **
- ** 									     **
- **   Description:	returns the number of hash entries in a TclHash	     **
- ** 									     **
- **   first edition:	2005/09/01	R.K.Owen <rk@owen.sj.ca.us>	     **
- ** 									     **
- **   Parameters:	Tcl_HashTable	*table	Hash to count		     **
- ** 									     **
- **   Result:		size_t			Count of Hash Entries	     **
- ** 									     **
- **   Attached Globals:	-						     **
- ** 									     **
- ** ************************************************************************ **
- ++++*/
-
-
-size_t countTclHash(Tcl_HashTable *table) {
-	size_t result = 0;
-	Tcl_HashSearch	 searchPtr;	/** Tcl hash search handle	     **/
-
-	if(Tcl_FirstHashEntry(table, &searchPtr)) {
-
-	    do {
-		result++;
-	    } while(Tcl_NextHashEntry( &searchPtr));
-
-	} /** if **/
-
-	return result;
-} /** End of 'countHashTable' **/
 
 /*++++
  ** ** Function-Header ***************************************************** **
