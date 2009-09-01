@@ -159,6 +159,7 @@ extern	int	  errno;
  **/
 typedef enum {
 	MHashNULL = 0,				/** invalid value	**/
+	MHashInt,				/** integer values	**/
 	MHashStrings,				/** string storage	**/
 	MHashRefCounts,				/** strings &		**/
 						/**   reference counts	**/
@@ -172,6 +173,13 @@ typedef struct _mhash {
 	int		(*add)(void **,va_list);/** fn copy/create data	**/
 	int		(*del)(void **,va_list);/** fn delete data	**/
 } MHash;
+
+typedef enum {
+	GHashNULL = 0,				/** invalid value	**/
+	GHashClear,				/** Clear  global hashes**/
+	GHashDelete,				/** Delete global hashes**/
+	GHashCopy,				/** Copy   global hashes**/
+} GHashAction;
 
 /**
  **  Structure to store information about a file.  Includes its name
@@ -483,12 +491,13 @@ extern	char	 *whatisRE;
 extern	char	 *aproposRE;
 extern	char	 *refreshRE;
 
-extern	Tcl_HashTable	*setenvHashTable;
-extern	Tcl_HashTable	*unsetenvHashTable;
-extern	Tcl_HashTable	*aliasSetHashTable;
-extern	Tcl_HashTable	*aliasUnsetHashTable;
+extern	MHash	*setenvHashTable;
+extern	MHash	*unsetenvHashTable;
+extern	MHash	*aliasSetHashTable;
+extern	MHash	*aliasUnsetHashTable;
 extern	Tcl_HashTable	*markVariableHashTable;
 extern	Tcl_HashTable	*markAliasHashTable;
+extern	MHash	*GlobalHashTables[5];
 
 extern	char    _fil_stdin[];
 extern	char    _fil_stdout[];
@@ -680,15 +689,11 @@ extern	uvec	 *SplitIntoList(const char*, int*, const char*);
 extern	void	  FreeList( uvec**);
 #endif
 extern	uvec	 *ModulePathList(void);
-extern	int	  store_hash_value( Tcl_HashTable*, const char*, const char*);
-extern	int	  clear_hash_value( Tcl_HashTable*, const char*);
 extern	int	  store_old_shell_variable( Tcl_HashTable*, const char*,
 			const char*);
 extern	int	  clear_old_shell_variable( Tcl_HashTable*, const char*);
-extern	void	  Delete_Global_Hash_Tables( void);
-extern	void	  Delete_Hash_Tables( Tcl_HashTable**);
-extern	Tcl_HashTable** Copy_Hash_Tables( void);
-extern	int	  Unwind_Modulefile_Changes( Tcl_Interp*, Tcl_HashTable**);
+extern	MHash	**Global_Hash_Table(GHashAction, MHash **);
+extern	int	  Unwind_Modulefile_Changes( Tcl_Interp*, MHash **);
 extern	int	  Output_Modulefile_Changes( Tcl_Interp*);
 extern	int	  store_env( void);
 extern	int	  free_stored_env( void);
@@ -709,7 +714,6 @@ extern	char	 *xdup(char const *);
 extern	char	 *xgetenv(char const *);
 extern  int       tmpfile_mod( char**, FILE**);
 extern	char	 *stringer(char *, int, ...);
-extern	size_t	  countTclHash(Tcl_HashTable *);
 extern	EM_RetVal	ReturnValue( Tcl_Interp*, int);
 extern	void	  OutputExit();
 
@@ -728,6 +732,8 @@ extern	MHash	 *mhash_copy(MHash *);
 extern	int	  mhash_del_(MHash *, const char *key, ...);
 extern	int	  mhash_del(MHash *, const char *key, ...);
 extern	int	  mhash_add(MHash *, const char *key, ...);
+extern	MHashType mhash_type(MHash *);
+extern	int	  mhash_number(MHash *);
 extern	uvec	 *mhash_keys_uvec(MHash *);
 extern	char	**mhash_keys(MHash *);
 extern	void	 *mhash_value(MHash *, const char *key);

@@ -29,7 +29,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utilobj.c,v 1.3.2.3 2009/08/31 18:26:27 rkowen Exp $";
+static char Id[] = "@(#)$Id: utilobj.c,v 1.3.2.4 2009/09/01 18:18:20 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -208,6 +208,7 @@ int Tcl_ObjvToArgv(
  **	mhash_copy		constructs a copy of a Mhash object	     **
  **	mhash_add		add    a key/value pair			     **
  **	mhash_del		delete a key/value pair			     **
+ **	mhash_type		type of MHash				     **
  **	mhash_number		number of key/value pairs		     **
  **	mhash_keys_uvec		return uvec object of keys		     **
  **	mhash_keys		return vector of keys			     **
@@ -223,6 +224,21 @@ int Tcl_ObjvToArgv(
 /* MHash data allocation functions for the various types
  * internal use only
  */
+/* type: MHashInt */
+
+static int	mhash_int_add(void	**data, va_list ap) {
+	intptr_t num = va_arg(ap,intptr_t);
+	if (!data) return -1;		/* NULL ptr */
+	if ((char *) *data) return 1;		/* already allocated */
+	*data = (void *) num;
+	return 0;
+}
+
+static int	mhash_int_del(void	**data, va_list ap) {
+	*data = (void *) NULL;
+	return 0;
+}
+
 /* type: MHashStrings */
 
 static int	mhash_strings_add(void	**data, va_list ap) {
@@ -266,6 +282,10 @@ MHash *mhash_ctor(MHashType type) {
 	case MHashStrings:
 		mhp->add = mhash_strings_add;
 		mhp->del = mhash_strings_del;
+		break;
+	case MHashInt:
+		mhp->add = mhash_int_add;
+		mhp->del = mhash_int_del;
 		break;
 	default:
 		if (OK != ErrorLogger(ERR_MHASH, LOC, NULL))
@@ -368,9 +388,11 @@ int mhash_del(MHash *mh, const char *key, ...) {
 	/* get variable arg pointer */
 	va_start(vargs, key);
 
-	if ((in = uvec_find(mh->keys, key, UVEC_ASCEND)) < 0)
+	if ((in = uvec_find(mh->keys, key, UVEC_ASCEND)) < -1)
 		if (OK != ErrorLogger(ERR_UVEC, LOC, NULL))
 			return TCL_ERROR; 	/** ---- EXIT (FAILURE) ---> **/
+	if (in == -1)	/* not found */
+			return TCL_OK;
 
 	if ((in = uvec_delete(mh->keys, in)) < 0)
 		if (OK != ErrorLogger(ERR_UVEC, LOC, NULL))
@@ -418,6 +440,11 @@ int mhash_add(MHash *mh, const char *key, ...) {
 /*
  * accessor methods
  */
+/* mhash_type - return the type of MHash this is */
+MHashType mhash_type(MHash *mh) {
+	return mh->type;
+}
+
 /* mhash_number - return the number of key/value pairs */
 int mhash_number(MHash *mh) {
 	return uvec_number(mh->keys);
