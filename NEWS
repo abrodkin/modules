@@ -23,6 +23,7 @@ modules 3.3.0
 	* Included another modulefile which adds $HOME to the *PATH hierarchy
 	* Wrapped the Tcl hash array code into a more convenient form - MHash
 	* Put all hash arrays in the MHash form and removed crufty code
+	* Changed the global rc file name to modulerc.
 
 ****************************   Release 3.2 ******************************
 Modules 3.2.7

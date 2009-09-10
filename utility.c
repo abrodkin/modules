@@ -52,7 +52,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.33 2009/09/02 20:37:39 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.33.2.1 2009/09/10 21:52:07 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -114,15 +114,14 @@ static	const int   bourne_alias = 	/** HAS_BOURNE_FUNCS macro	     **/
 /**				    PROTOTYPES				     **/
 /** ************************************************************************ **/
 
-static	int	 Output_Modulefile_Aliases( Tcl_Interp *interp);
-static	int	 Output_Directory_Change(Tcl_Interp *interp);
-static	int	 output_set_variable( Tcl_Interp *interp, const char*,
-				      const char*);
+static	int	 Output_Modulefile_Aliases( void);
+static	int	 Output_Directory_Change( void);
+static	int	 output_set_variable( const char*, const char*);
 static	int	 output_unset_variable( const char* var);
 static	void	 output_function( const char*, const char*);
 static	int	 output_set_alias( const char*, const char*);
 static	int	 output_unset_alias( const char*, const char*);
-static	int	 __IsLoaded( Tcl_Interp*, char*, char**, char*, int);
+static	int	 __IsLoaded( char*, char**, char*, int);
 static	char	*get_module_basename( char*);
 static	char	*chop( const char*);
 static  void     EscapeCshString(const char* in,
@@ -510,7 +509,7 @@ uvec *ModulePathList(
  ** 									     **
  **   Function:		Global_Hash_Tables				     **
  ** 									     **
- **   Description: 	Process the global hash tables in fell swoop	     **
+ **   Description: 	Process the global hash tables in one fell swoop     **
  ** 									     **
  **   First Edition:	2009/09/01					     **
  ** 									     **
@@ -607,12 +606,11 @@ int Unwind_Modulefile_Changes(
 
 	if (oldTables) {
 	/**
-	 **  Use only entries 0 and 1 which do contain all changes to the 
-	 **  shell varibles (setenv and unsetenv)
+	 **  Entries 0 and 1 which contain all changes to the 
+	 **  shell variables (setenv and unsetenv)
+	 **  Entries 2 and 3 which contain the aliase/unalias setting
 	 **/
-	/** ??? What about the aliases (table 2 and 3) ??? **/
-
-		for (i = 0; i < 2; i++) {
+		for (i = 0; i < 4; i++) {
 	    /**
 	     **  The hash entry will contain the appropriate value for the
 	     **  specified 'key' because it will have been acquired depending
@@ -622,8 +620,7 @@ int Unwind_Modulefile_Changes(
 			while (keys && *keys) {
 				val = mhash_value(oldTables[i], *keys);
 				if (val)
-					Tcl_SetVar2(interp, "env", *keys, val,
-						    TCL_GLOBAL_ONLY);
+					(void) module_setenv(*keys, val);
 				keys++;
 			}
 		} /** for **/
@@ -684,7 +681,7 @@ int Output_Modulefile_Changes(
 	MHash	       *table[2];	/** setenv & unsetenv hashes	     **/
 
     /**
-     **  The following hash tables do contain all changes to be made on
+     **  The following hash tables contain all changes to be made on
      **  shell variables
      **/
 	table[0] = setenvHashTable;
@@ -704,9 +701,8 @@ int Output_Modulefile_Changes(
 			if (i == 1) {
 				output_unset_variable(*keys);
 			} else {
-				if ((val = (char *)Tcl_GetVar2(interp, "env",
-						       *keys, TCL_GLOBAL_ONLY)))
-					output_set_variable(interp, *keys, val);
+				if ((val = getenv(*keys)))
+					output_set_variable(*keys, val);
 			}
 			keys++;
 		}
@@ -716,8 +712,8 @@ int Output_Modulefile_Changes(
 		if (OK != ErrorLogger(ERR_FLUSH, LOC, _fil_stdout, NULL))
 			return (TCL_ERROR); /** ------ EXIT (FAILURE) -----> **/
 
-	Output_Modulefile_Aliases(interp);
-	Output_Directory_Change(interp);
+	Output_Modulefile_Aliases();
+	Output_Directory_Change();
 
     /**
      **  Delete and reset the hash tables since the current contents have been
@@ -786,8 +782,7 @@ static int Open_Aliasfile(
  ** 									     **
  **   First Edition:	1991/10/23					     **
  ** 									     **
- **   Parameters:	Tcl_Interp	*interp		The attached Tcl in- **
- **							terpreter	     **
+ **   Parameters:	void			none			     **
  ** 									     **
  **   Result:		int	TCL_OK		Successful operation	     **
  ** 									     **
@@ -798,7 +793,7 @@ static int Open_Aliasfile(
  ++++*/
 
 static int Output_Modulefile_Aliases(
-	Tcl_Interp * interp
+	void
 ) {
 	char           *val = NULL,	/** Stored value (is a pointer!)     **/
 		      **keys,		/** hash keys			     **/
@@ -909,7 +904,7 @@ static int Output_Modulefile_Aliases(
  **									     **
  **   Description:	Changes the current working directory.               **
  **									     **
- **   Parameters:	Tcl_Interp *interp	The attached Tcl interpreter **
+ **   Parameters:	void			none			     **
  **									     **
  **   Result:		int	TCL_OK		Successful operation	     **
  **				TCL_ERROR	When not applicable	     **
@@ -919,7 +914,7 @@ static int Output_Modulefile_Aliases(
  ** ************************************************************************ **
  ++++*/
 static int Output_Directory_Change(
-	Tcl_Interp * interp
+	void
 ) {
 	int             retval = TCL_OK;
 
@@ -954,8 +949,7 @@ static int Output_Directory_Change(
  ** 									     **
  **   First Edition:	1991/10/23					     **
  ** 									     **
- **   Parameters:	Tcl_Interp	*interp	The attached Tcl interpreter **
- **   			const char	*var	Name of the variable to be   **
+ **   Parameters:	const char	*var	Name of the variable to be   **
  **						set			     **
  **			const char	*val	Value to be assigned	     **
  **									     **
@@ -968,7 +962,6 @@ static int Output_Directory_Change(
  ++++*/
 
 static int output_set_variable(
-	Tcl_Interp * interp,
 	const char *var,
 	const char *val
 ) {
@@ -1057,9 +1050,7 @@ static int output_set_variable(
 	     **/
 			do {
 				sprintf(formatted, "_LMFILES_%03d", count++);
-				cptr = (char *)Tcl_GetVar2(interp, "env",
-					formatted, TCL_GLOBAL_ONLY);
-				if (cptr) {
+				if ((cptr = getenv(formatted)))
 					fprintf(stdout, "unsetenv %s%s",
 						formatted, shell_cmd_separator);
 				}
@@ -1544,103 +1535,112 @@ static int output_unset_alias(
  ** 									     **
  **   First Edition:	1991/10/23					     **
  ** 									     **
- **   Parameters:	Tcl_Interp    *interp	Attached Tcl interpreter     **
+ **   Parameters:	void			none			     **
  ** 									     **
- **   Result:		char*	Value of the environment varibale _LMFILES_  **
+ **   Result:		char*	Value of the environment variable _LMFILES_  **
  ** 									     **
  **   Attached Globals:							     **
  ** 									     **
  ** ************************************************************************ **
  ++++*/
 
-char	*getLMFILES( Tcl_Interp	*interp)
-{
-    static char	*lmfiles = NULL;	/** Buffer pointer for the value     **/
+char           *getLMFILES(
+	void
+) {
+	static char    *lmfiles = NULL;	/** Buffer pointer for the value     **/
 
     /**
      **  Try to read the variable _LMFILES_. If the according buffer pointer
      **  contains a value, disallocate it before.
      **/
-    if( lmfiles)
-        null_free((void *) &lmfiles);
+	if (lmfiles)
+		null_free((void *)&lmfiles);
 
-    lmfiles = (char *) Tcl_GetVar2( interp, "env","_LMFILES_",TCL_GLOBAL_ONLY);
+	lmfiles = getenv("_LMFILES_");
 
     /**
      **  Now the pointer is NULL in case of the variable has not been defined.
      **  In this case try to read in the splitted variable from _LMFILES_xxx
      **/
-    if( !lmfiles) {
+	if (!lmfiles) {
 
-        char	buffer[ MOD_BUFSIZE];	/** Used to set up the split variab- **/
+		char            buffer[MOD_BUFSIZE];
+					/** Used to set up the split variab- **/
 					/** les name			     **/
-        int	count = 0;		/** Split part count		     **/
-        int	lmsize = 0;		/** Total size of _LMFILES_ content  **/
-        int	old_lmsize;		/** Size save buffer		     **/
-        int	cptr_len;		/** Size of the current split part   **/
-        char	*cptr;			/** Split part read pointer	     **/
+		int             count = 0;
+					/** Split part count		     **/
+		int             lmsize = 0;
+					/** Total size of _LMFILES_ content  **/
+		int             old_lmsize;
+					/** Size save buffer		     **/
+		int             cptr_len;
+					/** Size of the current split part   **/
+		char           *cptr;	/** Split part read pointer	     **/
 
 	/**
 	 **  Set up the split part environment variable name and try to read it
 	 **  in
 	 **/
-        sprintf( buffer, "_LMFILES_%03d", count++);
-        cptr = (char *) Tcl_GetVar2( interp, "env", buffer, TCL_GLOBAL_ONLY);
+		sprintf(buffer, "_LMFILES_%03d", count++);
+		cptr = getenv(buffer);
 
-        while( cptr) {			/** Something available		     **/
+		while (cptr) {		/** Something available		     **/
 
 	    /**
 	     **  Count up the variables length
 	     **/
-            cptr_len = strlen( cptr);	
-            old_lmsize = lmsize;
-            lmsize += cptr_len;
- 
+			cptr_len = strlen(cptr);
+			old_lmsize = lmsize;
+			lmsize += cptr_len;
+
 	    /**
 	     **  Reallocate the value's buffer and copy the current split
 	     **  part at its end
 	     **/
-            if((char *) NULL == (lmfiles =
-		(char*) module_realloc( lmfiles, lmsize * sizeof(char) + 1))) {
-		    if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
-			return( NULL);		/** ---- EXIT (FAILURE) ---> **/
-	    }
-            
-            strncpy( lmfiles + old_lmsize, cptr, cptr_len);
-            *(lmfiles + old_lmsize + cptr_len) = '\0';
- 
+			if ((char *)NULL == (lmfiles =
+					     (char *)module_realloc(lmfiles,
+								    lmsize *
+								    sizeof(char)
+								    + 1))) {
+				if (OK != ErrorLogger(ERR_ALLOC, LOC, NULL))
+					return (NULL);
+						/** ---- EXIT (FAILURE) ---> **/
+			}
+
+			strncpy(lmfiles + old_lmsize, cptr, cptr_len);
+			*(lmfiles + old_lmsize + cptr_len) = '\0';
+
 	    /**
 	     **  Read the next split part variable
 	     **/
-            sprintf( buffer, "_LMFILES_%03d", count++);
-            cptr = (char *) Tcl_GetVar2( interp,"env",buffer, TCL_GLOBAL_ONLY);
-        }
+			sprintf(buffer, "_LMFILES_%03d", count++);
+			cptr = getenv(buffer);
+		}
 
-    } else {  /** if( lmfiles) **/
-
+	} else { /** if( lmfiles) **/
 	/**
 	 **  If the environvariable _LMFILES_ has been set, copy the contents
 	 **  of the returned buffer into a free allocated one in order to
 	 **  avoid side effects.
 	 **/
-	char	*tmp = stringer(NULL,0, lmfiles, NULL);
+		char           *tmp = stringer(NULL, 0, lmfiles, NULL);
 
-	if( !tmp)
-	    if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
-		return( NULL);		/** -------- EXIT (FAILURE) -------> **/
+		if (!tmp)
+			if (OK != ErrorLogger(ERR_ALLOC, LOC, NULL))
+				return (NULL);
+					/** -------- EXIT (FAILURE) -------> **/
 
 	/** 
 	 **  Set up lmfiles pointing to the new buffer in order to be able to
 	 **  disallocate when invoked next time.
 	 **/
-        lmfiles = tmp;
+		lmfiles = tmp;
 
-    } /** if( lmfiles) **/
-
+	} /** if( lmfiles) **/
     /**
      **  Return the received value to the caller
      **/
-    return( lmfiles);
+	return (lmfiles);
 
 } /** end of 'getLMFILES' **/
 
@@ -1654,8 +1654,7 @@ char	*getLMFILES( Tcl_Interp	*interp)
  ** 									     **
  **   First Edition:	1991/10/23					     **
  ** 									     **
- **   Parameters:	Tcl_Interp       *interp	According Tcl interp.**
- **			char             *modulename	Name of the module to**
+ **   Parameters:	char             *modulename	Name of the module to**
  **							be searched for	     **
  **			char            **realname	Buffer for the name  **
  **							and version of the   **
@@ -1690,33 +1689,30 @@ char	*getLMFILES( Tcl_Interp	*interp)
 /**
  **  Check all possibilities of module-versions
  **/
-
 int IsLoaded(
-	Tcl_Interp * interp,
 	char *modulename,
 	char **realname,
 	char *filename
 ) {
-	return (__IsLoaded(interp, modulename, realname, filename, 0));
+	return (__IsLoaded(modulename, realname, filename, 0));
 }
 
 /**
  **  Check only an exact match of the passed module and version
  **/
 int IsLoaded_ExactMatch(
-	Tcl_Interp * interp,
 	char *modulename,
 	char **realname,
 	char *filename
 ) {
-	return (__IsLoaded(interp, modulename, realname, filename, 1));
+	return (__IsLoaded(modulename, realname, filename, 1));
 }
 
 /**
  **  The subroutine __IsLoaded finally checks for the requested module being
  **  loaded or not.
  **/
-static int __IsLoaded(	Tcl_Interp	 *interp,
+static int __IsLoaded(
 			char		 *modulename,
 			char		**realname,
 			char		 *filename,
@@ -1734,9 +1730,8 @@ static int __IsLoaded(	Tcl_Interp	 *interp,
      **  Get a list of loaded modules (environment variable 'LOADEDMODULES')
      **  and the list of loaded module-files (env. var. __LMFILES__)
      **/
-    char	*loaded_modules = (char *) Tcl_GetVar2( interp, "env",
-			"LOADEDMODULES", TCL_GLOBAL_ONLY);
-    char	*loaded_modulefiles = getLMFILES( interp);
+    char	*loaded_modules = getenv("LOADEDMODULES");
+    char	*loaded_modulefiles = getLMFILES();
     
     /**
      **  If no module is currently loaded ... the requested module is surely
@@ -2647,7 +2642,6 @@ int tmpfile_mod(char** filename, FILE** file) {
  ** ************************************************************************ **
  ++++*/
 
-
 EM_RetVal ReturnValue(Tcl_Interp *interp, int retval) {
 	EM_RetVal	 em_result;
 	char		*startp		= (char *) NULL,
@@ -2660,6 +2654,9 @@ EM_RetVal ReturnValue(Tcl_Interp *interp, int retval) {
 
 	tstr = (const char *) TCL_RESULT(interp);
 
+	/* Tcl caches upto 30 compiled regexps ... lost ones will be
+	 * recompiled
+	 */
 	/* compile regular expression the first time through */
 	if (!exit__expPtr)
 		exit__expPtr = Tcl_RegExpCompile(interp, "^EXIT ([0-9]*)");
@@ -2748,3 +2745,53 @@ void OutputExit() {
 		fprintf( stdout, " test 0 = 1;");
 	}
 } /** End of 'OutputExit' **/
+
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
+ **   Function:		module_setenv					     **
+ ** 									     **
+ **   Description:	Sets the global environment variables.  See the      **
+ ** 			Posix description.				     **
+ ** 									     **
+ **   first edition:	2009/09/09	R.K.Owen <rk@owen.sj.ca.us>	     **
+ ** 									     **
+ **   Parameters:	char	*var		variable name		     **
+ **			char	*val		value for variable	     **
+ ** 									     **
+ **   result:		int	    		result = 0 if success	     **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
+int module_setenv(
+	const char *var,
+	const char *val
+) {
+
+#ifdef HAVE_SETENV
+	/* overwrite any current values */
+	return setenv(var, val, 1);
+
+#elif HAVE_PUTENV
+	{
+		int             ret;
+		char           *tmp;
+		if (!(tmp = stringer(NULL, 0, var, "=", val, NULL)))
+			return -1;
+		ret = putenv(tmp);
+		null_free(&tmp);
+		return ret;
+	}
+#else
+/* use Tcl version ... must create an interpretor */
+	{
+		Tcl_Interp     *interp;
+
+		interp = Tcl_CreateInterp();
+		Tcl_SetVar2(interp, "env", var, val, TCL_GLOBAL_ONLY);
+		Tcl_DeleteInterp(interp);
+
+		return 0;
+	}
+#endif
+} /** End of 'module_setenv' **/

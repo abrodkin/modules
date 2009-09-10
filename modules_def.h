@@ -39,6 +39,7 @@
 #include <tcl.h>
 #include "config.h"
 #include "uvec.h"
+#include "ovec.h"
 
 #ifndef CONST84
 #  define CONST84	/* const */
@@ -377,7 +378,7 @@ typedef enum	{
  **/
 
 #ifndef	RCFILE
-#  define	RCFILE		"rc"
+#  define	RCFILE		"modulerc"
 #endif
 
 #ifndef	MODULERCFILE
@@ -470,6 +471,8 @@ extern	char	 *line;
 extern	char	 *error_line;
 extern	char	  local_line[];
 extern	char	  _colon[];
+extern	char	 *psep;
+extern	Tcl_Obj	 *cwd;
 
 extern	int	  linenum;
 
@@ -699,9 +702,9 @@ extern	int	  store_env( void);
 extern	int	  free_stored_env( void);
 extern	Tcl_HashTable*  environ_changes;
 extern	Tcl_HashTable*  alias_changes;
-extern	char	 *getLMFILES( Tcl_Interp *interp);
-extern	int	  IsLoaded( Tcl_Interp*, char*, char**, char*);
-extern	int	  IsLoaded_ExactMatch( Tcl_Interp*, char*, char	**, char*);
+extern	char	 *getLMFILES(void);
+extern	int	  IsLoaded( char*, char**, char*);
+extern	int	  IsLoaded_ExactMatch( char*, char	**, char*);
 extern	int	  Update_LoadedList( Tcl_Interp*, char*, char*);
 extern	int	  check_magic( char*, char*, int);
 extern	char	 *xstrtok_r(char *, const char *, char **);
@@ -714,6 +717,7 @@ extern  int       tmpfile_mod( char**, FILE**);
 extern	char	 *stringer(char *, int, ...);
 extern	EM_RetVal	ReturnValue( Tcl_Interp*, int);
 extern	void	  OutputExit();
+extern	int	  module_setenv(const char *var, const char *val);
 
 /** utilmem.c **/
 extern	void	 *module_malloc(size_t);
@@ -724,6 +728,7 @@ extern	void	  null_free(void **);
 /** utilobj.c **/
 extern	int	  Tcl_ArgvToObjv(int *, Tcl_Obj ***, int, char * const *);
 extern	int	  Tcl_ObjvToArgv(int *, char ***, int, Tcl_Obj * CONST84 *);
+extern	int	  Tcl_ObjvToUvec(uvec **, int, Tcl_Obj * CONST84 *);
 extern	MHash	 *mhash_ctor(MHashType);
 extern	int	  mhash_dtor(MHash **);
 extern	MHash	 *mhash_copy(MHash *);

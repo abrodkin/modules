@@ -30,7 +30,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: main.c,v 1.29 2009/09/02 20:37:39 rkowen Exp $";
+static char Id[] = "@(#)$Id: main.c,v 1.29.2.1 2009/09/10 21:52:07 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -79,13 +79,15 @@ char	 *g_current_module = NULL,	/** The module which is handled by   **/
 	 *shell_derelict,		/** Shell family (sh, csh, etc)	     **/
 	 *shell_init,			/** Shell init script name	     **/
 	 *shell_cmd_separator,		/** Shell command separator char     **/
-	  _colon[] = ":";		/** directory separator		     **/
+	  _colon[] = ":",		/** directory separator		     **/
+	 *psep;				/** path separator (default = "/")   **/
 int	  g_flags = 0,			/** Control what to do at the moment **/
 					/** The posible values are defined in**/
 					/** module_def.h		     **/
 	  g_retval = 0,			/** exit return value		     **/
 	  g_output = 0,			/** Has output been generated	     **/
 	  append_flag = 0;		/** only used by the 'use' command   **/
+Tcl_Obj	 *cwd;				/** Tcl version of cwd		     **/
 
 /**
  **  Name of the rc files
@@ -228,6 +230,11 @@ int	main( int argc, char *argv[], char *environ[]) {
     if( TCL_OK != Setup_Environment( interp))
 	goto unwind0;
 
+    cwd = Tcl_FSGetCwd(interp);
+    psep = Tcl_GetString(Tcl_FSPathSeparator(cwd));
+    if (!psep)
+	psep = "/";
+
     /**
      **  Check for command line switches
      **/
@@ -268,42 +275,34 @@ int	main( int argc, char *argv[], char *environ[]) {
 	null_free((void *) &rc_name);
 	rc_name = rc_file;
     }
-
     /**
      **  Finally we have to change PREFIX -> PREFIX/etc
      **/
-
     if( rc_path == instpath) {
 	if((char *) NULL == (rc_path = stringer(NULL,0, instpath,"/etc",NULL))){
 	    if( OK != ErrorLogger( ERR_ALLOC, LOC, NULL))
 		goto unwind1;
 	    else
 		rc_path = NULL;
-	
 	}
     }
-
     /**
      **  Source the global and the user defined RC file
      **/
-
     g_current_module = (char *) NULL;
 
     if( TCL_ERROR == SourceRC( interp, rc_path, rc_name) ||
-	TCL_ERROR == SourceRC( interp, getenv( "HOME"), modulerc_file))
+	TCL_ERROR == SourceRC( interp, getenv("HOME"), modulerc_file))
 	exit( 1);
 
     if( rc_path)
 	null_free((void *) &rc_path);
-
     /**
      **  Invocation of the module command as specified in the command line
      **/
-
     g_flags = 0;
     Tcl_ArgvToObjv(&objc, &objv, argc-1, argv+1);
-    return_val = cmdModule((ClientData) 0,interp,objc, objv);
-
+    return_val = cmdModule((ClientData) 0,interp, objc, objv);
     /**
      **  If we were doing some operation that has already flushed its output,
      **  then we don't need to re-flush the output here.
@@ -325,19 +324,16 @@ int	main( int argc, char *argv[], char *environ[]) {
 	xresourceFinish( 0);
 #endif
     }
-
     /**
      **  Finally clean up. Delete the required hash tables and conditionally
      **  allocated areas.
      **/
-
     Global_Hash_Tables(GHashDelete, NULL);
 
     if( line)
 	null_free((void *) &line);
     if( error_line)
 	null_free((void *) &error_line);
-
     /**
      **  This return value may be evaluated by the calling shell
      **/

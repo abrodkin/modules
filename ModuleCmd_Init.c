@@ -29,7 +29,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Init.c,v 1.15 2009/09/02 20:37:38 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Init.c,v 1.15.2.1 2009/09/10 21:52:07 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -257,8 +257,8 @@ int	ModuleCmd_Init(	Tcl_Interp	*interp,
 			*endp = '\0';
 		    }
 
-		    if ((char **) NULL ==
-		    (modlist = uvec_vector(SplitIntoList(startp, &nummods," \t"))))
+		    if ((char **) NULL == (modlist
+			= uvec_vector(SplitIntoList(startp, &nummods," \t"))))
 			continue; /** while(fgets) **/
 
 		    /* restore the list end character */

@@ -26,7 +26,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdIsLoaded.c,v 1.13 2009/09/02 20:37:39 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdIsLoaded.c,v 1.13.2.1 2009/09/10 21:52:07 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -140,7 +140,7 @@ int cmdIsLoaded(
 	     **  a prerequisite is missing.
 	     **/
 			for (k = 0; k < nummodules && notloaded_flag; k++) {
-				if (!IsLoaded (interp,
+				if (!IsLoaded(
 				uvec_vector(modulelist)[k], NULL, NULL)) {
 					notloaded_flag = Tcl_GetString(objv[i]);
 				} else {

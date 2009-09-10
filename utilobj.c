@@ -15,6 +15,7 @@
  ** 									     **
  **   Exports:		Tcl_ArgvToObjv					     **
  **			Tcl_ObjvToArgv					     **
+ **			Tcl_ObjvToUvec					     **
  **			mhash_*	(see below)				     **
  **									     **
  **   Notes:								     **
@@ -29,7 +30,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utilobj.c,v 1.5 2009/09/02 20:37:39 rkowen Exp $";
+static char Id[] = "@(#)$Id: utilobj.c,v 1.5.2.1 2009/09/10 21:52:08 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -133,8 +134,8 @@ int Tcl_ArgvToObjv(
  ** 									     **
  **   Function:		Tcl_ObjvToArgv					     **
  ** 									     **
- **   Description:	Take a Unix NULL terminated vector of char strings   **
- **			and create a Tcl_Obj vector.			     **
+ **   Description:	Take a vector of Tcl_Obj pointers and create	     **
+ **			a NULL terminated Unix vector.			     **
  ** 									     **
  **   First Edition:	2009/08/23					     **
  ** 									     **
@@ -181,6 +182,59 @@ int Tcl_ObjvToArgv(
 		*aptr++ = stringer(NULL,0, Tcl_GetString(*optr++), NULL);
 	}
 	*aptr = (char *) NULL;
+
+	return (TCL_OK);		      /** ----- EXIT (SUCCESS) ----> **/
+
+} /** End of 'Tcl_ObjvToArgv' **/
+
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
+ **   Function:		Tcl_ObjvToUvec					     **
+ ** 									     **
+ **   Description:	Take a vector of Tcl_Obj pointers and create	     **
+ **			a uvec object.					     **
+ ** 									     **
+ **   First Edition:	2009/09/03					     **
+ ** 									     **
+ **   Parameters:	uvec		**uvp		uvec object pointer  **
+ **			int		objc		objv element count   **
+ **			Tcl_Obj 	*objv[]		objv vector	     **
+ ** 									     **
+ **   Result:		int	TCL_OK		Successful completion	     **
+ ** 									     **
+ **   Attached Globals:	-						     **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
+
+int Tcl_ObjvToUvec(
+	uvec **uvp,
+	int objc,
+	Tcl_Obj * CONST84 * objv
+) {
+	Tcl_Obj * CONST84 * optr = objv;
+
+	/** if objc < 0 then count the number of elements **/
+	if (objc < 0) {
+		objc = 0;
+		while (optr && *optr) {
+			optr++;
+			objc++;
+		}
+	}
+
+	/** allocate the necessary memory **/
+	if (!(*uvp = uvec_ctor(objc + 1)))
+		if (OK != ErrorLogger(ERR_UVEC, LOC, NULL))
+			return (TCL_ERROR);   /** ----- EXIT (FAILURE) ----> **/
+
+	/** create the list of strings **/
+	while (objc--) {
+		if (0 > uvec_add(*uvp,Tcl_GetString(*objv++)))
+			if (OK != ErrorLogger(ERR_UVEC, LOC, NULL))
+				return (TCL_ERROR); /** -- EXIT (FAILURE) -> **/
+	}
 
 	return (TCL_OK);		      /** ----- EXIT (SUCCESS) ----> **/
 

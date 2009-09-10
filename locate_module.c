@@ -31,7 +31,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: locate_module.c,v 1.29 2009/09/02 20:37:39 rkowen Exp $";
+static char Id[] = "@(#)$Id: locate_module.c,v 1.29.2.1 2009/09/10 21:52:07 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -258,8 +258,7 @@ int Locate_ModuleFile(
 					goto unwind1;
 				modulename = strbuffer;
 			}
-		}
-	  /** for **/
+		} /** for **/
 	/**
 	 **  Free the memory created from the call to SplitIntoList()
 	 **/
@@ -272,8 +271,7 @@ int Locate_ModuleFile(
 			filename[0] = '\0';
 			goto unwind0;
 		}
-	}
-      /** not a full path name **/
+	} /** not a full path name **/
     /**
      **  Free up what has been allocated and pass the result back to
      **  the caller and save the real module file name returned by
@@ -486,7 +484,7 @@ unwindt:
 		 **  If it's a directory, we delve into it.
 		 **/
 		for( i=0; i<numlist && Result==NULL; i++) {
-	char	 *filename;
+			char	 *filename;
 		    /**
 		     **  Build the full path name and check if it is a
 		     **  directory. If it is, recursively try to find there what
