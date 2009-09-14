@@ -52,7 +52,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.33.2.1 2009/09/10 21:52:07 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.33.2.2 2009/09/14 22:08:48 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -218,7 +218,7 @@ uvec           *SortedDirList(
      **  the name of the module. Alloc memory in order to do this.
      **/
 	if ((char *)NULL == (full_path = stringer(NULL, 0,
-				  path, "/", modulename, NULL)))
+				  path, psep, modulename, NULL)))
 		if (OK != ErrorLogger(ERR_STRING, LOC, NULL))
 			goto unwind1;
 	pathlen = strlen(full_path);
@@ -265,7 +265,7 @@ uvec           *SortedDirList(
 	 **  and initialize it with the directory part we do already know.
 	 **/
 		if (NULL ==
-		    (tbuf = stringer(NULL, MOD_BUFSIZE, full_path, "/", NULL)))
+		    (tbuf = stringer(NULL, MOD_BUFSIZE, full_path, psep, NULL)))
 			if (OK != ErrorLogger(ERR_STRING, LOC, NULL))
 				goto unwind3;
 
@@ -297,7 +297,7 @@ uvec           *SortedDirList(
 		     **  Yep! Found! Put it on the list
 		     **/
 					if (uvec_add(filelist, stringer(NULL, 0,
-					 modulename, "/", file->d_name, NULL)))
+					 modulename, psep, file->d_name, NULL)))
 						if (OK !=
 						    ErrorLogger(ERR_UVEC, LOC,
 								NULL))
@@ -1030,7 +1030,6 @@ static int output_set_variable(
 						shell_cmd_separator);
 					count++;
 				}
-
 		/**
 		 ** Unset _LMFILES_ as indicator to use the multi-variable
 		 ** _LMFILES_
@@ -1044,7 +1043,6 @@ static int output_set_variable(
 				fprintf(stdout, "setenv %s %s%s", var, escaped,
 					shell_cmd_separator);
 			}
-
 	    /**
 	     ** Unset the extra _LMFILES_%03d variables that may be set
 	     **/
@@ -1053,7 +1051,6 @@ static int output_set_variable(
 				if ((cptr = getenv(formatted)))
 					fprintf(stdout, "unsetenv %s%s",
 						formatted, shell_cmd_separator);
-				}
 			} while (cptr);
 
 			null_free((void *)&escaped);
@@ -1928,7 +1925,7 @@ static char    *get_module_basename(
      **  Use strrchr to locate the very last version string on the module
      **  name.
      **/
-	if ((version = strrchr(modulename, '/'))) {
+	if ((version = strrchr(modulename, *psep))) {
 		*version = '\0';
 	} else {
 		modulename = NULL;

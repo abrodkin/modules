@@ -31,7 +31,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: error.c,v 1.20 2009/09/02 20:37:39 rkowen Exp $";
+static char Id[] = "@(#)$Id: error.c,v 1.20.2.1 2009/09/14 22:08:48 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -872,7 +872,7 @@ static	int	FlushError(	ErrType		  Type,
 	/**
 	 **  Syslog
 	 **/
-	else if( '.' != *fac && '/' != *fac) {
+	else if( '.' != *fac && *psep != *fac) {
 #if defined(HAVE_SYSLOG) && defined(WITH_LOGGING)
 	    int syslog_fac, syslog_lvl;
 
@@ -897,7 +897,7 @@ static	int	FlushError(	ErrType		  Type,
 	 **  Custom files ...
 	 **  This may result from the syslog part above
 	 **/
-	if( '.' == *fac || '/' == *fac) {
+	if( '.' == *fac || *psep == *fac) {
 	    if((FILE *) NULL == (facfp = fopen( fac, "a"))) {
 
 		if( WGHT_PANIC == Weight)	/** Avoid endless loops!     **/

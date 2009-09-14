@@ -48,7 +48,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdVersion.c,v 1.19 2009/09/02 20:37:39 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdVersion.c,v 1.19.2.1 2009/09/14 22:08:48 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -244,7 +244,7 @@ int cmdModuleVersion(
     /**
      **  get the version from the argument
      **/
-	if ((char *)NULL == (version = strrchr(module, '/'))) {
+	if ((char *)NULL == (version = strrchr(module, *psep))) {
 		if (OK != ErrorLogger(ERR_INTERAL, LOC, NULL))
 			return (TCL_ERROR); /** ------ EXIT (FAILURE) -----> **/
 	}
@@ -330,7 +330,7 @@ char	*ExpandVersions( char	*name)
     if((char *) NULL == (module = CheckModuleVersion( name))) 
 	return((char *) NULL );		/** -------- EXIT (FAILURE) -------> **/
 
-    if((char *) NULL == (version = strrchr( module, '/'))) {
+    if((char *) NULL == (version = strrchr( module, *psep))) {
 	if( OK != ErrorLogger( ERR_INTERAL, LOC, NULL))
 	    return((char *) NULL );	/** -------- EXIT (FAILURE) -------> **/
     }
@@ -492,7 +492,7 @@ static	char	*CheckModuleVersion( char *name)
      **  Check the first parameter and extract modulename and version
      **/
 
-    if( '/' == *name) {			/** only the version specified	     **/
+    if( *psep == *name) {			/** only the version specified	     **/
 
 	/**
 	 **  get the module name from the current module ...
@@ -502,16 +502,16 @@ static	char	*CheckModuleVersion( char *name)
 	    return((char *) NULL);
 
 	strcpy( buffer, g_current_module);
-	if((char *) NULL == (t = strrchr( buffer, '/')))
+	if((char *) NULL == (t = strrchr( buffer, *psep)))
 	    t = buffer + strlen( buffer);
-	*t++ = '/';
+	*t++ = *psep;
 	*t = '\0';
 
 	/**
 	 **  The version has been specified as a parameter
 	 **/
 
-	if( (s = strrchr( name, '/')) ) {
+	if( (s = strrchr( name, *psep)) ) {
 	    s++;
 	} else {
 	    ErrorLogger( ERR_INTERAL, LOC, NULL);
@@ -523,7 +523,7 @@ static	char	*CheckModuleVersion( char *name)
     } else {				/** Maybe an alias or a module	     **/
 
 	strcpy( buffer, name);
-	if( !strrchr( buffer, '/')) {
+	if( !strrchr( buffer, *psep)) {
 
 	    /**
 	     **  Check wheter this is an alias ...
@@ -533,7 +533,7 @@ static	char	*CheckModuleVersion( char *name)
 
 		/* sprintf( buffer, "%s/%s", s, t); */
 		strcpy( buffer, s);
-		strcat( buffer, "/");
+		strcat( buffer, psep);
 		strcat( buffer, t);
 
 	    } else {
@@ -543,8 +543,8 @@ static	char	*CheckModuleVersion( char *name)
 		 **/
 
 		t = buffer + strlen( buffer);
-		if( '/' != *t)
-		    *t++ = '/';
+		if( *psep != *t)
+		    *t++ = *psep;
 		strcpy( t, _(em_default));
 	    }
 	}
@@ -623,7 +623,7 @@ int cmdModuleAlias(
 		    (module = CheckModuleVersion(Tcl_GetString(objv[2]))))
 			module = (char *)Tcl_GetString(objv[2]);
 
-		if ((char *)NULL != (version = strrchr(module, '/')))
+		if ((char *)NULL != (version = strrchr(module, *psep)))
 			*version++ = '\0';
 	}
     /**
@@ -796,9 +796,9 @@ int	VersionLookup(	char *name, char **module, char **version)
      **  BTW: Alias lookups return the FQMN (full qualifed module name ;-)
      **/
 
-    if( '/' == *name) {
+    if( *psep == *name) {
 	strcpy( buffer, g_current_module);
-	if( (s = strrchr( buffer, '/')) )
+	if( (s = strrchr( buffer, *psep)) )
 	    *s = '\0';
 	*module = buffer;
 	*version = name + 1;
@@ -808,7 +808,7 @@ int	VersionLookup(	char *name, char **module, char **version)
 	strcpy( buffer, name);
 	*module = buffer;
 
-	if((char *) NULL == (*version = strrchr( buffer, '/'))) {
+	if((char *) NULL == (*version = strrchr( buffer, *psep))) {
 
 	    if( AliasLookup( buffer, &s, &t)) {
 		*module = s; *version = t;

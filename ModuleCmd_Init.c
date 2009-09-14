@@ -29,7 +29,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Init.c,v 1.15.2.1 2009/09/10 21:52:07 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Init.c,v 1.15.2.2 2009/09/14 22:08:48 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -167,7 +167,7 @@ int	ModuleCmd_Init(	Tcl_Interp	*interp,
      **/
     homelen = strlen(home) + 40;
     if ((char *) NULL ==
-	(home_pathname = stringer(NULL, homelen, home, "/", NULL)))
+	(home_pathname = stringer(NULL, homelen, home, psep, NULL)))
 	if (OK != ErrorLogger(ERR_STRING, LOC, NULL))
 	    goto unwind0;
 

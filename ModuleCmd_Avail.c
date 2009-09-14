@@ -35,7 +35,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Avail.c,v 1.20 2009/09/02 20:37:38 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Avail.c,v 1.20.2.1 2009/09/14 22:08:48 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -164,7 +164,7 @@ int ModuleCmd_Avail(
      **  If we're given a full-path, then we'll just check that directory.
      **  Otherwise, we'll check every directory in MODULESPATH.
      **/
-	if (argc > 0 && **argv == '/') {
+	if (argc > 0 && **argv == *psep) {
 		while (argc--) {
 	    /**
 	     ** Set the name of the module specified on the command line
@@ -333,7 +333,7 @@ static int print_dir(
 	if (module) {
 		if (dir) {
 			if ((char *)NULL == (selection = stringer(NULL, 0,
-					  dir, "/", module, NULL))) {
+					  dir, psep, module, NULL))) {
 				ErrorLogger(ERR_STRING, LOC, NULL);
 				goto unwind0;	/** ---- EXIT (FAILURE) ---> **/
 			}
@@ -366,7 +366,7 @@ static int print_dir(
 	if (dir) {
 		s = dir;
 		while (s) {
-			if ((s = strchr(s, '/')))
+			if ((s = strchr(s, *psep)))
 				*s = '\0';
 			else
 				break;
@@ -375,7 +375,7 @@ static int print_dir(
 			SourceVers(interp, dir, module);
 
 			if (s)
-				*s++ = '/';
+				*s++ = *psep;
 		}
 	/**
 	 **  Finally source the rc files in the directory itself
@@ -719,12 +719,12 @@ void	dirlst_to_list(	char	**list,
 
 	    if( path) {
 		if( (char *) NULL == stringer(buf, MOD_BUFSIZE,
-		    path,"/", dirlst_cur->fi_prefix,"/", dirlst_cur->fi_name,
+		    path,psep, dirlst_cur->fi_prefix,psep, dirlst_cur->fi_name,
 		    NULL))
 			return;
 	    } else {
 		if( (char *) NULL == stringer(buf, MOD_BUFSIZE,
-		    dirlst_cur->fi_prefix,"/", dirlst_cur->fi_name, NULL))
+		    dirlst_cur->fi_prefix,psep, dirlst_cur->fi_name, NULL))
 			return;
 	    }
 
@@ -732,7 +732,7 @@ void	dirlst_to_list(	char	**list,
         } else {
 	    if( path) {
 		if( (char *) NULL == stringer(buf, MOD_BUFSIZE,
-		    path,"/", dirlst_cur->fi_name, NULL))
+		    path,psep, dirlst_cur->fi_name, NULL))
 			return;
 		ptr = buf;
 
@@ -938,16 +938,16 @@ void print_aligned_files(
 	/**
 	 ** find module[/version] in filename
 	 **/
-		if ((g_current_module = s = strrchr(*list, '/'))) {
+		if ((g_current_module = s = strrchr(*list, *psep))) {
 			*s = 0;
 			g_current_module++;
 			if (TCL_ERROR ==
 			    Locate_ModuleFile(interp, g_current_module,
 					      modulename, modulefile)) {
-				g_current_module = strrchr(*list, '/');
+				g_current_module = strrchr(*list, *psep);
 				g_current_module++;
 			}
-			*s = '/';
+			*s = *psep;
 		}
 		if (!stat(*list, &stats)) {
 	    /**
@@ -980,7 +980,7 @@ void print_aligned_files(
 					dirname++;
 				}
 		    /**
-		     ** Skip over '/'
+		     ** Skip over *psep
 		     **/
 				if (maxPrefixLength > 0)
 					maxPrefixLength += 1;
@@ -989,7 +989,7 @@ void print_aligned_files(
 						*list + maxPrefixLength, NULL);
 			} else {
 				t = strlen(path);
-				if (*(*list + t) == '/')
+				if (*(*list + t) == *psep)
 					t++;
 				module = stringer(NULL, 0, *list + t, NULL);
 			}
@@ -1006,7 +1006,7 @@ void print_aligned_files(
 				symbols = "";
 
 			if ((sw_format & SW_LONG)
-			    || (char *)NULL == (release = strchr(module, '/')))
+			    || (char *)NULL == (release = strchr(module, *psep)))
 				release = "";	/* no release info */
 			else
 				*release++ = '\0';
@@ -1380,8 +1380,8 @@ static	char *mkdirnm(	char	*dir,
      **/
 
     strcpy( dirbuf, dir);
-    if( dir[ strlen( dir) - 1] != '/' && file[0] != '/')
-	strcat( dirbuf, "/");
+    if( dir[ strlen( dir) - 1] != *psep && file[0] != *psep)
+	strcat( dirbuf, psep);
     return( strcat( dirbuf, file));
 
 } /** End of 'mkdirnm' **/

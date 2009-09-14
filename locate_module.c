@@ -31,7 +31,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: locate_module.c,v 1.29.2.1 2009/09/10 21:52:07 rkowen Exp $";
+static char Id[] = "@(#)$Id: locate_module.c,v 1.29.2.2 2009/09/14 22:08:48 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -128,8 +128,8 @@ int Locate_ModuleFile(
 		if (OK != ErrorLogger(ERR_PARAM, LOC, "modulename", NULL))
 			goto unwind0;
 
-	if (modulename[0] == '/' || modulename[0] == '.') {
-		p = (char *)strrchr(modulename, '/');
+	if (modulename[0] == *psep || modulename[0] == '.') {
+		p = (char *)strrchr(modulename, *psep);
 		if (p) {
 			*p = '\0';
 	    /**
@@ -143,7 +143,7 @@ int Locate_ModuleFile(
 	     **  Reinstall the 'modulefile' which has been corrupted by
 	     **   tokenization
 	     **/
-			*p = '/';
+			*p = *psep;
 	    /**
 	     **  ... Looks good! Conditionally (if there has been no version
 	     **  specified) we have to add the default version
@@ -156,7 +156,7 @@ int Locate_ModuleFile(
 			} else {
 				if ((char *)NULL ==
 				    stringer(filename, MOD_BUFSIZE, modulename,
-					     "/", result, NULL))
+					     psep, result, NULL))
 					goto unwind1;
 			}
 		} else {
@@ -180,7 +180,7 @@ int Locate_ModuleFile(
 			} else {
 				if ((char *)NULL ==
 				    stringer(filename, MOD_BUFSIZE, modulename,
-					     "/", result, NULL))
+					     psep, result, NULL))
 					goto unwind1;
 			}
 		}
@@ -212,7 +212,7 @@ int Locate_ModuleFile(
 	 **/
 		if (VersionLookup(modulename, &mod, &vers)) {
 			if ((char *)NULL == stringer(strbuffer, MOD_BUFSIZE,
-						     mod, "/", vers, NULL))
+						     mod, psep, vers, NULL))
 				goto unwind0;
 			modulename = strbuffer;
 		}
@@ -241,7 +241,7 @@ int Locate_ModuleFile(
 				} else {
 					if ((char *)NULL ==
 					    stringer(filename, MOD_BUFSIZE,
-						     pathlist[i], "/", result,
+						     pathlist[i], psep, result,
 						     NULL))
 						goto unwind1;
 				}
@@ -253,7 +253,7 @@ int Locate_ModuleFile(
 	     **/
 			if (VersionLookup(modulename, &mod, &vers)) {
 				if ((char *)NULL ==
-				    stringer(strbuffer, MOD_BUFSIZE, mod, "/",
+				    stringer(strbuffer, MOD_BUFSIZE, mod, psep,
 					     vers, NULL))
 					goto unwind1;
 				modulename = strbuffer;
@@ -342,7 +342,7 @@ static	char	*GetModuleName(	Tcl_Interp	*interp,
     }
     slen = strlen( s) + 1;
     mod = s;
-    if( (ver = strchr( mod, '/')) )
+    if( (ver = strchr( mod, *psep)) )
 	*ver++ = '\0';
     /**
      **  Allocate a buffer for full pathname building
@@ -357,11 +357,11 @@ static	char	*GetModuleName(	Tcl_Interp	*interp,
      **/
     if( prefix) {
 	if((char *) NULL == stringer(fullpath, MOD_BUFSIZE,
-	path,"/",prefix,"/",mod, NULL))
+	path,psep,prefix,psep,mod, NULL))
 	    goto unwind1;
     } else {
 	if((char *) NULL == stringer(fullpath, MOD_BUFSIZE,
-	path,"/",mod, NULL))
+	path,psep,mod, NULL))
 	    goto unwind1;
     }
     is_def = !strcmp( mod, _(em_default));
@@ -377,7 +377,7 @@ static	char	*GetModuleName(	Tcl_Interp	*interp,
 	     **/
 	    if( prefix) {
 		if((char *) NULL == stringer(modfil_buf, MOD_BUFSIZE,
-		path,"/",mod, NULL))
+		path,psep,mod, NULL))
 		    goto unwind2;
 	    } else {
 		if((char *) NULL == stringer(modfil_buf, MOD_BUFSIZE,mod, NULL))
@@ -385,7 +385,7 @@ static	char	*GetModuleName(	Tcl_Interp	*interp,
 	    }
 
 	    if((char *) NULL == stringer(fullpath, MOD_BUFSIZE,
-	    path,"/",modfil_buf, NULL))
+	    path,psep,modfil_buf, NULL))
 		goto unwind2;
 	    g_current_module = modfil_buf;
 
@@ -413,12 +413,12 @@ static	char	*GetModuleName(	Tcl_Interp	*interp,
 		/**
 		 **  Print the new module/version in the buffer
 		 **/
-		if((char *) NULL == stringer( s, len, mod1,"/", ver1, NULL)) {
+		if((char *) NULL == stringer( s, len, mod1,psep, ver1, NULL)) {
 		    ErrorLogger( ERR_STRING, LOC, NULL);
 		    goto unwind2;
 		}
 		mod = s;
-		if( (ver = strchr( s, '/')) )
+		if( (ver = strchr( s, *psep)) )
 		    *ver++ = '\0';
 	    }
 	    /**
@@ -438,7 +438,7 @@ static	char	*GetModuleName(	Tcl_Interp	*interp,
 		}
 
 		if( prefix) {
-		    if((char *) NULL == stringer(t, len, prefix,"/",mod, NULL)){
+		    if((char *) NULL == stringer(t, len, prefix,psep,mod, NULL)){
 			ErrorLogger( ERR_STRING, LOC, NULL);
 			goto unwindt;
 		    }
@@ -492,7 +492,7 @@ unwindt:
 		     **/
 			filename = uvec_vector(filelist)[i];
 		    if ((char *)NULL == stringer(fullpath, MOD_BUFSIZE,
-			path, "/", filename, NULL))
+			path, psep, filename, NULL))
 			    goto unwind2;
 
 		    if( !stat( fullpath, &stats) && S_ISDIR( stats.st_mode)) {
@@ -534,7 +534,7 @@ unwindt:
 		   goto unwind2;
 		}
 		if( prefix) {
-		    if((char *) NULL == stringer(t,len, prefix,"/",Result,NULL))
+		    if((char *) NULL == stringer(t,len, prefix,psep,Result,NULL))
 			goto unwindt2;
 		} else {
 		    if((char *) NULL == stringer(t,len, Result,NULL))
@@ -613,7 +613,7 @@ int SourceRC( Tcl_Interp *interp, char *path, char *name)
      **  Build the full name of the RC file
      **  Avoid duplicate sourcing
      **/
-    if ((char *) NULL == (buffer = stringer(NULL, 0, path,"/",name, NULL)))
+    if ((char *) NULL == (buffer = stringer(NULL, 0, path,psep,name, NULL)))
 	if( OK != ErrorLogger( ERR_STRING, LOC, NULL))
 	    goto unwind0;
     for( i=0; i<listndx; i++)
@@ -734,7 +734,7 @@ int SourceVers( Tcl_Interp *interp, char *path, char *name)
      **  Build the full name of the RC file and check whether it exists and
      **  has the magic cookie inside
      **/
-    if ((char *) NULL == (buffer = stringer(NULL, 0, path,"/",version_file,
+    if ((char *) NULL == (buffer = stringer(NULL, 0, path,psep,version_file,
 	NULL)))
 	if( OK != ErrorLogger( ERR_STRING, LOC, NULL))
 	    return( TCL_ERROR);
@@ -760,7 +760,7 @@ int SourceVers( Tcl_Interp *interp, char *path, char *name)
 		 **/
 		null_free((void *) &buffer);
 		if ((char *) NULL == (buffer = stringer(NULL, 0,
-		name,"/",version, NULL)))
+		name,psep,version, NULL)))
 		    if( OK != ErrorLogger( ERR_STRING, LOC, NULL))
 			return( TCL_ERROR);
 

@@ -30,7 +30,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: main.c,v 1.29.2.1 2009/09/10 21:52:07 rkowen Exp $";
+static char Id[] = "@(#)$Id: main.c,v 1.29.2.2 2009/09/14 22:08:48 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -261,7 +261,7 @@ int	main( int argc, char *argv[], char *environ[]) {
 		null_free((void *) &rc_name);
 	} else {
 	    null_free((void *) &rc_name);
-	    if((char *) NULL == (rc_name = strrchr( rc_path, '/'))) {
+	    if((char *) NULL == (rc_name = strrchr( rc_path, *psep))) {
 		rc_name = rc_path;
 		rc_path = instpath;
 	    } else

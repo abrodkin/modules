@@ -27,7 +27,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Switch.c,v 1.10.4.1 2009/09/10 21:52:07 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Switch.c,v 1.10.4.2 2009/09/14 22:08:48 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -141,7 +141,7 @@ int	ModuleCmd_Switch(	Tcl_Interp	*interp,
       /* starting from the end of the module name, find the first
        * forward slash and replace with null 
        */
-      if ((oldmodule = strrchr(oldmodule_buffer, '/'))) {
+      if ((oldmodule = strrchr(oldmodule_buffer, *psep))) {
 	  *oldmodule = 0;
       }
       oldmodule = oldmodule_buffer;
