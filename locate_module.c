@@ -31,7 +31,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: locate_module.c,v 1.29.2.2 2009/09/14 22:08:48 rkowen Exp $";
+static char Id[] = "@(#)$Id: locate_module.c,v 1.29.2.3 2009/09/15 05:05:24 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -111,15 +111,11 @@ int Locate_ModuleFile(
 	char *realname,
 	char *filename
 ) {
-	char           *p;		/** Tokenization pointer	     **/
-	char           *result = NULL;	/** This functions result	     **/
 	uvec           *pathvec;	/** Vector of paths to scan	     **/
-	char          **pathlist;	/** List of paths to scan	     **/
-	int             numpaths,	/** Size of this list		     **/
-	                i;		/** Loop counter		     **/
-	char           *modulespath;	/** Buffer for the contents of the   **/
-					/** environment variable MODULEPATH  **/
-	char           *mod, *vers;	/** Module and version name for sym- **/
+	char           *p,		/** Tokenization pointer	     **/
+		       *result = NULL,	/** This functions result	     **/
+		      **pathlist,	/** List of paths to scan	     **/
+		       *mod, *vers;	/** Module and version name for sym- **/
 					/** bolic name lookup		     **/
     /**
      **  If it is a full path name, that's the module file to load.
@@ -136,7 +132,7 @@ int Locate_ModuleFile(
 	     **  Check, if what has been specified is a valid version of
 	     **  the specified module ...
 	     **/
-			if ((char *)NULL == (result =
+			if (!(result =
 			     GetModuleName(interp, modulename, NULL, (p + 1))))
 				goto unwind0;
 	    /**
@@ -149,14 +145,12 @@ int Locate_ModuleFile(
 	     **  specified) we have to add the default version
 	     **/
 			if (!strcmp((p + 1), result)) {
-				if ((char *)NULL ==
-				    stringer(filename, MOD_BUFSIZE, modulename,
-					     NULL))
+				if (!(stringer(filename, MOD_BUFSIZE,
+					     modulename, NULL)))
 					goto unwind1;
 			} else {
-				if ((char *)NULL ==
-				    stringer(filename, MOD_BUFSIZE, modulename,
-					     psep, result, NULL))
+				if (!(stringer(filename, MOD_BUFSIZE,
+					     modulename, psep, result, NULL)))
 					goto unwind1;
 			}
 		} else {
@@ -164,86 +158,68 @@ int Locate_ModuleFile(
 	     **  Hmm! There's no backslash in 'modulename'. So it MUST begin
 	     **  on '.' and MUST be part of the current directory
 	     **/
-			if (NULL ==
-			    (result =
-			     GetModuleName(interp, modulename, NULL,
+			if (!(result = GetModuleName(interp, modulename, NULL,
 					   modulename)))
 				goto unwind0;
 
 			if (!strcmp(modulename, result) ||
 			    (strlen(modulename) + 1 + strlen(result) + 1 >
 			     MOD_BUFSIZE)) {
-				if ((char *)NULL ==
-				    stringer(filename, MOD_BUFSIZE, modulename,
-					     NULL))
+				if (!(stringer(filename, MOD_BUFSIZE,
+					     modulename, NULL)))
 					goto unwind1;
 			} else {
-				if ((char *)NULL ==
-				    stringer(filename, MOD_BUFSIZE, modulename,
-					     psep, result, NULL))
+				if (!(stringer(filename, MOD_BUFSIZE,
+					modulename, psep, result, NULL)))
 					goto unwind1;
 			}
 		}
+	} else {
     /**
      **  So it is not a full path name what has been specified. Scan the 
      **  MODULESPATH
      **/
-	} else {
-	/**
-	 **  If I don't find a path in MODULEPATH, there's nothing to search.
-	 **/
-		if (!(modulespath = (char *)getenv("MODULEPATH"))) {
+		if (!(pathvec = ModulePathList()))
 			if (OK != ErrorLogger(ERR_MODULE_PATH, LOC, NULL)) {
 				g_current_module = NULL;
 				goto unwind0;
 			}
-		}
 	/**
-	 ** strip off any extraneous new lines
+	 **  If I don't find a path in MODULEPATH, there's nothing to search.
 	 **/
-		{
-			char           *end;
-			if ((char *)NULL != (end = strrchr(modulespath, '\n')))
-				*end = '\0';
+		if (!(uvec_number(pathvec))) {
+				g_current_module = NULL;
+				goto unwindp;
 		}
+		pathlist = uvec_vector(pathvec);
 	/**
 	 **  Expand the module name (in case it is a symbolic one). This must
 	 **  be done once here in order to expand any aliases
 	 **/
 		if (VersionLookup(modulename, &mod, &vers)) {
-			if ((char *)NULL == stringer(strbuffer, MOD_BUFSIZE,
-						     mod, psep, vers, NULL))
-				goto unwind0;
+			if (!(stringer(strbuffer, MOD_BUFSIZE,
+						     mod, psep, vers, NULL)))
+				goto unwindp;
 			modulename = strbuffer;
 		}
 	/**
-	 **  Split up the MODULEPATH values into multiple directories
-	 **/
-		if (NULL == (pathvec = SplitIntoList(modulespath, &numpaths,
-						     _colon)))
-			goto unwind0;
-		pathlist = uvec_vector(pathvec);
-	/**
 	 **  Check each directory to see if it contains the module
 	 **/
-		for (i = 0; i < numpaths; i++) {
+		while (pathlist && *pathlist && **pathlist) {
 			/* skip empty paths */
-			if (*pathlist[i] && (NULL != (result =
-				GetModuleName(interp, pathlist[i],
-				    NULL, modulename)))) {
+			if ((result = GetModuleName(interp,
+				    *pathlist, NULL, modulename))) {
 
-				if (strlen(pathlist[i]) + 2 + strlen(result) >
+				if (strlen(*pathlist) + 2 + strlen(result) >
 				    MOD_BUFSIZE) {
-					if ((char *)NULL ==
-					    stringer(filename, MOD_BUFSIZE,
-						     pathlist[i], NULL))
-						goto unwind1;
+					if (!(stringer(filename, MOD_BUFSIZE,
+						     *pathlist, NULL)))
+						goto unwindp;
 				} else {
-					if ((char *)NULL ==
-					    stringer(filename, MOD_BUFSIZE,
-						     pathlist[i], psep, result,
-						     NULL))
-						goto unwind1;
+					if (!(stringer(filename, MOD_BUFSIZE,
+						     *pathlist, psep, result,
+						     NULL)))
+						goto unwindp;
 				}
 				break;
 			}
@@ -255,9 +231,10 @@ int Locate_ModuleFile(
 				if ((char *)NULL ==
 				    stringer(strbuffer, MOD_BUFSIZE, mod, psep,
 					     vers, NULL))
-					goto unwind1;
+					goto unwindp;
 				modulename = strbuffer;
 			}
+			pathlist++;
 		} /** for **/
 	/**
 	 **  Free the memory created from the call to SplitIntoList()
@@ -271,6 +248,11 @@ int Locate_ModuleFile(
 			filename[0] = '\0';
 			goto unwind0;
 		}
+		if (0) {
+unwindp:
+			FreeList(&pathvec);
+			goto unwind1;
+		}
 	} /** not a full path name **/
     /**
      **  Free up what has been allocated and pass the result back to
@@ -278,7 +260,7 @@ int Locate_ModuleFile(
      **  GetModuleName
      **/
 	strncpy(realname, result, MOD_BUFSIZE);
-	if ((char *)NULL == stringer(realname, MOD_BUFSIZE, result, NULL))
+	if (!(stringer(realname, MOD_BUFSIZE, result, NULL)))
 		goto unwind1;
 	null_free((void *)&result);
 
@@ -336,7 +318,7 @@ static	char	*GetModuleName(	Tcl_Interp	*interp,
      **  Split the modulename into module and version. Use a private buffer
      **  for this
      **/
-    if((char *) NULL == (s = stringer(NULL, 0,  modulename, NULL))) {
+    if(!(s = stringer(NULL, 0,  modulename, NULL))) {
 	ErrorLogger( ERR_ALLOC, LOC, NULL);
 	goto unwind0;
     }
@@ -347,7 +329,7 @@ static	char	*GetModuleName(	Tcl_Interp	*interp,
     /**
      **  Allocate a buffer for full pathname building
      **/
-    if((char *) NULL == (fullpath = stringer(NULL, MOD_BUFSIZE, NULL))) {
+    if(!(fullpath = stringer(NULL, MOD_BUFSIZE, NULL))) {
 	if( OK != ErrorLogger( ERR_STRING, LOC, NULL)) {
 	    goto unwind1;
 	}
@@ -438,7 +420,7 @@ static	char	*GetModuleName(	Tcl_Interp	*interp,
 		}
 
 		if( prefix) {
-		    if((char *) NULL == stringer(t, len, prefix,psep,mod, NULL)){
+		    if((char *) NULL == stringer(t,len,prefix,psep,mod, NULL)){
 			ErrorLogger( ERR_STRING, LOC, NULL);
 			goto unwindt;
 		    }

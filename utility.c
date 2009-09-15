@@ -52,7 +52,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.33.2.2 2009/09/14 22:08:48 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.33.2.3 2009/09/15 05:05:24 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -385,7 +385,8 @@ uvec *SplitIntoList(
 ) {
 	uvec		*pathlist = NULL;	/** Temporary uvec	     **/
 	char		*givenpath = NULL,	/** modifiable buffer	     **/
-			*dirname = NULL;	/** Token ptr		     **/
+			*dirname = NULL,	/** Token ptr		     **/
+			*tpath = NULL;		/** temp xdup string	     **/
     /** 
      **  Parameter check
      **/
@@ -412,10 +413,15 @@ uvec *SplitIntoList(
 	for (dirname = xstrtok(givenpath, delim);
 	     dirname;
 	     dirname = xstrtok( NULL, delim)) {
-		if(uvec_add(pathlist,xdup(dirname))) {
+		tpath = xdup(dirname);
+		/* chop off any ending \n's */
+		if (tpath[strlen(tpath)-1] == '\n')
+			tpath[strlen(tpath) - 1] = '\0';
+		if(uvec_add(pathlist,tpath)) {
 			if( OK != ErrorLogger( ERR_UVEC, LOC, NULL))
 				goto unwind2;
 		}
+		null_free((void *) &tpath);
 	}
     /**
      **  Free up the temporary string buffer

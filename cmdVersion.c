@@ -48,7 +48,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdVersion.c,v 1.19.2.1 2009/09/14 22:08:48 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdVersion.c,v 1.19.2.2 2009/09/15 05:05:24 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -63,7 +63,7 @@ static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
 /**									     **/
-/**   The whole thing is handled in memory. The structure is build of module **/
+/**   The whole thing is handled in memory. The structure is built of module **/
 /**   and name records. There are 3 types of name records: version, name     **/
 /**   and alias. 							     **/
 /**									     **/
@@ -227,8 +227,7 @@ int cmdModuleVersion(
 			return (TCL_ERROR); /** ------ EXIT (FAILURE) -----> **/
 	}
 
-	if ((char *)NULL ==
-	    (module = CheckModuleVersion((char *)Tcl_GetString(objv[1])))) {
+	if (!(module = CheckModuleVersion((char *)Tcl_GetString(objv[1])))) {
 		ErrorLogger(ERR_BADMODNAM, LOC, Tcl_GetString(objv[1]), NULL);
 		return (TCL_ERROR);	/** -------- EXIT (FAILURE) -------> **/
 	}
@@ -244,7 +243,7 @@ int cmdModuleVersion(
     /**
      **  get the version from the argument
      **/
-	if ((char *)NULL == (version = strrchr(module, *psep))) {
+	if (!(version = strrchr(module, *psep))) {
 		if (OK != ErrorLogger(ERR_INTERAL, LOC, NULL))
 			return (TCL_ERROR); /** ------ EXIT (FAILURE) -----> **/
 	}
@@ -775,7 +774,7 @@ int	AliasLookup(	char	*alias,
  **   Result:		int	1		Success, value in the buffer **
  **						is valid		     **
  **				0		Any error, or not found	     **
-
+ ** 									     **
  **   Attached Globals:	g_current_module	The module which is handled  **
  **						by the current command	     **
  ** 									     **
@@ -830,7 +829,7 @@ int	VersionLookup(	char *name, char **module, char **version)
     }
 
     /**
-     **  This is for preventing from endless loops
+     **  This is for preventing endless loops
      **/
     histsize = HISTTAB;
     histndx = 0;
@@ -1020,7 +1019,7 @@ static	ModModule	*AddModule(	char	*name)
      **  Fill the name in and put it in the queue
      **/
 
-    if((char *) NULL == (ptr->module = stringer(NULL,0, name, NULL))) {
+    if(!(ptr->module = stringer(NULL,0, name, NULL))) {
 	ErrorLogger( ERR_ALLOC, LOC, NULL);
 	null_free((void *) &ptr);
 	return((ModModule *) NULL);
@@ -1128,7 +1127,7 @@ static	ModName	*AddName(	char	 *name,
      **  Fill the name in and put it in the queue
      **/
 
-    if((char *) NULL == (ptr->name = stringer(NULL,0, name, NULL))) {
+    if(!(ptr->name = stringer(NULL,0, name, NULL))) {
 	ErrorLogger( ERR_ALLOC, LOC, NULL);
 	null_free((void *) &ptr);
 	return((ModName *) NULL);
