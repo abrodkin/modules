@@ -52,7 +52,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.33.2.3 2009/09/15 05:05:24 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.33.2.4 2009/09/16 19:13:17 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -622,6 +622,9 @@ int Unwind_Modulefile_Changes(
 	     **  specified 'key' because it will have been acquired depending
 	     **  upon whether the unset or set table was used.
 	     **/
+			if (!mhash_exists(oldTables[i]))
+				continue;
+
 			keys = mhash_keys(oldTables[i]);
 			while (keys && *keys) {
 				val = mhash_value(oldTables[i], *keys);
@@ -698,6 +701,8 @@ int Output_Modulefile_Changes(
      **  Scan both tables that are of interest for shell variables
      **/
 	for (i = 0; i < 2; i++) {
+		if (!mhash_exists(table[i]))
+			continue;
 		uvkeys = mhash_keys_uvec(table[i]);
 		uvec_qsort(uvkeys, keycmp);
 
@@ -802,7 +807,7 @@ static int Output_Modulefile_Aliases(
 	void
 ) {
 	char           *val = NULL,	/** Stored value (is a pointer!)     **/
-		      **keys,		/** hash keys			     **/
+		      **keys = NULL,	/** hash keys			     **/
 		       *sourceCommand;	/** Command used to source the alias **/
 	int             i,		/** Loop counter		     **/
 	                openfile = 0;	/** whether using a file or not	     **/
@@ -826,7 +831,8 @@ static int Output_Modulefile_Aliases(
      **  We only need to output stuff into a temporary file if we're setting
      **  stuff.  We can unset variables and aliases by just using eval.
      **/
-	keys = mhash_keys(aliasSetHashTable);
+	if (mhash_exists(aliasSetHashTable))
+		keys = mhash_keys(aliasSetHashTable);
 	while (keys && *keys) {
 	/**
 	 **  We must use an aliasfile if EVAL_ALIAS is not defined
@@ -874,6 +880,8 @@ static int Output_Modulefile_Aliases(
      **  Scan the hash tables involved in changing aliases
      **/
 	for (i = 0; i < 2; i++) {
+		if (!mhash_exists(table[i]))
+			continue;
 		keys = mhash_keys(table[i]);
 		while (keys && *keys) {
 		/**
