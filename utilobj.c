@@ -30,7 +30,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utilobj.c,v 1.5.2.1 2009/09/10 21:52:08 rkowen Exp $";
+static char Id[] = "@(#)$Id: utilobj.c,v 1.5.2.2 2009/09/16 19:11:54 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -44,6 +44,7 @@ static void *UseId[] = { &UseId, Id };
 /** ************************************************************************ **/
 
 /** not applicable **/
+char mhash_TAG[6] = "MHASH";
 
 /** ************************************************************************ **/
 /** 				     CONSTANTS				     **/
@@ -243,6 +244,43 @@ int Tcl_ObjvToUvec(
 /*++++
  ** ** Function-Header ***************************************************** **
  ** 									     **
+ **   Function:		Tcl_FreeObjv					     **
+ ** 									     **
+ **   Description:	Take a Tcl_Obj vector and free the storage	     **
+ ** 									     **
+ **   First Edition:	2009/09/15					     **
+ ** 									     **
+ **   Parameters:	Tcl_Obj 	**objv[]	objv vector	     **
+ ** 									     **
+ **   Result:		int	TCL_OK		Successful completion	     **
+ ** 									     **
+ **   Attached Globals:	-						     **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
+
+int Tcl_FreeObjv(
+	Tcl_Obj *** objv
+) {
+	Tcl_Obj       **optr = *objv;
+	
+	while (optr && *optr) {
+		/* just decrement count ... when zero Tcl will garbage collect*/
+		Tcl_DecrRefCount(*optr);
+		*optr = (Tcl_Obj *) NULL;
+		optr++;
+	}
+	
+	/** free vector memory **/
+	null_free((void *) objv);
+
+	return (TCL_OK);		      /** ----- EXIT (SUCCESS) ----> **/
+
+} /** End of 'Tcl_FreeObjv' **/
+
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
  **   Function:		mhash_*						     **
  ** 									     **
  **   Description:	A collection of functions for managing a hash	     **
@@ -321,6 +359,7 @@ MHash *mhash_ctor(MHashType type) {
 			return (MHash *) NULL; 	/** ---- EXIT (FAILURE) ---> **/
 
 	/* set some struct elements */
+	(void) strcpy(mhp->tag, mhash_TAG);
 	mhp->type = type;
 	if (!(mhp->hash =(Tcl_HashTable *)module_malloc(sizeof(Tcl_HashTable))))
 		if (OK != ErrorLogger(ERR_ALLOC, LOC, NULL))
@@ -374,6 +413,10 @@ int mhash_dtor(MHash **mhp) {
 
 	Tcl_DeleteHashTable(mh->hash);
 	null_free((void *) &(mh->hash));
+
+	/* set some values */
+	mh->type = MHashNULL;
+	*(mh->tag) = '\0';
 
 	/* dealloc struct */
 	null_free((void *) mhp);
@@ -492,6 +535,11 @@ int mhash_add(MHash *mh, const char *key, ...) {
 /*
  * accessor methods
  */
+/* mhash_exists - tests whether struct is valid (1 = OK, 0 = otherwise) */
+int mhash_exists(MHash *mh) {
+	return ((mh && !strncmp(mh->tag, mhash_TAG, 6)) ? 1 : 0);
+}
+
 /* mhash_type - return the type of MHash this is */
 MHashType mhash_type(MHash *mh) {
 	return mh->type;
