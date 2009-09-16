@@ -30,7 +30,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: main.c,v 1.29.2.2 2009/09/14 22:08:48 rkowen Exp $";
+static char Id[] = "@(#)$Id: main.c,v 1.29.2.3 2009/09/16 19:16:29 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -230,11 +230,6 @@ int	main( int argc, char *argv[], char *environ[]) {
     if( TCL_OK != Setup_Environment( interp))
 	goto unwind0;
 
-    cwd = Tcl_FSGetCwd(interp);
-    psep = Tcl_GetString(Tcl_FSPathSeparator(cwd));
-    if (!psep)
-	psep = "/";
-
     /**
      **  Check for command line switches
      **/
@@ -291,8 +286,8 @@ int	main( int argc, char *argv[], char *environ[]) {
      **/
     g_current_module = (char *) NULL;
 
-    if( TCL_ERROR == SourceRC( interp, rc_path, rc_name) ||
-	TCL_ERROR == SourceRC( interp, getenv("HOME"), modulerc_file))
+    if( TCL_ERROR == SourceRC(interp, rc_path, rc_name, Mod_Load) ||
+	TCL_ERROR == SourceRC(interp, getenv("HOME"), modulerc_file, Mod_Load))
 	exit( 1);
 
     if( rc_path)
