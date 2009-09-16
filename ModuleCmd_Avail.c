@@ -35,7 +35,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Avail.c,v 1.20.2.1 2009/09/14 22:08:48 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Avail.c,v 1.20.2.2 2009/09/16 19:19:03 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -371,8 +371,8 @@ static int print_dir(
 			else
 				break;
 
-			SourceRC(interp, dir, modulerc_file);
-			SourceVers(interp, dir, module);
+			SourceRC(interp, dir, modulerc_file, Mod_Load);
+			SourceVers(interp, dir, module, Mod_Load);
 
 			if (s)
 				*s++ = *psep;
@@ -380,8 +380,8 @@ static int print_dir(
 	/**
 	 **  Finally source the rc files in the directory itself
 	 **/
-		SourceRC(interp, dir, modulerc_file);
-		SourceVers(interp, dir, module);
+		SourceRC(interp, dir, modulerc_file, Mod_Load);
+		SourceVers(interp, dir, module, Mod_Load);
 	}
 
 	if (dir && selection)
@@ -955,8 +955,9 @@ void print_aligned_files(
 	     **  file and skip to the next file
 	     **/
 			if (S_ISDIR(stats.st_mode)) {
-				SourceRC(interp, *list, modulerc_file);
-				SourceVers(interp, *list, g_current_module);
+				SourceRC(interp,*list,modulerc_file,Mod_Load);
+				SourceVers(interp, *list, g_current_module,
+					Mod_Load);
 				g_current_module = (char *)NULL;
 				list++;
 				continue;

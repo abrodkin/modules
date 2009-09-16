@@ -9,6 +9,7 @@
  ** 									     **
  **   Authors:	John Furlan, jlf@behere.com				     **
  **		Jens Hamisch, jens@Strawberry.COM			     **
+ **		R.K. Owen, <rk@owen.sj.ca.us> or <rkowen@nersc.gov>	     **
  ** 									     **
  **   Description:	The load and unload procedure that takes care of     **
  **			adding and removing modulefiles to and from the	     **
@@ -28,7 +29,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Load.c,v 1.14.2.1 2009/09/10 21:52:07 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Load.c,v 1.14.2.2 2009/09/16 19:19:03 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/

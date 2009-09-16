@@ -26,7 +26,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_List.c,v 1.12.2.2 2009/09/14 22:08:48 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_List.c,v 1.12.2.3 2009/09/16 19:19:03 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -165,13 +165,12 @@ int	ModuleCmd_List(	Tcl_Interp	*interp,
 		if( (s = strchr( s, *psep)) )
 		    *s = '\0';
 
-		SourceRC( interp, files[i], modulerc_file);
-		SourceVers( interp, files[i], list[i]);
+		SourceRC( interp, files[i], modulerc_file, Mod_Load);
+		SourceVers( interp, files[i], list[i], Mod_Load);
 
 		if( s)
 		    *s++ = *psep;
 	    }
-
 	    /** 
 	     **  Print this guy
 	     **/

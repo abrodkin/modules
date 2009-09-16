@@ -31,7 +31,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: locate_module.c,v 1.29.2.3 2009/09/15 05:05:24 rkowen Exp $";
+static char Id[] = "@(#)$Id: locate_module.c,v 1.29.2.4 2009/09/16 19:19:03 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -223,6 +223,7 @@ int Locate_ModuleFile(
 				}
 				break;
 			}
+#if 0
 	    /**
 	     **  If we havn't found it, we should try to re-expand the module
 	     **  name, because some rc file have been sourced
@@ -234,6 +235,7 @@ int Locate_ModuleFile(
 					goto unwindp;
 				modulename = strbuffer;
 			}
+#endif
 			pathlist++;
 		} /** for **/
 	/**
@@ -371,8 +373,8 @@ static	char	*GetModuleName(	Tcl_Interp	*interp,
 		goto unwind2;
 	    g_current_module = modfil_buf;
 
-	    if( TCL_ERROR == SourceRC( interp, fullpath, modulerc_file) ||
-		TCL_ERROR == SourceVers( interp, fullpath, modfil_buf)) {
+	    if( TCL_ERROR == SourceRC(interp,fullpath,modulerc_file,Mod_Load) ||
+		TCL_ERROR == SourceVers(interp,fullpath,modfil_buf,Mod_Load)) {
 		/* flags = save_flags; */
 		    goto unwind2;
 	    }
@@ -554,13 +556,14 @@ unwind0:
  ** 									     **
  **   Function:		SourceRC					     **
  ** 									     **
- **   Description:	Source the passed global RC file		     **
+ **   Description:	Source the passed RC file			     **
  ** 									     **
  **   First Edition:	1991/10/23					     **
  ** 									     **
  **   Parameters:	Tcl_Interp	*interp		Tcl interpreter	     **
  **			char		*path		Path to be used      **
  **			char		*name		Name of the RC file  **
+ **			Mod_Act		action		Load or Unload	     **
  **									     **
  **   Result:		int		TCL_OK		Success		     **
  **					TCL_ERROR	Failure		     **
@@ -572,95 +575,80 @@ unwind0:
  ** ************************************************************************ **
  ++++*/
 
-int SourceRC( Tcl_Interp *interp, char *path, char *name)
-{
-    struct stat	  stats;		/** Buffer for the stat() systemcall **/
-    int 	  save_flags, i;
-    char	 *buffer;
-    int		  Result = TCL_OK;
-    static char	**srclist = (char **) NULL;
-    static int	  listsize = 0, listndx = 0;
+int SourceRC(
+	Tcl_Interp * interp,
+	char *path,
+	char *name,
+	Mod_Act action
+) {
+	struct stat     stats;		/** Buffer for the stat() systemcall **/
+	char           *buffer;		/** for full path/name		     **/
+	int             save_flags,	/** cache g_flags		     **/
+	                Result = TCL_OK;
 
     /**
      **  If there's a problem with the input parameters it means, that
      **  we do not have to source anything
      **  Only a valid TCL interpreter should be there
      **/
-    if( !path || !name)
-	return( TCL_OK);
+	if (!path || !name)
+		return (TCL_OK);
 
-    if( !interp)
-	return( TCL_ERROR);
+	if (!interp)
+		return (TCL_ERROR);
+
+	if (action != Mod_Load && action != Mod_Unload)
+		return (TCL_ERROR);
+
     /**
      **  Build the full name of the RC file
-     **  Avoid duplicate sourcing
      **/
-    if ((char *) NULL == (buffer = stringer(NULL, 0, path,psep,name, NULL)))
-	if( OK != ErrorLogger( ERR_STRING, LOC, NULL))
-	    goto unwind0;
-    for( i=0; i<listndx; i++)
-	if( !strcmp( srclist[ i], buffer))
-	    goto unwind1;
+	if ((char *)NULL ==
+	    (buffer = stringer(NULL, 0, path, psep, name, NULL)))
+		if (OK != ErrorLogger(ERR_STRING, LOC, NULL))
+			goto unwind0;
     /**
      **  Check whether the RC file exists and has the magic cookie inside
      **/
-    if( !stat( buffer, &stats)) {
-	if( check_magic( buffer, MODULES_MAGIC_COOKIE, 
-	    MODULES_MAGIC_COOKIE_LENGTH)) {
+	if (!stat(buffer, &stats)) {
+		if (check_magic(buffer, MODULES_MAGIC_COOKIE,
+				MODULES_MAGIC_COOKIE_LENGTH)) {
 	    /**
-	     **  Set the flags to 'load only'. This prevents from accidently
-	     **  printing something
+	     **  Set the flags to '(un)load only'. This prevents from
+	     **  accidentally printing something
 	     **/
-	    save_flags = g_flags;
-	    g_flags = M_LOAD;
+			save_flags = g_flags;
+			if (action == Mod_Load)
+				g_flags = M_LOAD;
+			else
+				g_flags = M_REMOVE;
 	    /**
 	     **  Source now
 	     **/
-	    if( TCL_ERROR == Execute_TclFile( interp, buffer)) 
-		if( OK != ErrorLogger( ERR_SOURCE, LOC, buffer, NULL)) 
-		    Result = TCL_ERROR;
-	    g_flags = save_flags;
-	    /**
-	     **  Save the currently sourced file in the list
-	     **  Check whether the list is big enough to fit in a new entry
-	     **/
-	    if( !listsize) {
-		listsize = SRCFRAG;
-		if((char **) NULL
-			== (srclist = (char **) module_malloc( listsize *
-		    sizeof( char **)))) {
-		    ErrorLogger( ERR_ALLOC, LOC, NULL);
-		    goto unwind1;
-		}
-	    } else if( listndx + 1 >= listsize) {
-		listsize += SRCFRAG;
-		if((char **) NULL == (srclist = (char **) module_realloc(
-		    srclist, listsize * sizeof( char **)))) {
-		    ErrorLogger( ERR_ALLOC, LOC, NULL);
-		    goto unwind1;
-		}
-	    }
-	    /**
-	     **  Put the current RC files name on the list
-	     **/
-	    srclist[ listndx++] = buffer;
+			if (TCL_ERROR == Execute_TclFile(interp, buffer))
+				if (OK !=
+				    ErrorLogger(ERR_SOURCE, LOC, buffer, NULL))
+					Result = TCL_ERROR;
 
-	} else {
-	    ErrorLogger( ERR_MAGIC, LOC, buffer, NULL);
-	    null_free((void *) &buffer);
+			g_flags = save_flags;
+
+		} else {
+			/* Not an error ... just warn of invalid magic cookie */
+			ErrorLogger(ERR_MAGIC, LOC, buffer, NULL);
+		}
 	}
-    } else {	/** if( !stat) - presumably not found **/
-	null_free((void *) &buffer);
-    }
+	    /** if( !stat) - presumably not found **/
     /**
-     **  Return our result
+     **  Free resources and return result
      **/
-    return( Result);
+	null_free((void *)&buffer);
+
+	return (Result);
 
 unwind1:
-    null_free((void *) &buffer);
+	null_free((void *)&buffer);
 unwind0:
-    return( TCL_ERROR);
+	return (TCL_ERROR);
 
 } /** End of 'SourceRC' **/
 
@@ -676,6 +664,7 @@ unwind0:
  **   Parameters:	Tcl_Interp	*interp		Tcl interpreter	     **
  **			char		*path		Path to be used      **
  **			char		*name		Name of the module   **
+ **			Mod_Act		action		Load or Unload	     **
  **									     **
  **   Result:		int		TCL_OK		Success		     **
  **					TCL_ERROR	Failure		     **
@@ -687,93 +676,105 @@ unwind0:
  ** ************************************************************************ **
  ++++*/
 
-int SourceVers( Tcl_Interp *interp, char *path, char *name)
-{
-    struct stat	  stats;		/** Buffer for the stat() systemcall **/
-    int save_flags;
-    char *buffer;
-    int Result = TCL_OK;
-    char *version;
-    char *new_argv[3];
-    char *mod, *ver;
+int SourceVers(
+	Tcl_Interp * interp,
+	char *path,
+	char *name,
+	Mod_Act action
+) {
+	struct stat     stats;		/** Buffer for the stat() systemcall **/
+	char           *buffer,		/** for full path/name		     **/
+		       *version,	/** default version		     **/
+		       *mod, *ver;	/** module & version		     **/
+	int             save_flags,	/** cache g_flags		     **/
+	                Result = TCL_OK;
 
     /**
      **  If there's a problem with the input parameters it means, that
      **  we do not have to source anything
-     **  Only a valid TCL interpreter should be there
+     **  Only a valid TCL interpreter should be here
      **/
-    if( !path || !name)
-	return( TCL_OK);
-    if( !interp)
-	return( TCL_ERROR);
+	if (!path || !name)
+		return (TCL_OK);
+	if (!interp)
+		return (TCL_ERROR);
     /**
      **  No default version defined so far?
      **/
-    if( VersionLookup( name, &mod, &ver) &&
-	strcmp( ver, _(em_default)))
-	return( TCL_OK);
+	if (VersionLookup(name, &mod, &ver) && strcmp(ver, _(em_default)))
+		return (TCL_OK);
     /**
      **  Build the full name of the RC file and check whether it exists and
      **  has the magic cookie inside
      **/
-    if ((char *) NULL == (buffer = stringer(NULL, 0, path,psep,version_file,
-	NULL)))
-	if( OK != ErrorLogger( ERR_STRING, LOC, NULL))
-	    return( TCL_ERROR);
-    if( !stat( buffer, &stats)) {
-	if(
+	if ((char *)NULL ==
+	    (buffer = stringer(NULL, 0, path, psep, version_file, NULL)))
+		if (OK != ErrorLogger(ERR_STRING, LOC, NULL))
+			return (TCL_ERROR);
+	if (!stat(buffer, &stats)) {
+		if (
 #if VERSION_MAGIC != 0
-	    check_magic( buffer, MODULES_MAGIC_COOKIE, 
-	    MODULES_MAGIC_COOKIE_LENGTH)
+			   check_magic(buffer, MODULES_MAGIC_COOKIE,
+				       MODULES_MAGIC_COOKIE_LENGTH)
 #else
-	1
+			   1
 #endif
-	) {
-	    save_flags = g_flags;
-	    g_flags = M_LOAD;
+		    ) {
+			save_flags = g_flags;
+			if (action == Mod_Load)
+				g_flags = M_LOAD;
+			else
+				g_flags = M_REMOVE;
 
-	    if( TCL_ERROR != (Result = Execute_TclFile( interp, buffer)) && 
-		(version = (char *) Tcl_GetVar(interp, "ModulesVersion", 0))) {
-		int	objc = 3;
-		Tcl_Obj **objv;
+			if (TCL_ERROR !=
+			    (Result = Execute_TclFile(interp, buffer))
+			    && (version =
+				(char *)Tcl_GetVar(interp, "ModulesVersion",
+						   0))) {
+				char	       *new_argv[4];
+				int             objc = 3;
+				Tcl_Obj       **objv;
 		/**
-		 **  The version has been specified in the
-		 **  '.version' file. Set up the result code
+		 **  The version has been specified within the
+		 **  '.version' file via the ModulesVersion variable
 		 **/
-		null_free((void *) &buffer);
-		if ((char *) NULL == (buffer = stringer(NULL, 0,
-		name,psep,version, NULL)))
-		    if( OK != ErrorLogger( ERR_STRING, LOC, NULL))
-			return( TCL_ERROR);
+				null_free((void *)&buffer);
+				if ((char *)NULL == (buffer = stringer(NULL, 0,
+					name, psep, version, NULL)))
+					if (OK !=
+					    ErrorLogger(ERR_STRING, LOC, NULL))
+						return (TCL_ERROR);
 
-		new_argv[0] = "module-version";
-		new_argv[1] = buffer;
-		new_argv[2] = _(em_default);
-		Tcl_ArgvToObjv(&objc, &objv, 3, new_argv);
+				new_argv[0] = "module-version";
+				new_argv[1] = buffer;
+				new_argv[2] = _(em_default);
+				new_argv[3] = NULL;
+				Tcl_ArgvToObjv(&objc, &objv, 3, new_argv);
 		/**
 		 **  Define the default version
 		 **/
-		if( TCL_OK != cmdModuleVersion( (ClientData) 0,
-		    (Tcl_Interp *) NULL, 3, objv)) {
-			Result = TCL_ERROR;
-		}
-	    } /** if( Execute...) **/
-
-	    g_flags = save_flags;
-
-	} else
-	    ErrorLogger( ERR_MAGIC, LOC, buffer, NULL);
-
-    } /** if( !stat) **/
+				if (TCL_OK != cmdModuleVersion((ClientData) 0,
+				    (Tcl_Interp *) NULL, objc, objv))
+					Result = TCL_ERROR;
+				Tcl_FreeObjv(&objv);
+		/**
+		 **  No need for the set variable (only accepted here)
+		 **/
+				(void) Tcl_UnsetVar(interp,"ModulesVersion",
+					NULL);
+			} /** if( Execute...) **/
+			g_flags = save_flags;
+		} else
+			ErrorLogger(ERR_MAGIC, LOC, buffer, NULL);
+	} /** if( !stat) **/
     /**
      ** free buffer memory
      **/
-    null_free((void *) &buffer);
+	null_free((void *)&buffer);
     /**
      **  Result determines if this was successful
      **/
-
-    return( Result);
+	return (Result);
 
 } /** End of 'SourceVers' **/
 
