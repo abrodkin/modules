@@ -27,6 +27,7 @@ Jul 30, 2009				R.K. Owen (rk@owen.sj.ca.us)
 	  - simplify (t)csh initialisation
 	  - Add bash auto-completion for the 'module' command
 	  - Adds new 'chdir' modulefile command (sets cwd on module load)
+	* versions a & b fixed some bugs
 
 Modules 3.2.6
 Oct 29, 2007				R.K. Owen (rk@owen.sj.ca.us)
