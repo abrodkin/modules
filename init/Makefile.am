@@ -1,7 +1,7 @@
 ###########################################################################
 ##
 ## File:        init/Makefile.am
-## Versions:    $Id: Makefile.am,v 1.2.6.1.10.2.2.1 2009/09/22 18:02:59 rkowen Exp $
+## Versions:    $Id: Makefile.am,v 1.2.6.1.10.2.2.2 2009/09/22 18:13:31 rkowen Exp $
 ## Created:     2002/06/14
 ##
 ###########################################################################
@@ -56,7 +56,7 @@ uninstall-inits :
 	s,@prefix\@,${prefix},g; \
 	s,@bindir\@,${exec_prefix}/bin,g; \
 	s,@VERSION\@,@VERSION@,g; \
-	s,@BASEPREFIX\@,/usr/share,g;" < $< > $@
+	s,@BASEPREFIX\@,@BASEPREFIX@,g;" < $< > $@
 
 tcsh : csh
 	cp csh $@
