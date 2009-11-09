@@ -35,7 +35,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Avail.c,v 1.22 2009/10/15 19:08:59 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Avail.c,v 1.22.2.1 2009/11/09 21:15:12 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -92,11 +92,12 @@ static	char	 short_format_full[] = "%s/%s(%s)";
 static	char	 long_format[] = "%-39.39s  %-10.10s  %17s\n";
  	char	 long_header[] = "\
 - Package -----------------------------+- Versions -+- Last mod. ------\n";
+ 	char	 long_spaces[] = 
+"                                                                       ";
 
 /**
  **  Terse file list buffer
  **/
-
 #define	FILE_LIST_SEGM_SIZE 100
 static	char	  _file_list_buffer[ 200];
 static	char	**_file_list_ptr = (char **) NULL;
@@ -104,11 +105,16 @@ static	int	  _file_list_cnt = 0;
 static	int	  _file_list_wr_ndx = 0;
 static	int	  _file_list_rd_ndx = 0;
 
+/* values needed for dirtree helper fns */
+static	Tcl_Interp *Ainterp;
+static	int	  Adirlevel = 0;
+
 /** ************************************************************************ **/
 /**				    PROTOTYPES				     **/
 /** ************************************************************************ **/
 
 static	int	  print_dir( Tcl_Interp*, char*, char*);
+static	int	  print_tree(Tcl_Interp *, char *);
 static	void	  print_spaced_file( char*, int, int, int);
 static	char	 *mkdirnm( char*, char*);
 static	int	  fi_ent_cmp( const void*, const void*);
@@ -217,7 +223,7 @@ int ModuleCmd_Avail(
 			dirname = ModulePath;
 			while (dirname && *dirname) {
 				if (check_dir(*dirname))
-					print_dir(interp, *dirname, NULL);
+					print_tree(interp, *dirname);
 				dirname++;
 			}
 		} /** argc **/
@@ -603,8 +609,7 @@ fi_ent	*get_dir(	char	*dir,
 	 **/
 
         } else if( dp->d_name[NLENGTH(dp)-1] == '~' ||
-	    !check_magic( dirname, MODULES_MAGIC_COOKIE,
-		MODULES_MAGIC_COOKIE_LENGTH)) {
+	    !check_magic( dirname )) {
 	    continue;
 	} else {
 	    dirlst_cur->fi_subdir = NULL;
@@ -935,8 +940,7 @@ void print_aligned_files(
 		if ((g_current_module = s = strrchr(*list, *psep))) {
 			*s = 0;
 			g_current_module++;
-			if (TCL_ERROR ==
-			    Locate_ModuleFile(interp, g_current_module,
+			if (TCL_ERROR == Locate_ModuleFile(interp, g_current_module,
 					      modulename, modulefile)) {
 				g_current_module = strrchr(*list, *psep);
 				g_current_module++;
@@ -1416,3 +1420,145 @@ static	int fi_ent_cmp(	const void	*fi1,
   return strcmp( ((fi_ent*)fi1)->fi_name, ((fi_ent*)fi2)->fi_name);
 #endif
 }
+
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
+ **   Function:		print_tree					     **
+ ** 									     **
+ **   Description:	Print all files beyond the passed directory	     **
+ ** 									     **
+ **   First Edition:	2009/09/17					     **
+ ** 									     **
+ **   Parameters:	Tcl_Interp	*interp		Tcl interpretor	     **
+ **			char	*dir		Directory to be scanned	     **
+ ** 									     **
+ **   Result:		int	TCL_OK		Successful operation	     **
+ ** 									     **
+ **   Attached Globals:	-						     **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
+
+static int startdir (const char *dir) {
+	/* source the .modulerc and .version files if they exist */
+	if ((TCL_OK != SourceRC(Ainterp, dir, modulerc_file, Mod_Load)
+	||  (TCL_OK != SourceVers(Ainterp, dir, version_file, Mod_Load))))
+		return -10;
+	Adirlevel++;
+	return 0;
+}
+
+static int middir (const char *dir) {
+	/* unsource the .version file if it exists */
+	/* this is before the subdirs have been recursed */
+#if 0
+	if (TCL_OK != SourceVers(Ainterp, dir, version_file, Mod_Unload))
+		return -20;
+#endif
+	return 0;
+}
+
+static int enddir (const char *dir) {
+	/* unsource the .modulerc file if it exists */
+	/* this is after the subdirs have been recursed */
+#if 0
+	if (TCL_OK != SourceRC(Ainterp, dir, modulerc_file, Mod_Unload))
+		return -30;
+#endif
+	Adirlevel--;
+	return 0;
+}
+
+static int dirfn (const char *dir, const char *base) {
+	fprintf(stderr,"%.*s%s%s\n", Adirlevel*2, long_spaces, base, psep);
+	return 0;
+}
+
+static int filefn(
+	const char *file,
+	const char *base
+) {
+	struct stat     fst;			/* file stat                  */
+	struct tm      *tm;			/* file time                  */
+	int             t;			/* indent spaces              */
+	char	       *symbols;		/* version/aliases	      */
+
+	/* skip the special files */
+	if (!strcmp(base, modulerc_file)
+	    || !strcmp(base, version_file)
+	    || *base == '.')
+		return 0;
+	/**
+	 **  Get the time of last modification
+	 **/
+	if (!stat(file, &fst)) {
+		if ((tm = localtime(&fst.st_mtime))) {
+			sprintf(buffer, "%04d/%02d/%02d %2d:%02d:%02d",
+				1900 + tm->tm_year,
+				tm->tm_mon + 1, tm->tm_mday,
+				tm->tm_hour, tm->tm_min, tm->tm_sec);
+		} else
+			strcpy(buffer, "no date");
+	} else
+		return 0;
+	/**
+	 ** see if there are any version or alias symbols
+	 **/
+	if (!(symbols = ExpandVersions((char *)file)))
+		symbols = "";
+	/**
+	 **  Now print the line
+	 **/
+#if 0
+	fprintf(stderr, long_format, module, symbols, timestr);
+	static char     long_format[] = "%-39.39s  %-10.10s  %17s\n";
+#endif
+	t = 2*Adirlevel;
+	fprintf(stderr, "%.*s%*.*s%-10.10s  %17s\n", t, long_spaces,
+		t - 48, 48 - t, base, symbols, buffer);
+	return 0;
+}
+
+static int cmpfiledir(
+	const void *fi1,
+	const void *fi2
+) {
+	return strcmp(*(const char **)fi1, *(const char **)fi2);
+}
+
+static int print_tree(
+	Tcl_Interp * interp,
+	char *dir
+) {
+    /**
+     **  set the "global variables"
+     **/
+	Ainterp = interp;
+	Adirlevel = 0;
+    /**
+     **  Print the directory name
+     **/
+	if ((sw_format & (SW_PARSE | SW_TERSE | SW_LONG))
+	    && !(sw_format & (SW_HUMAN | SW_LIST))) {
+		fprintf(stderr, "%s:\n", dir);
+	}
+    /**
+     **  walk through the tree
+     **/
+	module_dirtree(-1,MAXLINKS, dir, dirfn, filefn,
+		startdir, middir, enddir, cmpfiledir, cmpfiledir);
+
+	if (sw_format & SW_LONG)
+		fprintf(stderr, "\n");
+
+	/* dump aliases & module list */
+	DumpX("aliaslist");
+	DumpX("modlist");
+
+	return (TCL_OK);		/** ------- EXIT (SUCCESS) --------> **/
+
+unwind0:
+	return (TCL_ERROR);		/** ------- EXIT (FAILURE) --------> **/
+
+} /** End of 'print_tree' **/

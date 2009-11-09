@@ -26,7 +26,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_List.c,v 1.13 2009/10/15 19:09:03 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_List.c,v 1.13.2.1 2009/11/09 21:15:12 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -143,7 +143,6 @@ int	ModuleCmd_List(	Tcl_Interp	*interp,
 	  ErrorLogger( ERR_ENVVAR, LOC, NULL);
 	}
 	  
-
 	/**
 	 **  We have to build a single list of files for each loaded entry
 	 **  in order to be able to figure out the length of the directory
@@ -159,7 +158,6 @@ int	ModuleCmd_List(	Tcl_Interp	*interp,
 	     **  We have to source all relevant .modulerc and .version files
 	     **  on the path
 	     **/
-
 	    s = files[i] + len;
 	    while( s) {
 		if( (s = strchr( s, *psep)) )

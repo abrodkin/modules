@@ -37,7 +37,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: init.c,v 1.23 2009/10/15 20:32:51 rkowen Exp $";
+static char Id[] = "@(#)$Id: init.c,v 1.23.2.1 2009/11/09 21:15:12 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -274,6 +274,20 @@ int Initialize_Module(
 	if (!set_shell_properties(argv[1]))
 		if (OK != ErrorLogger(ERR_SHELL, LOC, argv[1], NULL))
 			goto unwind0;
+    /**
+     **  List of directories & files to skip
+     **/
+	if (!(skipdirs = mhash_ctor(MHashInt)))
+		if (OK != ErrorLogger(ERR_UVEC, LOC, NULL))
+			goto unwind0;
+
+	(void) mhash_add(skipdirs, "CVS",1);
+	(void) mhash_add(skipdirs, "RCS",1);
+	(void) mhash_add(skipdirs, ".git",1);
+	(void) mhash_add(skipdirs, ".svn",1);
+	(void) mhash_add(skipdirs, modulerc_file,1);
+	(void) mhash_add(skipdirs, version_file,1);
+
     /**
      **  Create a Tcl interpreter in order to proceed the command. Initialize
      **  this interpreter and set up pointers to all Tcl Module commands

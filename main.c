@@ -30,7 +30,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: main.c,v 1.32 2009/10/15 20:33:01 rkowen Exp $";
+static char Id[] = "@(#)$Id: main.c,v 1.32.2.1 2009/11/09 21:15:12 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -75,7 +75,8 @@ char	**ModulePath,			/** vector of the above		     **/
 					/** the current command		     **/
 	 *g_specified_module = NULL,	/** The module that was specified    **/
 					/** on the command line		     **/
-	 *g_module_path = NULL,		/** The path to the module	     **/
+	 g_curr_path[FILENAME_MAX],	/** The path to the module in steps  **/
+	 g_tmp_path[FILENAME_MAX],
 	 *shell_name,			/** Name of the shell		     **/
 					/** (first parameter to modulcmd)    **/
 	 *shell_derelict,		/** Shell family (sh, csh, etc)	     **/
@@ -90,6 +91,7 @@ int	  g_flags = 0,			/** Control what to do at the moment **/
 	  g_output = 0,			/** Has output been generated	     **/
 	  append_flag = 0;		/** only used by the 'use' command   **/
 Tcl_Obj	 *cwd;				/** Tcl version of cwd		     **/
+MHash	 *skipdirs;			/** directories to skip		     **/
 
 /**
  **  Name of the rc files

@@ -323,7 +323,6 @@ typedef enum	{
 /** ************************************************************************ **/
 
 #define      MODULES_MAGIC_COOKIE         "#%Module"
-#define      MODULES_MAGIC_COOKIE_LENGTH  8
 
 /**
  **  User level
@@ -405,13 +404,14 @@ typedef enum	{
 
 #define  LINELENGTH	8192
 #define  MOD_BUFSIZE	1024
+#define	 MAXLINKS	10
 
 /** ************************************************************************ **/
 /**				      MACROS				     **/
 /** ************************************************************************ **/
 
 /**
- **  I'm going to remove all of the calls to free( ) since they are not
+ **  Remove all of the calls to free( ) since they are not
  **    necessary for Modules.  Since the modulecmd program is only run for
  **    a very short time ( usually <1sec) it's faster to not clutter the heap
  **    by freeing up memory.
@@ -470,6 +470,8 @@ extern	char	 *version_string;
 extern	char	 *date_string;
 extern	char	 *g_current_module;
 extern	char	 *g_specified_module;
+extern	char	 g_curr_path[FILENAME_MAX];
+extern	char	 g_tmp_path[FILENAME_MAX];
 extern	char	 *shell_name;
 extern	char	 *shell_derelict;
 extern	char	 *shell_init;
@@ -485,6 +487,7 @@ extern	char	  local_line[];
 extern	char	  _colon[];
 extern	char	 *psep;
 extern	Tcl_Obj	 *cwd;
+extern	MHash	 *skipdirs;
 
 extern	int	  linenum;
 
@@ -546,9 +549,14 @@ extern	char	 long_header[];
 
 /**  locate_module.c  **/
 extern	int	  Locate_ModuleFile( Tcl_Interp*, char*, char*, char*);
-extern	int	  SourceVers( Tcl_Interp*, char*, char*, Mod_Act);
-extern	int	  SourceRC( Tcl_Interp*, char*, char*, Mod_Act);
-
+extern	int	  SourceVers(Tcl_Interp*, const char*, const char*, Mod_Act);
+extern	int	  SourceRC(Tcl_Interp *interp,const char*,const char*, Mod_Act);
+extern	const char *Strip_ModulePath(const char*,const char*);
+extern	char	 *SetCurrPath(const char*);
+extern	char	 *AppendToCurrPath(const char*);
+extern	char	 *UpCurrPath(void);
+extern	int	  Locate_Module( Tcl_Interp*, char*, size_t, char*);
+  
 /**  main.c  **/
 extern  void	  module_usage(FILE *output);
 
@@ -686,8 +694,11 @@ extern	int	  cmdModuleVersion(ClientData,Tcl_Interp*,
 extern	int	  cmdModuleAlias(ClientData,Tcl_Interp*,
 			int, Tcl_Obj * CONST84 []);
 extern	int	  AliasLookup( char*, char**, char**);
+extern	char	 *LookupAlias(char*);
 extern	int	  VersionLookup( char*, char**, char**);
+extern	char	 *LookupVersion(char*);
 extern	char	 *ExpandVersions( char*);
+void		  DumpX(char *);
 
 /**  init.c  **/
 extern	int	  Initialize_Module( Tcl_Interp**, int, char*[], char*[]);
@@ -718,7 +729,7 @@ extern	char	 *getLMFILES(void);
 extern	int	  IsLoaded( char*, char**, char*);
 extern	int	  IsLoaded_ExactMatch( char*, char	**, char*);
 extern	int	  Update_LoadedList( Tcl_Interp*, char*, char*);
-extern	int	  check_magic( char*, char*, int);
+extern	int	  check_magic( char*);
 extern	char	 *xstrtok_r(char *, const char *, char **);
 extern	char	 *xstrtok(char *, const char *);
 extern	void	  chk4spch( char*);
@@ -729,7 +740,15 @@ extern  int       tmpfile_mod( char**, FILE**);
 extern	char	 *stringer(char *, int, ...);
 extern	EM_RetVal	ReturnValue( Tcl_Interp*, int);
 extern	void	  OutputExit();
-extern	int	  module_setenv(const char *var, const char *val);
+extern	int	  module_setenv(const char *, const char *);
+extern	int	  module_dirtree(int, int, const char *,
+        int (*)(const char *, const char *),
+	int (*)(const char *, const char *),
+        int (*)(const char *), int (*)(const char *), int (*)(const char *),
+	int (*)(const void *, const void *),
+	int (*)(const void *, const void *)
+);
+extern	int	  is_(const char *, const char *);
 
 /** utilmem.c **/
 extern	void	 *module_malloc(size_t);

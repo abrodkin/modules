@@ -19,6 +19,8 @@
  **			cmdModuleAlias					     **
  **			CleanupVersion					     **
  **			AliasLookup					     **
+ **			LookupAlias					     **
+ **			LookupVersion					     **
  **			ExpandVersions					     **
  ** 									     **
  **   Notes:	This module defines the callback functions for the defi-     **
@@ -48,7 +50,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdVersion.c,v 1.20 2009/10/15 19:09:24 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdVersion.c,v 1.20.2.1 2009/11/09 21:15:12 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -221,7 +223,7 @@ int cmdModuleVersion(
      **/
 	if (objc < 3) {
 		if (OK != ErrorLogger(ERR_USAGE, LOC, Tcl_GetString(objv[0]),
-				" modulename ",
+				" modulename or .",
 				" symbolic-version [symbolic-version ...] ",
 				NULL))
 			return (TCL_ERROR); /** ------ EXIT (FAILURE) -----> **/
@@ -475,7 +477,7 @@ static	char	*scan_versions( char		 *buffer,
  **						string			     **
  ** 									     **
  **   Attached Globals:	modlist		List containing all version names    **
- **			aliaslist	List containing all alises	     **
+ **			aliaslist	List containing all aliases	     **
  **			g_current_module	The module which is handled  **
  **						by the current command	     **
  ** 									     **
@@ -574,7 +576,7 @@ static	char	*CheckModuleVersion( char *name)
  **   Result:		int	TCL_OK		Successful completion	     **
  **				TCL_ERROR	Any error		     **
  ** 									     **
- **   Attached Globals:	aliaslist	List containing all alises	     **
+ **   Attached Globals:	aliaslist	List containing all aliases	     **
  **   			g_flags		These are set up accordingly before  **
  **					this function is called in order to  **
  **					control everything		     **
@@ -696,7 +698,7 @@ int cmdModuleAlias(
  **						is valid		     **
  **				0		Any error, or not found	     **
  ** 									     **
- **   Attached Globals:	aliaslist	List containing all alises	     **
+ **   Attached Globals:	aliaslist	List containing all aliases	     **
  ** 									     **
  ** ************************************************************************ **
  ++++*/
@@ -760,6 +762,88 @@ int	AliasLookup(	char	*alias,
 /*++++
  ** ** Function-Header ***************************************************** **
  ** 									     **
+ **   Function:		LookupAlias					     **
+ ** 									     **
+ **   Description:	Resolves a given alias a string			     **
+ ** 									     **
+ **   First Edition:	2009/10/29					     **
+ ** 									     **
+ **   Parameters:	char	*alias		Name of the alias to be re-  **
+ **						solved			     **
+ **   Result:		char*			Success, is ptr to string    **
+ **						else NULL ptr if not found   **
+ ** 									     **
+ **   Attached Globals:	aliaslist	List containing all aliases	     **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
+
+char           *LookupAlias(
+	char *alias
+) {
+
+#ifdef foobar
+	ModName        *ptr, *tmp, *oldptr = NULL;
+
+	while (1) {
+
+	/**
+	 **  Lokate the alias entry and check intergrity
+	 **/
+
+		if ((ModName *) NULL ==
+		    (ptr = FindName(alias, aliaslist, &tmp)))
+			return (0);	/** ------- EXIT (not found) ------> **/
+
+		if (ptr == oldptr || !ptr->ptr || !ptr->ptr->name) {
+			ErrorLogger(ERR_INTERAL, LOC, NULL);
+			return (0);	/** -------- EXIT (FAILURE) -------> **/
+		}
+
+	/**
+	 **  Do we have to loop? Another alias has no module reference ...
+	 **/
+
+		if (!ptr->ptr->module) {
+			alias = ptr->ptr->name;
+			oldptr = ptr;
+			continue;
+		}
+
+	/**
+	 **  Got it. Get the module name and the version from the found
+	 **  entry.
+	 **  Dereference symbolic module versions
+	 **/
+
+		*module = ptr->ptr->module->module;
+		*version = ptr->ptr->name;
+
+		if ((ModName *) NULL != (ptr = FindName(*version,
+							ptr->ptr->module->name,
+							&tmp))) {
+			if (!ptr->version || !ptr->version->name) {
+				if (OK != ErrorLogger(ERR_INTERAL, LOC, NULL))
+					return (0);
+			} else
+				*version = ptr->version->name;
+		}
+
+		break;
+
+	}
+      /** while **/
+
+	return (1);
+#else
+	return (char *)NULL;
+#endif
+
+} /** End of 'LookupAlias' **/
+
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
  **   Function:		VersionLookup					     **
  ** 									     **
  **   Description:	Resolves a given alias to a module/version string    **
@@ -780,6 +864,10 @@ int	AliasLookup(	char	*alias,
  ** 									     **
  ** ************************************************************************ **
  ++++*/
+
+char	*LookupVersion(char *path) {
+	return LookupAlias(path);
+}
 
 int	VersionLookup(	char *name, char **module, char **version)
 {
@@ -807,7 +895,7 @@ int	VersionLookup(	char *name, char **module, char **version)
 	strcpy( buffer, name);
 	*module = buffer;
 
-	if((char *) NULL == (*version = strrchr( buffer, *psep))) {
+	if(!(*version = strrchr( buffer, *psep))) {
 
 	    if( AliasLookup( buffer, &s, &t)) {
 		*module = s; *version = t;
@@ -914,7 +1002,7 @@ int	VersionLookup(	char *name, char **module, char **version)
  **   Result:		-						     **
  ** 									     **
  **   Attached Globals:	modlist		List containing all version names    **
- **			aliaslist	List containing all alises	     **
+ **			aliaslist	List containing all aliases	     **
  ** 									     **
  ** ************************************************************************ **
  ++++*/
@@ -1188,3 +1276,142 @@ static	ModName	*FindName(	char	 *name,
     return( cmp ? (ModName *) NULL : ptr);
 
 } /** End of 'FindName' **/
+
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
+ **   Function:		DumpName					     **
+ ** 									     **
+ **   Description:	Dumps the list of ModNames to stderr		     **
+ ** 									     **
+ **   First Edition:	2009/09/24					     **
+ ** 									     **
+ **   Parameters:	ModName  *start		Start of the name queue      **
+ **   			char	 *follow	<a>lphabetic or <l>ogical    **
+ ** 									     **
+ **   Result:		void						     **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
+
+static void DumpName(
+	ModName *start,
+	char *follow
+) {
+	ModName        *ptr = start;
+	char	       *name, *module, *version, *logical, *alpha,
+			null_[] = "(null)";
+
+	while (ptr) {
+		name = ptr->name;
+		if (ptr->module && ptr->module->module)
+			module = ptr->module->module;
+		else
+			module = null_;
+
+		if (ptr->version && ptr->version->name)
+			version = ptr->version->name;
+		else
+			version = null_;
+
+		if (ptr->next && ptr->next->name)
+			alpha = ptr->next->name;
+		else
+			alpha = null_;
+
+		if (ptr->ptr && ptr->ptr->name)
+			logical = ptr->ptr->name;
+		else
+			logical = null_;
+
+		fprintf(stderr,"\tname: %s\n"
+			"\t\t->logical: %s\n\t\t->alpha: %s\n"
+			"\t\tmodule: %s\n\t\tversion: %s\n",
+			name, logical, alpha, module, version);
+
+		if (ptr->ptr)
+			DumpName(ptr->ptr, "logical");
+
+		if (*follow == 'l' || *follow == 'L')
+			ptr = ptr->ptr;
+		else
+			ptr = ptr->next;
+	}
+
+} /** End of 'DumpName' **/
+
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
+ **   Function:		DumpMod						     **
+ ** 									     **
+ **   Description:	Dumps the list of ModModules to stderr		     **
+ ** 									     **
+ **   First Edition:	2009/09/24					     **
+ ** 									     **
+ **   Parameters:	ModModules  *start	Start of the module queue    **
+ ** 									     **
+ **   Result:		void						     **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
+
+static void DumpMod(
+	ModModule *start
+) {
+	ModModule      *ptr = start;
+	char	       *module, *name, *version,
+			null_[] = "(null)";
+
+	while (ptr) {
+		module = ptr->module;
+		if (ptr->name && ptr->name->name)
+			name = ptr->name->name;
+		else
+			name = null_;
+
+		if (ptr->version && ptr->version->name)
+			version = ptr->version->name;
+		else
+			version = null_;
+
+		fprintf(stderr,"\tmodule: %s\n"
+			"\t\tname: %s\n\t\tversion: %s\n",
+			module, name, version);
+
+		ptr = ptr->next;
+	}
+
+} /** End of 'DumpMod' **/
+
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
+ **   Function:		DumpX						     **
+ ** 									     **
+ **   Description:	Dumps the modlist or alias to stderr		     **
+ ** 									     **
+ **   First Edition:	2009/09/24					     **
+ ** 									     **
+ **   Parameters:	char  *what		<M>odules or <A>liases	     **
+ ** 									     **
+ **   Attached Globals:	modlist		List containing all version names    **
+ **			aliaslist	List containing all aliases	     **
+ ** 									     **
+ **   Result:		void						     **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
+
+void DumpX(
+	char * what
+) {
+	if (*what == 'a' || *what == 'A') {
+		fprintf(stderr,">>>Alias List:\n");
+		DumpName(aliaslist, "alphabetic");
+	} else if (*what == 'm' || *what == 'M') {
+		fprintf(stderr,">>>Module Version List:\n");
+		DumpMod(modlist);
+	}
+
+} /** End of 'DumpMod' **/

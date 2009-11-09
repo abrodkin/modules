@@ -31,7 +31,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: locate_module.c,v 1.32 2009/10/15 20:32:56 rkowen Exp $";
+static char Id[] = "@(#)$Id: locate_module.c,v 1.32.2.1 2009/11/09 21:15:12 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -481,8 +481,7 @@ unwindt:
 			/**
 			 **  Otherwise check the file for a magic cookie ...
 			 **/
-			if( check_magic( fullpath, MODULES_MAGIC_COOKIE, 
-			    MODULES_MAGIC_COOKIE_LENGTH)) 
+			if( check_magic( fullpath ))
 			    Result = filename;
 		    } /** if( !stat) **/
 		} /** for **/
@@ -491,8 +490,7 @@ unwindt:
 		 **  If mod names a file, we have to check wheter it exists and
 		 **  is a valid module file
 		 **/
-		if( check_magic( fullpath, MODULES_MAGIC_COOKIE, 
-		    MODULES_MAGIC_COOKIE_LENGTH)) 
+		if( check_magic( fullpath ))
 		    Result = mod;
 		else {
 		    ErrorLogger( ERR_MAGIC, LOC, fullpath, NULL);
@@ -573,8 +571,8 @@ unwind0:
 
 int SourceRC(
 	Tcl_Interp * interp,
-	char *path,
-	char *name,
+	const char *path,
+	const char *name,
 	Mod_Act action
 ) {
 	struct stat     stats;		/** Buffer for the stat() systemcall **/
@@ -599,16 +597,14 @@ int SourceRC(
     /**
      **  Build the full name of the RC file
      **/
-	if ((char *)NULL ==
-	    (buffer = stringer(NULL, 0, path, psep, name, NULL)))
+	if (!(buffer = stringer(NULL, 0, path, psep, name, NULL)))
 		if (OK != ErrorLogger(ERR_STRING, LOC, NULL))
 			goto unwind0;
     /**
      **  Check whether the RC file exists and has the magic cookie inside
      **/
 	if (!stat(buffer, &stats)) {
-		if (check_magic(buffer, MODULES_MAGIC_COOKIE,
-				MODULES_MAGIC_COOKIE_LENGTH)) {
+		if (check_magic(buffer )) {
 	    /**
 	     **  Set the flags to '(un)load only'. This prevents from
 	     **  accidentally printing something
@@ -632,8 +628,7 @@ int SourceRC(
 			/* Not an error ... just warn of invalid magic cookie */
 			ErrorLogger(ERR_MAGIC, LOC, buffer, NULL);
 		}
-	}
-	    /** if( !stat) - presumably not found **/
+	} /** if( !stat) - presumably not found **/
     /**
      **  Free resources and return result
      **/
@@ -674,8 +669,8 @@ unwind0:
 
 int SourceVers(
 	Tcl_Interp * interp,
-	char *path,
-	char *name,
+	const char *path,
+	const char *name,
 	Mod_Act action
 ) {
 	struct stat     stats;		/** Buffer for the stat() systemcall **/
@@ -697,7 +692,8 @@ int SourceVers(
     /**
      **  No default version defined so far?
      **/
-	if (VersionLookup(name, &mod, &ver) && strcmp(ver, _(em_default)))
+	if (VersionLookup((char *)name, &mod, &ver)
+	&&  strcmp(ver, _(em_default)))
 		return (TCL_OK);
     /**
      **  Build the full name of the RC file and check whether it exists and
@@ -710,8 +706,7 @@ int SourceVers(
 	if (!stat(buffer, &stats)) {
 		if (
 #if VERSION_MAGIC != 0
-			   check_magic(buffer, MODULES_MAGIC_COOKIE,
-				       MODULES_MAGIC_COOKIE_LENGTH)
+			   check_magic(buffer)
 #else
 			   1
 #endif
@@ -773,3 +768,257 @@ int SourceVers(
 
 } /** End of 'SourceVers' **/
 
+/*RKO----------------------------------------------------------------------RKO*/
+
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
+ **   Function:		SetCurrPath					     **
+ **   Function:		AppendToCurrPath				     **
+ **   Function:		UpCurrPath					     **
+ ** 									     **
+ **   Description:	Sets the g_curr_path global variable		     **
+ ** 									     **
+ **   First Edition:	2009/09/28					     **
+ ** 									     **
+ **   Parameters:	char	*path		current path to set/append   **
+ ** 									     **
+ **   Result:		char	*g_curr_path	or NULL if error	     **
+ ** 									     **
+ **   Attached Globals:	g_curr_path		current path		     **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
+
+char *SetCurrPath(
+	const char *path
+) {
+	if (g_curr_path == path)	/* same objects */
+		return g_curr_path;
+
+	return stringer(g_curr_path,FILENAME_MAX, path, NULL);
+}
+
+char *AppendToCurrPath(
+	const char *path
+) {
+	/* should convert all '/'s to psep in resulting path (if different) */
+	return stringer(g_curr_path,FILENAME_MAX,g_curr_path, psep, path, NULL);
+}
+
+char *UpCurrPath(
+	void
+) {
+	char *ptr;
+
+	if (!(ptr = strrchr(g_curr_path, (int) *psep))) {
+		/* zero the path from here to end */
+		while (ptr && *ptr)
+			*ptr++ = '\0';
+	} else {
+		/* no path separator found ... set to "" */
+		*g_curr_path = '\0';
+	}
+	return	g_curr_path;
+}
+
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
+ **   Function:		Strip_ModulePath				     **
+ ** 									     **
+ **   Description:	Returns a pointer into the module path without the   **
+ **			prepended module path, else NULL.		     **
+ ** 									     **
+ **   First Edition:	2009/09/28					     **
+ ** 									     **
+ **   Parameters:	char		*modulepath	ModulePath to try    **
+ ** 									     **
+ ** 			char		*module		full path to module  **
+ ** 									     **
+ **   Result:		char *		modulename	or NULL		     **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
+
+const char *Strip_ModulePath(
+	const char *modulepath,
+	const char *module
+) {
+	const char	*ptr;
+	int		 len;
+
+	len = strlen(modulepath);
+
+	if (!strncmp(module,modulepath,len)) {
+		/* got match */
+		ptr = module + len;
+		/* check for *psep */
+		if (*ptr == *psep)
+			return ++ptr;
+	}
+	return (const char *) NULL;
+}
+
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
+ **   Function:		Locate_Module					     **
+ ** 									     **
+ **   Description:	Searches for a modulefile given a string argument    **
+ **			which is either a full path or a modulefile name     **
+ **			-- usually the argument the user gave. If it's not a **
+ **			full path, the directories in the MODULESPATH	     **
+ **			environment variable are searched to find a match    **
+ **			for the given name.				     **
+ **			If the name resolves into a directory then default   **
+ **			paths are followed until a modulefile is found	     **
+ **			(or not).					     **
+ ** 									     **
+ **   First Edition:	2009/09/21					     **
+ ** 									     **
+ **   Parameters:	Tcl_Interp	*interp		Attached Tcl interpr.**
+ ** 									     **
+ **			char		*modulepath	dir path to look     **
+ ** 							set NULL for search  **
+ **			char		*modulename	Name of the module to**
+ **							be located	     **
+ ** 									     **
+ **   Result:		int		TCL_OK if found else TCL_ERROR	     **
+ **			g_curr_path	the full path of the required module **
+ **					file is copied in here		     **
+ **			g_current_module	pointer into g_curr_path     **
+ ** 									     **
+ **   Attached Globals:	g_curr_path		The full path to module	     **
+ **   			g_current_module	Normalized  module name	     **
+ **						handled by this command	     **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
+
+#if 1
+int Locate_Module(
+	Tcl_Interp *interp,
+	char *modulepath,
+	size_t mpsize,
+	char *modulename
+) {
+	char	      **pathlist,	/** List of paths to scan	     **/
+		       *alias,		/** returned alias path		     **/
+		       *nextlevel,	/** next level down modulename	     **/
+		       *ptr;		/** for string operations	     **/
+	int		result = TCL_ERROR;/** This functions result	     **/
+	size_t		len,		/** string lengths, etc.	     **/
+			initpathlen;	/** keep the initial modulepath len  **/
+
+	if (!modulename)
+		if (OK != ErrorLogger(ERR_PARAM, LOC, "modulename", NULL))
+			goto unwind0;
+
+	/**
+	 ** If no modulepath is given then cycle through the MODULEPATH
+	 **/
+	if (!modulepath) {
+		/**
+		 **  If nothing in MODULEPATH, there's nothing to search.
+		 **/
+		if (!(uvec_number(ModulePathVec)))
+			goto unwind0;
+
+		pathlist = ModulePath;
+		/**
+		 **  Check each directory to see if it contains the module
+		 **/
+		while (pathlist && *pathlist) {
+			if (!**pathlist) {
+				/* skip empty paths */
+				pathlist++;
+				continue;
+			}
+			SetCurrPath(*pathlist);
+			/* recurse into self and let the section below look */
+			result = Locate_Module(interp,
+				g_curr_path, FILENAME_MAX, modulename);
+			if (result == TCL_OK) {
+				g_current_module =
+					g_curr_path + strlen(*pathlist) + 1;
+				goto unwind0;
+			}
+			pathlist++;
+		} /** while **/
+	} else {
+	/**
+	 ** Given a modulepath now peel through the sub-levels
+	 **/
+		initpathlen = strlen(modulepath);
+		SetCurrPath(modulepath);
+		/**
+		 ** if directory then source RC files, etc.
+		 **/
+		if (is_("dir", modulepath)) {
+			/* source .modulerc and .version */
+			if (TCL_ERROR==SourceRC(interp,
+				modulepath, modulerc_file, Mod_Load)
+			||  TCL_ERROR==SourceVers(interp,
+				modulepath, version_file, Mod_Load)) {
+				goto unwind0;
+			}
+
+			/* parse off the top level from the modulename */
+			*g_tmp_path = '\0';
+			if ((ptr = strstr(modulename, psep))) {
+				/* copy this top level part */
+				len = ptr - modulename - strlen(psep) + 1;
+				strncpy(g_tmp_path, modulename, len);
+				g_tmp_path[len] = '\0';
+				nextlevel = modulename + len + 1;
+			} else {
+				/* check if NULL string */
+				if (*modulename) {	/* not null */
+					nextlevel = modulename +
+						strlen(modulename);
+					strcpy(g_tmp_path, modulename);
+				} else {		/* null */
+					nextlevel = modulename;
+				}
+			}
+
+			/* if modulename is empty - check for default */
+			if (!*g_tmp_path) {
+				alias = LookupVersion(modulepath);
+			} else {
+				/* look for alias which trumps file/dir */
+				alias = LookupAlias(g_tmp_path);
+			}
+
+			/* unsource .version */
+			g_curr_path[initpathlen] = '\0';
+			if ( TCL_ERROR==SourceVers(interp,
+				g_curr_path, version_file, Mod_Unload)) {
+				goto unwind0;
+			}
+
+			if (alias && *alias) {
+				/* version or alias - append on then recurse */
+				AppendToCurrPath(alias);
+			} else {
+				AppendToCurrPath(g_tmp_path);
+			}
+			result = Locate_Module(interp,
+				g_curr_path, FILENAME_MAX, nextlevel);
+		} else {
+		/**
+		 ** not directory so this must be it ... if file with magic!
+		 **/
+			if (check_magic(modulepath)) {
+				result = TCL_OK;
+				SetCurrPath(modulepath);
+			}
+			/* do we have to clean-up? No if saved state before */
+		}
+	}
+
+unwind0:
+	return result;
+}
+#endif

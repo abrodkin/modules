@@ -29,7 +29,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Load.c,v 1.15 2009/10/15 19:09:05 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Load.c,v 1.15.2.1 2009/11/09 21:15:12 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -137,7 +137,6 @@ int	ModuleCmd_Load(	Tcl_Interp	*interp,
 	/**
 	 **  Create a Tcl interpreter and initialize it with the module commands
 	 **/
-
         tmp_interp = Tcl_CreateInterp();
 	if( TCL_OK != (return_val = Module_Init( tmp_interp)))
 	    return( return_val);	/** -------- EXIT (FAILURE) -------> **/
@@ -147,7 +146,6 @@ int	ModuleCmd_Load(	Tcl_Interp	*interp,
 	 **  UNLOAD to be done
 	 **  At first check if it is loaded ...
 	 **/
-
         if( !load) {
 
             char	*tmpname;
@@ -159,7 +157,6 @@ int	ModuleCmd_Load(	Tcl_Interp	*interp,
 #endif
 		    return_val = TCL_ERROR;
             } else {
-
 		/**
 		 **  So it is loaded ...
 		 **  Do we know the filename?
@@ -169,14 +166,15 @@ int	ModuleCmd_Load(	Tcl_Interp	*interp,
 		    if( OK != ErrorLogger( ERR_STRING, LOC, NULL))
 			goto unwind0;
                 if( !filename[0])
-                    if( TCL_ERROR == (return_val = Locate_ModuleFile(
-			tmp_interp, argv[i], tmpname, filename))) 
+                    if( TCL_ERROR == (return_val = Locate_Module(
+			tmp_interp, NULL,0, argv[i]))) 
 			ErrorLogger( ERR_LOCATE, LOC, argv[i], NULL);
+
+			strcpy(filename,g_curr_path);
 
                 /**
                  **  If IsLoaded() created tmpname, then we must free it.
                  **/
-
                 if( tmpname && (tmpname != argv[i]))
                     null_free((void *) &tmpname);
 
@@ -187,9 +185,12 @@ int	ModuleCmd_Load(	Tcl_Interp	*interp,
 	 **  Only check the filename
 	 **/
         } else {
-	    if( TCL_ERROR == (return_val = Locate_ModuleFile( tmp_interp,
-		argv[i], modulename, filename)))
+	    if( TCL_ERROR == (return_val = Locate_Module( tmp_interp,
+		NULL,0, argv[i])))
 		ErrorLogger( ERR_LOCATE, LOC, argv[i], NULL);
+
+		strcpy(filename,g_curr_path);
+		strcpy(modulename,g_current_module);
         }
         /**
          **  If return_val has been set to something other than TCL_OK,
@@ -199,8 +200,8 @@ int	ModuleCmd_Load(	Tcl_Interp	*interp,
 	 **  respect to the 'flags' which are set to M_LOAD or M_REMOVE
 	 **  according to the intention of calling this procedure.
          **/
-
-	g_current_module = modulename;
+	/***** RKO - this should be the normalized modulename - fix this *****/
+	/* g_current_module = filename; */
 	if( TCL_OK == return_val) {
 	    return_val = Read_Modulefile(tmp_interp, filename);
 	    em_return_val = ReturnValue(tmp_interp, return_val);

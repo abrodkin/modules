@@ -32,7 +32,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdModule.c,v 1.23 2009/09/02 20:37:39 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdModule.c,v 1.23.6.1 2009/11/09 21:15:12 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -433,8 +433,7 @@ int   Read_Modulefile( Tcl_Interp	*interp,
      **  Trust stdin as a valid module file ...
      **/
     
-    if( !strcmp( filename, _fil_stdin) && !check_magic( filename,
-    	MODULES_MAGIC_COOKIE, MODULES_MAGIC_COOKIE_LENGTH)) {
+    if( !strcmp( filename, _fil_stdin) && !check_magic( filename)) {
 	if( OK != ErrorLogger( ERR_MAGIC, LOC, filename, NULL))
 	    return( TCL_ERROR);		/** -------- EXIT (FAILURE) -------> **/
     }

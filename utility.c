@@ -34,11 +34,12 @@
  **			chk4spch					     **
  **			xdup						     **
  **			xgetenv						     **
- **			stringer					     **
- **			module_realloc					     **
  **			countTclHash					     **
  **			ReturnValue					     **
  **			OutputExit					     **
+ **			module_setenv					     **
+ **			module_dirtree					     **
+ **			is_						     **
  **									     **
  **   Notes:								     **
  ** 									     **
@@ -52,7 +53,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.35 2009/10/15 19:09:35 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.35.2.1 2009/11/09 21:15:12 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -290,9 +291,8 @@ uvec           *SortedDirList(
 		 **  validate this as a modulefile entry we're seeking for.
 		 **/
 				strcpy(mpath, file->d_name);
-				if (check_magic(tbuf, MODULES_MAGIC_COOKIE,
-						MODULES_MAGIC_COOKIE_LENGTH) ||
-				    !stat(tbuf, &stats)) {
+				if (check_magic(tbuf) 
+				|| !stat(tbuf, &stats)) {
 		    /**
 		     **  Yep! Found! Put it on the list
 		     **/
@@ -2056,16 +2056,14 @@ int Update_LoadedList(
  ** 									     **
  **   Function:		check_magic					     **
  ** 									     **
- **   Description:	Check the magic cookie of the file passed as para-   **
- **			meter if it is a valid module file		     **
+ **   Description:	Check the magic cookie of the file passed	     **
+ **			if it is a valid modulefile or not.		     **
  **			Based on check_magic in Richard Elling's	     **
  **			find_by_magic <Richard.Elling"@eng.auburn.edu>	     **
  ** 									     **
  **   First Edition:	1991/10/23					     **
  ** 									     **
  **   Parameters:	char   *filename	Name of the file to check    **
- **			char   *magic_name	Magic cookie		     **
- **			int     magic_len	Length of the magic cookie   **
  ** 									     **
  **   Result:		int	0	Magic cookie doesn't match or any    **
  **					I/O error			     **
@@ -2076,43 +2074,47 @@ int Update_LoadedList(
  ** ************************************************************************ **
  ++++*/
 
-int check_magic( char	*filename,
-		 char	*magic_name,
-		 int	 magic_len)
-{
-    int  fd;				/** File descriptor for reading in   **/
-    int  read_len;			/** Number of bytes read	     **/
-    char buf[BUFSIZ];			/** Read buffer			     **/
+int check_magic(
+	char *filename
+) {
+	int             fd,		/** File descriptor for reading in   **/
+		        read_len,	/** Number of bytes read	     **/
+		        magic_len;	/** MAGIC COOKIE length		     **/
+	char            buf[BUFSIZ],	/** Read buffer			     **/
+	               *magic_name;	/** MAGIC COOKIE string		     **/
 
+	magic_name = MODULES_MAGIC_COOKIE;
+	magic_len = strlen(magic_name);
     /**
      **  Parameter check. The length of the magic cookie shouldn't exceed the
      **  length of out read buffer
      **/
-    if( magic_len > BUFSIZ)
-	return 0;
+	if (magic_len > BUFSIZ)
+		return 0;
 
     /**
      **  Open the file and read in as many bytes as required for checking the
      **  magic cookie. If there's an I/O error (Unable to open the file or
      **  less than magic_len have been read) return on failure.
      **/
-    if( 0 > (fd = open( filename, O_RDONLY)))
-	if( OK != ErrorLogger( ERR_OPEN, LOC, filename, _(em_reading), NULL))
-	    return( 0);			/** -------- EXIT (FAILURE) -------> **/
+	if (0 > (fd = open(filename, O_RDONLY)))
+		if (OK !=
+		    ErrorLogger(ERR_OPEN, LOC, filename, _(em_reading), NULL))
+			return (0);	/** -------- EXIT (FAILURE) -------> **/
 
-    read_len = read( fd, buf, magic_len);
-    
-    if( 0 > close(fd))
-	if( OK != ErrorLogger( ERR_CLOSE, LOC, filename, NULL))
-	    return( 0);			/** -------- EXIT (FAILURE) -------> **/
+	read_len = read(fd, buf, magic_len);
 
-    if( read_len < magic_len)
-	return( 0);
+	if (0 > close(fd))
+		if (OK != ErrorLogger(ERR_CLOSE, LOC, filename, NULL))
+			return (0);	/** -------- EXIT (FAILURE) -------> **/
+
+	if (read_len < magic_len)
+		return (0);
 
     /**
      **  Check the magic cookie now
      **/
-    return( !strncmp( buf, magic_name, magic_len));
+	return (!strncmp(buf, magic_name, magic_len));
 
 } /** end of 'check_magic' **/
 
@@ -2806,3 +2808,255 @@ int module_setenv(
 	}
 #endif
 } /** End of 'module_setenv' **/
+
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
+ **   Function:		module_dirtree					     **
+ ** 									     **
+ **   Description:	dirtree - recurses through a directory tree and	     **
+ **			executes four user functions:			     **
+ ** 									     **
+ **		1) entry into dirtree() & directory
+ **		2) function regarding files in the list
+ **		3) function after files and before recursing
+ **		4) function regarding directory in the list
+ **		5) leaving dirtree() & directory
+ **
+ **	be performed by the user functions.  If a given
+ **	user function is NULL, then that action will be skipped.
+ **
+ **		sort =	if non-zero dirtree sorts all lists and perform
+ **			all recursions and file actions on these ASCII
+ **			alphabetically sorted lists, else dirtree will
+ **			process the lists as given in the directory
+ **			files.
+ **		dirlvl=	if > 0 then descend only to the dirlvl-th
+ **			subdirectory.  To descend into all the
+ **			directories then set < 0.  If set = 0 then
+ **			process only the entries in the given directory.
+ **		lnklvl=	if > 0 then follow only the lnklvl-th
+ **			subdirectory symbolic link.  To follow all the
+ **			directory links then set < 0.  If set = 0 then
+ **			don't follow any symbolic links.
+ **
+ **	The list of files and directories are sorted by the qsort-type
+ **	functions given by sortfiles and sortdirs.  If they are NULL
+ **	then no sorting will be performed.
+ **
+ **	dirtree does not change the current working directory.
+ ** 									     **
+ **   first edition:	2009/09/17	R.K.Owen <rk@owen.sj.ca.us>	     **
+ ** 									     **
+ **   result:		int	    		result = 0 if success	     **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
+
+int module_dirtree(
+	int dirlvl,
+	int lnklvl,
+	const char *dir,
+	int             (dirfn) (const char *, const char *),
+	int             (filefn) (const char *, const char *),
+	int             (direnter) (const char *),
+	int             (dirmid) (const char *),
+	int             (dirleave) (const char *),
+	int		(sortdirs)(const void *, const void *),
+	int		(sortfiles)(const void *, const void *)
+) {
+
+	DIR            *dr;			/* Directory file descriptor  */
+	struct dirent  *de;			/* Directory entry	      */
+	uvec           *dirvec = (uvec *) NULL,	/* list of sub dirs	      */
+		       *regvec = (uvec *) NULL;	/* list of regular files      */
+	char          **vecptr,			/* for cycling through list   */
+		      **skip,			/* for skip list	      */
+		        thislevel[FILENAME_MAX],/* full path name	      */
+		        nextlevel[FILENAME_MAX];/* subdirectory name	      */
+	struct stat     sbuf;			/* file stat		      */
+	int             err,
+		        nextlnklvl = lnklvl - 1;/* what to pass to next level */
+
+	/* execute user direnter function */
+	if (direnter != (int (*)(const char *))NULL) {
+		if (direnter(dir) < 0)
+			return -1;	/* dirtree : user direnter fn error */
+	}
+
+	/* see if full path is given else do tricks to get full path name */
+	if (*dir != *psep || (*dir == '.' && dir[1] == *psep)
+	|| dir[strlen(dir) - 1] == '.') {
+		if (!(getcwd(nextlevel, FILENAME_MAX)))
+			return -1;	/* dirtree : getcwd this dir  error */
+
+		/* go to the specified directory */
+		if (chdir(dir) < 0)
+			return -1;	/* dirtree : chdir error */
+		/* get full path */
+		if (!(getcwd(thislevel, FILENAME_MAX)))
+			return -1;	/* dirtree : getcwd full dir  error */
+		/* return back again */
+		if (chdir(nextlevel) < 0)
+			return -1;	/* dirtree : chdir return error */
+	} else {
+		(void)strcpy(thislevel, dir);
+		if (thislevel[strlen(thislevel) - 1] == *psep)
+			thislevel[strlen(thislevel) - 1] = '\0';
+	}
+
+	/* Open the directory for processing */
+	if (!(dr = opendir(thislevel)))
+		return -2;	/* dirtree : opendir error */
+
+	/* setup vectors for dirs & files */
+	if (!(dirvec = uvec_ctor(10)))
+		return -3;	/* dirtree : dirvec ctor error */
+
+	if (!(regvec = uvec_ctor(10)))
+		return -4;	/* dirtree : regvec ctor error */
+
+	/* Read the directory */
+	while ((de = readdir(dr))) {
+		if (*(de->d_name) == '.')
+			continue;		/* skip all dot files */
+
+		if (mhash_value(skipdirs,de->d_name))
+			continue;		/* skip special dirs & files */
+
+		(void)strcpy(nextlevel, thislevel);
+		(void)strcat(nextlevel, psep);	/* posix defined */
+		(void)strcat(nextlevel, de->d_name);
+#ifdef S_ISLNK		/* only worry about soft links if they exist at all */
+		if (lnklvl) {
+#endif
+			if ((err = stat(nextlevel, &sbuf)))
+				continue;
+#ifdef S_ISLNK
+		} else {
+			nextlnklvl = 0;	/* pass 0 to next level */
+			if ((err = lstat(nextlevel, &sbuf)))
+				continue;
+		}
+#endif
+		/* put directory entries into a list */
+		if (S_ISDIR(sbuf.st_mode)) {
+			if (uvec_add(dirvec, de->d_name))
+				return -5;	/* dirtree : dirvec add error */
+		} else {
+			if (uvec_add(regvec, de->d_name))
+				return -6;	/* dirtree : regvec add error */
+		}
+	}
+
+	/* sort dir & file vectors */
+	if (sortdirs != (int (*)(const void *, const void *)) NULL)
+		if (uvec_qsort(dirvec, sortdirs))
+			return -7;	/* dirtree : dirvec sort error */
+
+	if (sortfiles != (int (*)(const void *, const void *)) NULL)
+		if (uvec_qsort(regvec, sortfiles))
+			return -8;	/* dirtree : regvec sort error */
+
+	/* perform action on files */
+	if (filefn != (int (*)(const char *, const char *))NULL) {
+		for (vecptr = uvec_vector(regvec);
+		     vecptr && *vecptr;
+		     vecptr++) {
+			(void)strcpy(nextlevel, thislevel);
+			(void)strcat(nextlevel, psep);
+			(void)strcat(nextlevel, *vecptr);
+
+			if ((err = filefn(nextlevel, *vecptr)) != 0)
+				return err;
+		}
+	}
+
+	/* execute user dirmid function */
+	if (dirmid != (int (*)(const char *))NULL) {
+		if (dirmid(dir) < 0)
+			return -9;	/* dirtree : dirmid error */
+	}
+
+	/* now recurse through tree - if desired */
+	for (vecptr = uvec_vector(dirvec);
+	     vecptr && *vecptr;
+	     vecptr++) {
+		(void)strcpy(nextlevel, thislevel);
+		(void)strcat(nextlevel, psep);	/* posix defined */
+		(void)strcat(nextlevel, *vecptr);
+
+		/* execute user function on dir */
+		if (dirfn != (int (*)(const char *, const char *))NULL) {
+			(void)dirfn(nextlevel, *vecptr);
+		}
+		if (dirlvl) {
+			if ((err = module_dirtree(dirlvl - 1, nextlnklvl,
+				nextlevel, dirfn, filefn,
+				direnter, dirmid, dirleave,
+				sortdirs, sortfiles)) != 0)
+				return err;
+		}
+	}
+
+	(void)uvec_dtor(&dirvec);
+	(void)uvec_dtor(&regvec);
+	(void)closedir(dr);
+
+	/* execute user dirleave function */
+	if (dirleave != (int (*)(const char *))NULL) {
+		if (dirleave(dir) < 0)
+			return -10;	/* dirtree : dirleave error */
+	}
+	return 0;
+} /* module_dirtree */
+
+/*++++
+ ** ** Function-Header ***************************************************** **
+ ** 									     **
+ **   Function:		is_					     	     **
+ ** 									     **
+ **   Description:	Does a stat on the path and returns 0 if not X	     **
+ **			else 1 if X, where X is <f>ile, or <d>ir, etc.	     **
+ **			or returns -1 if the path does not exist.	     **
+ **			If X is <w>hat, then return 1 if file, 2 if dir	     **
+ ** 									     **
+ **   First Edition:	2009/09/21					     **
+ ** 									     **
+ **   Parameters:	char	*path		Name of the object to be     **
+ **						checked			     **
+ ** 									     **
+ **   Result:		int	 0	Not an X			     **
+ **				 1	OK				     **
+ **				-1	if not exists			     **
+ ** 									     **
+ **   Attached Globals:	-						     **
+ ** 									     **
+ ** ************************************************************************ **
+ ++++*/
+
+int is_(
+	const char *type,
+	const char *path
+) {
+	struct stat	stats;		/** stat() system call buffer	     **/
+
+	/* stat path */
+	if (stat(path, &stats)) {
+		return -1;		/** does not exist even		     **/
+	} else {
+		if (*type == 'f' || *type == 'F') {
+			if (S_ISREG(stats.st_mode))
+				return 1;
+		} else if (*type == 'd' || *type == 'D') {
+			if (S_ISDIR(stats.st_mode))
+				return 1;
+		} else if (*type == 'w' || *type == 'W') {
+			if (S_ISREG(stats.st_mode))
+				return 1;
+			if (S_ISDIR(stats.st_mode))
+				return 2;
+		}
+	}
+	return 0;
+} /** is_ **/
