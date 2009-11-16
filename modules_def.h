@@ -472,6 +472,7 @@ extern	char	 *g_current_module;
 extern	char	 *g_specified_module;
 extern	char	 g_curr_path[FILENAME_MAX];
 extern	char	 g_tmp_path[FILENAME_MAX];
+extern	char	 g_src_file[FILENAME_MAX];
 extern	char	 *shell_name;
 extern	char	 *shell_derelict;
 extern	char	 *shell_init;

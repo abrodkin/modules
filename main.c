@@ -30,7 +30,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: main.c,v 1.32.2.1 2009/11/09 21:15:12 rkowen Exp $";
+static char Id[] = "@(#)$Id: main.c,v 1.32.2.2 2009/11/16 23:22:06 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -77,6 +77,7 @@ char	**ModulePath,			/** vector of the above		     **/
 					/** on the command line		     **/
 	 g_curr_path[FILENAME_MAX],	/** The path to the module in steps  **/
 	 g_tmp_path[FILENAME_MAX],
+	 g_src_file[FILENAME_MAX],
 	 *shell_name,			/** Name of the shell		     **/
 					/** (first parameter to modulcmd)    **/
 	 *shell_derelict,		/** Shell family (sh, csh, etc)	     **/

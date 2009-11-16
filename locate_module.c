@@ -31,7 +31,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: locate_module.c,v 1.32.2.1 2009/11/09 21:15:12 rkowen Exp $";
+static char Id[] = "@(#)$Id: locate_module.c,v 1.32.2.2 2009/11/16 23:22:06 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -1017,7 +1017,6 @@ int Locate_Module(
 			/* do we have to clean-up? No if saved state before */
 		}
 	}
-
 unwind0:
 	return result;
 }

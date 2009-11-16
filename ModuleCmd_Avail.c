@@ -35,7 +35,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Avail.c,v 1.22.2.1 2009/11/09 21:15:12 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Avail.c,v 1.22.2.2 2009/11/16 23:22:05 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -1452,20 +1452,16 @@ static int startdir (const char *dir) {
 static int middir (const char *dir) {
 	/* unsource the .version file if it exists */
 	/* this is before the subdirs have been recursed */
-#if 0
 	if (TCL_OK != SourceVers(Ainterp, dir, version_file, Mod_Unload))
 		return -20;
-#endif
 	return 0;
 }
 
 static int enddir (const char *dir) {
 	/* unsource the .modulerc file if it exists */
 	/* this is after the subdirs have been recursed */
-#if 0
 	if (TCL_OK != SourceRC(Ainterp, dir, modulerc_file, Mod_Unload))
 		return -30;
-#endif
 	Adirlevel--;
 	return 0;
 }

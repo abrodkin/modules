@@ -29,7 +29,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdInfo.c,v 1.16 2009/10/15 19:09:18 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdInfo.c,v 1.16.2.1 2009/11/16 23:22:05 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -270,9 +270,8 @@ int cmdModuleInfo(
 				return (TCL_ERROR); /** -- EXIT (FAILURE) -> **/
 		}
 
-		if (AliasLookup((char *)arg2, &s, &t)) {
-			stringer(buf, BUFSIZ, s, psep, t, NULL);
-			Tcl_SetResult(interp, buf, TCL_VOLATILE);
+		if ((s = LookupAlias((char *)arg2))) {
+			Tcl_SetResult(interp, s, TCL_VOLATILE);
 		} else {
 			Tcl_SetResult(interp, "*undef*", TCL_STATIC);
 		}
