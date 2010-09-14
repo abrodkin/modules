@@ -47,7 +47,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdVersion.c,v 1.9.18.1 2010/07/27 19:09:05 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdVersion.c,v 1.9.18.2 2010/09/14 03:59:24 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -295,8 +295,9 @@ int	cmdModuleVersion(	ClientData	 client_data,
     
     for( i=2; i<argc; i++) {
 
-	if( FindName( (char *) argv[ i], modptr->name, &tmp)) {
-	    if( OK != ErrorLogger( ERR_DUP_SYMVERS, LOC, argv[ i], NULL))
+	if( strcmp(argv[i], _default)
+	&&  FindName( (char *) argv[i], modptr->name, &tmp)) {
+	    if( OK != ErrorLogger( ERR_DUP_SYMVERS, LOC, argv[i], NULL))
 		break;
 	    else
 		continue;

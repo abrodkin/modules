@@ -33,7 +33,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: locate_module.c,v 1.14.16.1 2010/07/27 19:09:05 rkowen Exp $";
+static char Id[] = "@(#)$Id: locate_module.c,v 1.14.16.2 2010/09/14 03:59:24 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -389,7 +389,7 @@ static	char	*GetModuleName(	Tcl_Interp	*interp,
     }
     slen = strlen( s) + 1;
     mod = s;
-    if( ver = strchr( mod, '/'))
+    if( ver = strrchr( mod, '/'))
 	*ver++ = '\0';
     /**
      **  Allocate a buffer for full pathname building
@@ -399,6 +399,32 @@ static	char	*GetModuleName(	Tcl_Interp	*interp,
 	    goto unwind1;
 	}
     }
+    /**
+     **  Check whether $path/$prefix/$modulename is a directory.
+     **/
+    if( prefix) {
+	if((char *) NULL == stringer(fullpath, MOD_BUFSIZE,
+	path,"/",prefix,"/",modulename, NULL))
+	    goto unwind1;
+    } else {
+	if((char *) NULL == stringer(fullpath, MOD_BUFSIZE,
+	path,"/",modulename, NULL))
+	    goto unwind1;
+    }
+    if( !stat( fullpath, &stats) && S_ISDIR( stats.st_mode)) {
+	/**
+	 ** So the full modulename is $modulename/default.  Recurse on that.
+	 **/
+	if((char *) NULL == (t = stringer(NULL, 0, modulename, "/",
+					  _default, NULL)))
+	    goto unwind1;
+	Result = GetModuleName( interp, path, prefix, t);
+	null_free((void *) &t);
+	null_free((void *) &fullpath);
+	null_free((void *) &s);
+	return( Result);
+    }
+
     /**
      **  Check whether $path/$prefix/$mod is a directory
      **/
@@ -424,7 +450,7 @@ static	char	*GetModuleName(	Tcl_Interp	*interp,
 	     **/
 	    if( prefix) {
 		if((char *) NULL == stringer(modfil_buf, MOD_BUFSIZE,
-		path,"/",mod, NULL))
+		prefix,"/",mod, NULL))
 		    goto unwind2;
 	    } else {
 		if((char *) NULL == stringer(modfil_buf, MOD_BUFSIZE,mod, NULL))
@@ -436,7 +462,7 @@ static	char	*GetModuleName(	Tcl_Interp	*interp,
 		goto unwind2;
 	    g_current_module = modfil_buf;
 
-	    if( TCL_ERROR == SourceRC( interp, fullpath, modulerc_file) ||
+	    if(	TCL_ERROR == SourceRC( interp, fullpath, modulerc_file) ||
 		TCL_ERROR == SourceVers( interp, fullpath, modfil_buf)) {
 		/* flags = save_flags; */
 		    goto unwind2;
@@ -1038,9 +1064,6 @@ int SourceRC( Tcl_Interp *interp, char *path, char *name)
     if ((char *) NULL == (buffer = stringer(NULL, 0, path,"/",name, NULL)))
 	if( OK != ErrorLogger( ERR_STRING, LOC, NULL))
 	    goto unwind0;
-    for( i=0; i<listndx; i++)
-	if( !strcmp( srclist[ i], buffer))
-	    goto unwind1;
     /**
      **  Check whether the RC file exists and has the magic cookie inside
      **/
@@ -1130,6 +1153,7 @@ int SourceVers( Tcl_Interp *interp, char *path, char *name)
     struct stat	  stats;		/** Buffer for the stat() systemcall **/
     int save_flags;
     char *buffer;
+    char *modname;			/** ptr to module part of name	     **/
     int Result = TCL_OK;
     char *version;
     char *new_argv[3];
@@ -1144,12 +1168,6 @@ int SourceVers( Tcl_Interp *interp, char *path, char *name)
 	return( TCL_OK);
     if( !interp)
 	return( TCL_ERROR);
-    /**
-     **  No default version defined so far?
-     **/
-    if( VersionLookup( name, &mod, &ver) &&
-	strcmp( ver, _default))
-	return( TCL_OK);
     /**
      **  Build the full name of the RC file and check whether it exists and
      **  has the magic cookie inside
@@ -1176,9 +1194,15 @@ int SourceVers( Tcl_Interp *interp, char *path, char *name)
 		 **  The version has been specified in the
 		 **  '.version' file. Set up the result code
 		 **/
+		/* for deep modulefile dirs ... just use lowest part */
+		if (!(modname = (char*) strrchr( name, '/'))) {
+			modname = name;
+		} else {
+			modname++;
+		}
 		null_free((void *) &buffer);
 		if ((char *) NULL == (buffer = stringer(NULL, 0,
-		name,"/",version, NULL)))
+		modname,"/",version, NULL)))
 		    if( OK != ErrorLogger( ERR_STRING, LOC, NULL))
 			return( TCL_ERROR);
 
