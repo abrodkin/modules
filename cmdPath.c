@@ -30,7 +30,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdPath.c,v 1.10.2.1 2010/07/27 19:09:05 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdPath.c,v 1.10.2.2 2010/09/23 22:47:15 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -207,7 +207,8 @@ int	cmdSetPath(	ClientData	 client_data,
     }
 
     /**
-     **  Get the old value of the variable. MANPATH defaults to "/usr/man".
+     **  Get the old value of the variable. MANPATH defaults to a configure
+     **  generated value.
      **  Put a \ in front of each '.' and '+'.
      **  (this is an intentional memory leak)
      **/
@@ -215,7 +216,7 @@ int	cmdSetPath(	ClientData	 client_data,
     _TCLCHK(interp)
 
     if( oldpath == NULL)
-	oldpath = !strcmp( argv[arg1], "MANPATH") ? "/usr/man" : "";
+	oldpath = !strcmp( argv[arg1], "MANPATH") ? DEFAULTMANPATH : "";
 
     /**
      **  Split the new path into its components directories so each
