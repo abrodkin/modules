@@ -11,6 +11,9 @@ Sep 30, 2010				R.K. Owen (rk@owen.sj.ca.us)
 	* Handle the .modulerc/.version in deep modulefile dirs,
 	  Patches thanks to Lindsay Todd, and others.
 	* Note that .version takes precedence over .modulerc files.
+	* Renamed init/python to init/python.py
+	* Fixed the MANPATH in modulefiles/modules to use configure generated
+	  values.
 
 Modules 3.2.7
 Jul 30, 2009				R.K. Owen (rk@owen.sj.ca.us)
