@@ -1,7 +1,7 @@
 ###########################################################################
 ##
 ## File:        init/Makefile.am
-## Versions:    $Id: Makefile.am,v 1.2.2.1 2010/07/27 19:09:06 rkowen Exp $
+## Versions:    $Id: Makefile.am,v 1.2.2.2 2010/09/23 20:53:11 rkowen Exp $
 ## Created:     2002/06/14
 ##
 ###########################################################################
@@ -10,7 +10,7 @@
 AUTOMAKE_OPTIONS=foreign no-installinfo
 
 EXTRA_SCRIPTS= \
-	bash bash_completion csh ksh perl python sh tcsh zsh ksh .modulespath
+	bash bash_completion csh ksh perl python.py sh tcsh zsh ksh .modulespath
 
 INIT_FILES=${EXTRA_SCRIPTS}
 

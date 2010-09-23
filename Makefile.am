@@ -1,7 +1,7 @@
 ###########################################################################
 ##
 ## File:        ./Makefile.am
-## Versions:    $Id: Makefile.am,v 1.21.4.1 2010/07/27 19:09:05 rkowen Exp $
+## Versions:    $Id: Makefile.am,v 1.21.4.2 2010/09/23 20:53:11 rkowen Exp $
 ## Created:     2002/06/14
 ##
 ###########################################################################
@@ -20,7 +20,7 @@ DIST_SUBDIRS = . init modulefiles etc ext doc
 SOURCES_H = modules_def.h getopt.h config.h
 EXTRA_DIST = modules_def.h getopt.h testsuite INSTALL.RH7x		\
 	init/filter init/bash.in init/sh.in init/zsh.in			\
-	init/csh.in init/ksh.in init/perl.in init/python.in		\
+	init/csh.in init/ksh.in init/perl.in init/python.py.in		\
 	init/bash_completion.in						\
 	LICENSE.GPL
 
