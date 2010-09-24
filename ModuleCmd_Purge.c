@@ -26,7 +26,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: ModuleCmd_Purge.c,v 1.3.20.1 2010/07/27 19:09:05 rkowen Exp $";
+static char Id[] = "@(#)$Id: ModuleCmd_Purge.c,v 1.3.20.2 2010/09/24 01:00:59 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -111,9 +111,7 @@ int	ModuleCmd_Purge(	Tcl_Interp	*interp,
     if( NULL == (loaded_modules =
 	(char *) Tcl_GetVar2( interp, "env", "LOADEDMODULES",
 	TCL_GLOBAL_ONLY))) {
-	if( OK != ErrorLogger( ERR_MODULE_PATH, LOC, NULL))
-	    return( TCL_ERROR);		/** -------- EXIT (FAILURE) -------- **/
-	else
+	    /* nothing to do */
 	    return( TCL_OK);		/** ---- EXIT (Nothing to list) ---- **/
     }
 

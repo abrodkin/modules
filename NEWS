@@ -18,6 +18,7 @@ Sep 30, 2010				R.K. Owen (rk@owen.sj.ca.us)
 	  could be used.  Some "man"s radically change their search path
 	  when a MANPATH exists and when not.
 	  The default is "/usr/man:/usr/share/man" (when both exists).
+	* Purging a purged module list does not result in an error.
 
 Modules 3.2.7
 Jul 30, 2009				R.K. Owen (rk@owen.sj.ca.us)
