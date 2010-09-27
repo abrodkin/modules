@@ -36,7 +36,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: init.c,v 1.9.2.1 2010/07/27 19:09:05 rkowen Exp $";
+static char Id[] = "@(#)$Id: init.c,v 1.9.2.2 2010/09/27 23:25:10 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -158,6 +158,7 @@ static char *shellprops [][4] = {
 	{"scheme",	"scm",		NULL,		"\n"},
 	{"guile",	"scm",		NULL,		"\n"},
 	{"mel",		"mel",		NULL,		";"},
+	{"cmake",	"cmake",	"cmake",	"\n"},
 	{NULL,		NULL,		NULL,		NULL},
 };
 

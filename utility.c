@@ -52,7 +52,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: utility.c,v 1.19.4.1 2010/07/27 19:09:05 rkowen Exp $";
+static char Id[] = "@(#)$Id: utility.c,v 1.19.4.2 2010/09/27 23:25:10 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -158,6 +158,8 @@ static  void     EscapeCshString(const char* in,
 static  void     EscapeShString(const char* in,
 				 char* out);
 static  void     EscapePerlString(const char* in,
+				 char* out);
+static  void     EscapeCmakeString(const char* in,
 				 char* out);
 
 
@@ -1131,6 +1133,16 @@ static	int	output_set_variable(	Tcl_Interp	*interp,
 		null_free((void *) &escaped);
 
     /**
+     **  CMAKE
+     **/
+    } else if( !strcmp((char*) shell_derelict, "cmake")) {
+		char* escaped = stringer(NULL, strlen(val)*2+1,NULL);
+		EscapeCmakeString(val,escaped);
+		fprintf(stdout, "set(ENV{%s} \"%s\")%s", var, escaped,
+			shell_cmd_separator);
+		null_free((void *) &escaped);
+
+    /**
      **  PYTHON
      **/
     } else if( !strcmp((char*) shell_derelict, "python")) {
@@ -1206,6 +1218,8 @@ static	int	output_unset_variable( const char* var)
 	fprintf( stdout, "(setenv \"%s\" nil)\n", var);
     } else if( !strcmp( shell_derelict, "perl")) {
 	fprintf( stdout, "delete $ENV{'%s'}%s", var, shell_cmd_separator);  
+    } else if( !strcmp( shell_derelict, "cmake")) {
+	fprintf( stdout, "unset(ENV{%s})%s", var, shell_cmd_separator);  
     } else if( !strcmp( shell_derelict, "python")) {
       fprintf( stdout, "os.environ['%s'] = ''\ndel os.environ['%s']\n",var,var);
     } else if( !strcmp( shell_derelict, "scm")) {
@@ -2749,6 +2763,19 @@ void EscapePerlString(const char* in,
     if (*in == '\\'||
 	*in == ';' ||
 	*in == '\'') {
+      *out++ = '\\';
+    }
+    *out++ = *in;
+  }
+  *out = 0;
+}
+
+/* I think this needs a bunch of work --NJW */
+void EscapeCmakeString(const char* in,
+		     char* out) {
+  for(;*in;in++) {
+    if (*in == '\\'||
+	*in == '"') {
       *out++ = '\\';
     }
     *out++ = *in;
