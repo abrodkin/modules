@@ -29,7 +29,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: main.c,v 1.16.2.1 2010/07/27 19:09:05 rkowen Exp $";
+static char Id[] = "@(#)$Id: main.c,v 1.16.2.2 2010/09/27 21:44:33 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -353,7 +353,7 @@ unwind1:
     null_free((void *) &rc_name);
 unwind0:
 
-    /* and error occurred of some type */
+    /* an error occurred of some type */
     g_retval = (g_retval ? g_retval : 1);
     OutputExit();
     return (g_retval);

@@ -1,6 +1,6 @@
 dnl
 dnl File:        configure.in
-dnl Revision:    $Id: configure.ac,v 1.20.16.3 2010/09/23 22:47:15 rkowen Exp $
+dnl Revision:    $Id: configure.ac,v 1.20.16.4 2010/09/27 21:44:33 rkowen Exp $
 dnl Created:     1994/06/18
 dnl Author:      Leif Hedstrom<hedstrom@inf.ethz.ch>
 dnl		 Martin S. Utesch <wstd@hl.siemens.de>
@@ -993,7 +993,7 @@ AC_CONFIG_FILES([Makefile modules.lsm .spec doc/Makefile
 	modulefiles/use.own modulefiles/dot modulefiles/version
 	])dnl
 dnl We want these to be recreated for each install
-dnl	init/bash init/csh init/ksh init/perl init/python.py init/sh init/zsh
+dnl	init/bash init/csh init/ksh init/perl.pm init/python.py init/sh init/zsh
 AC_CONFIG_COMMANDS([default],[[date > stamp-h]],[[]])dnl
 AC_OUTPUT
 dnl
