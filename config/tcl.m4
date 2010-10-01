@@ -266,9 +266,10 @@ AC_DEFUN([EM_PATH_TCLXCONFIG], [
 	AC_ARG_WITH(tclx,
 	AC_HELP_STRING([--with-tclx=<dir>],
 	[directory containing TclX configuration (tclxConfig.sh) [[searches]]]),
-	with_tclxconfig=${withval},
+	[with_tclxconfig=${withval}],
+	[with_tclxconfig=search]
 	)
-	if test x"$withval" = x"no" ; then #{{
+	if test x"$with_tclxconfig" = x"no" ; then #{{
 		AC_MSG_NOTICE([Skipping TclX configuration])
 		no_tclx=true
 	else #}{
@@ -276,7 +277,7 @@ AC_DEFUN([EM_PATH_TCLXCONFIG], [
 		AC_CACHE_VAL(em_cv_tclxconfig,[
 
 	    # First check to see if --with-tclx was specified.
-	    if test x"${with_tclxconfig}" != x ; then #{
+	    if test x"${with_tclxconfig}" != xsearch ; then #{
 		if test -f "${with_tclxconfig}/tclxConfig.sh" ; then #{{
 		    em_cv_tclxconfig=`(cd ${with_tclxconfig}; pwd)`
 		else #}{
