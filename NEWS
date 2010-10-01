@@ -23,6 +23,8 @@ Sep 30, 2010				R.K. Owen (rk@owen.sj.ca.us)
 	  when a MANPATH exists and when not.
 	  The default is "/usr/man:/usr/share/man" (when both exists).
 	* Purging a purged module list does not result in an error.
+	* Fixed the configure script for searching for tclConfig.sh
+	  and handle --without-x in the tests.
 
 Modules 3.2.7
 Jul 30, 2009				R.K. Owen (rk@owen.sj.ca.us)
