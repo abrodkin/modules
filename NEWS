@@ -7,7 +7,7 @@
 
 ****************************   Release 3.2 ******************************
 Modules 3.2.8
-Sep 30, 2010				R.K. Owen (rk@owen.sj.ca.us)
+Oct  1, 2010				R.K. Owen (rk@owen.sj.ca.us)
 	* Handle the .modulerc/.version in deep modulefile dirs,
 	  Patches thanks to Lindsay Todd, and others.
 	* Note that .version takes precedence over .modulerc files.
