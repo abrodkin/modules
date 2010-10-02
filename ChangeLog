@@ -1,6 +1,1022 @@
 Do Not Edit!  This is a generated file.
 	You should edit the NEWS file instead.
 
+2010-10-02 14:05  rkowen
+
+	* Makefile.am, cmdVersion.c: Prevent needless warnings about
+	"Version symbol 'default' loops"
+
+2010-10-02 13:08  rkowen
+
+	* Makefile.am: Updated the cxref generation (but doesn't generate
+	.h source .html files).
+
+2010-10-02 09:45  rkowen
+
+	* version.c: Updated the release date.
+
+2010-10-02 09:42  rkowen
+
+	* NEWS: Updated release date.
+
+2010-10-01 14:39  rkowen
+
+	* config/tcl.m4: Made similar changes for --with-tclx as --with-tcl
+
+2010-10-01 14:17  rkowen
+
+	* NEWS, config/emtcl.m4, config/tcl.m4,
+	testsuite/modules.70-maint/070-display.exp: * Fixed the configure
+	script for searching for tclConfig.sh	and handle --without-x in
+	the tests.
+
+2010-10-01 13:01  sirdude
+
+	* tcl/modulecmd.tcl: Patches from John Tseng,
+	
+	Fixes an issue with perl autoinit by adding tclsh to the call
+	
+	Updates to module-version.
+	
+	Kent
+
+2010-09-27 16:25  rkowen
+
+	* NEWS, init.c, utility.c, doc/module.1.in, init/Makefile.am,
+	init/cmake.in, testsuite/modulefiles/info/shellsexp,
+	testsuite/modules.00-init/030-shells.exp,
+	testsuite/modules.00-init/080-begenv.exp,
+	testsuite/modules.10-use/030-use.exp,
+	testsuite/modules.10-use/031-append.exp,
+	testsuite/modules.10-use/070-unuse.exp,
+	testsuite/modules.50-cmds/015-use.exp,
+	testsuite/modules.50-cmds/017-use-undo.exp,
+	testsuite/modules.50-cmds/020-setenv.exp,
+	testsuite/modules.50-cmds/022-setenv-eschars.exp,
+	testsuite/modules.50-cmds/025-setenv-undo.exp,
+	testsuite/modules.50-cmds/030-unsetenv.exp,
+	testsuite/modules.50-cmds/035-unsetenv-undo.exp,
+	testsuite/modules.50-cmds/036-unsetenv-x.exp,
+	testsuite/modules.50-cmds/040-append.exp,
+	testsuite/modules.50-cmds/042-append-delim.exp,
+	testsuite/modules.50-cmds/045-append-undo.exp,
+	testsuite/modules.50-cmds/047-app-del-undo.exp,
+	testsuite/modules.50-cmds/050-prepend.exp,
+	testsuite/modules.50-cmds/052-prepend-delim.exp,
+	testsuite/modules.50-cmds/055-prepend-undo.exp,
+	testsuite/modules.50-cmds/057-pre-del-undo.exp,
+	testsuite/modules.50-cmds/060-remove.exp,
+	testsuite/modules.50-cmds/065-remove-undo.exp,
+	testsuite/modules.50-cmds/077-alias-undo.exp,
+	testsuite/modules.50-cmds/080-info-name.exp,
+	testsuite/modules.50-cmds/086-info-shells.exp,
+	testsuite/modules.50-cmds/087-info-shells-exp.exp,
+	testsuite/modules.50-cmds/088-info-isloaded.exp,
+	testsuite/modules.50-cmds/170-swap.exp,
+	testsuite/modules.50-cmds/175-swap2.exp,
+	testsuite/modules.50-cmds/190-load.exp,
+	testsuite/modules.50-cmds/200-break.exp,
+	testsuite/modules.50-cmds/210-exit.exp,
+	testsuite/modules.50-cmds/220-continue.exp,
+	testsuite/modules.50-cmds/230-loop.exp,
+	testsuite/modules.95-version/020-load.exp,
+	testsuite/modules.95-version/020-unload.exp,
+	testsuite/modules.95-version/022-load2.exp,
+	testsuite/modules.95-version/022-unload2.exp,
+	testsuite/modules.95-version/040-xgetenv.exp: * Added Nathaniel
+	Waisbrot's exceptional patch for CMake support with tests.
+
+2010-09-27 16:25  rkowen
+
+	* init/cmake.in: file cmake.in was initially added on branch
+	modules-3-2-8.
+
+2010-09-27 16:06  rkowen
+
+	* NEWS, doc/module.1.in, init/python.py.in: * Updated
+	init/python.py to eliminate 'sed' references * Added brief section
+	to module.1 on invoking modules for perl & python
+
+2010-09-27 14:44  rkowen
+
+	* NEWS, configure.ac, main.c, init/Makefile.am, init/perl.in,
+	init/perl.pm.in: 
+	* Renamed init/perl to init/perl.pm
+
+2010-09-27 14:44  rkowen
+
+	* init/perl.pm.in: file perl.pm.in was initially added on branch
+	modules-3-2-8.
+
+2010-09-23 18:00  rkowen
+
+	* ModuleCmd_Purge.c, NEWS: 
+	* Purging a purged module list does not result in an error.  (It
+	returned an erroneous ERR_MODULE_PATH error message before.)
+
+2010-09-23 16:21  rkowen
+
+	* Makefile.am: Fixed order of objects and libraries when linking.
+
+2010-09-23 15:47  rkowen
+
+	* NEWS, cmdPath.c, configure.ac: * Added the configure
+	--with-man-path so a system specific MANPATH   could be used.  Some
+	"man"s radically change their search path   when a MANPATH exists
+	and when not.	 The default is "/usr/man:/usr/share/man" (when
+	both exists).
+
+2010-09-23 15:08  rkowen
+
+	* NEWS, modulefiles/modules.in: 
+	* Fixed the MANPATH in modulefiles/modules to use configure
+	generated   values.
+
+2010-09-23 13:53  rkowen
+
+	* Makefile.am, configure.ac, init/Makefile.am, init/python.in,
+	init/python.py.in: Renamed the init/python script to python.py .
+
+2010-09-23 13:53  rkowen
+
+	* init/python.py.in: file python.py.in was initially added on
+	branch modules-3-2-8.
+
+2010-09-14 11:37  rkowen
+
+	* modulefiles/module-cvs.in: Removed the module-cvs info on
+	anonymous ftp ... no longer available, and updated the aliases for
+	anonymous CVS access.
+
+2010-09-13 22:10  rkowen
+
+	* cmdChdir.c, init/bash_completion.in,
+	testsuite/modulefiles/alias/1.0, testsuite/modulefiles/append/0.1,
+	testsuite/modulefiles/append/0.2, testsuite/modulefiles/append/1.0,
+	testsuite/modulefiles/append/2.1, testsuite/modulefiles/append/2.2,
+	testsuite/modulefiles/break/4.0,
+	testsuite/modulefiles/continue/1.0,
+	testsuite/modulefiles/continue/2.0,
+	testsuite/modulefiles/continue/3.0,
+	testsuite/modulefiles/continue/4.0, testsuite/modulefiles/exit/1.0,
+	testsuite/modulefiles/exit/2.0, testsuite/modulefiles/exit/3.0,
+	testsuite/modulefiles/prepend/0.1,
+	testsuite/modulefiles/prepend/0.2,
+	testsuite/modulefiles/prepend/1.0,
+	testsuite/modulefiles/prepend/2.1,
+	testsuite/modulefiles/prepend/2.2,
+	testsuite/modules.50-cmds/042-append-delim.exp,
+	testsuite/modules.50-cmds/047-app-del-undo.exp,
+	testsuite/modules.50-cmds/052-prepend-delim.exp,
+	testsuite/modules.50-cmds/057-pre-del-undo.exp,
+	testsuite/modules.50-cmds/076-alias-sub.exp,
+	testsuite/modules.50-cmds/175-swap2.exp,
+	testsuite/modules.50-cmds/210-exit.exp,
+	testsuite/modules.50-cmds/220-continue.exp,
+	testsuite/modules.50-cmds/230-loop.exp,
+	testsuite/modules.50-cmds/999-cleanup.exp: Merged in the 3-2-7
+	files missed from 3-2-0-tag.
+
+2010-09-13 20:59  rkowen
+
+	* NEWS, cmdVersion.c, locate_module.c, doc/modulefile.4.in,
+	testsuite/modulefiles.deep/modulerc/.modulerc,
+	testsuite/modulefiles.deep/modulerc/dir1/.modulerc,
+	testsuite/modulefiles.deep/modulerc/dir1/1.0,
+	testsuite/modulefiles.deep/modulerc/dir1/2.0,
+	testsuite/modulefiles.deep/modulerc/dir2/.modulerc,
+	testsuite/modulefiles.deep/modulerc/dir2/2.0,
+	testsuite/modulefiles.deep/modulerc/dir2/3.0,
+	testsuite/modulefiles.deep/modulerc/dir2/1.0/.modulerc,
+	testsuite/modulefiles.deep/modulerc/dir2/1.0/rc1,
+	testsuite/modulefiles.deep/modulerc/dir2/1.0/rc2,
+	testsuite/modulefiles.deep/plain/dir1/1.0,
+	testsuite/modulefiles.deep/plain/dir1/2.0,
+	testsuite/modulefiles.deep/plain/dir2/1.0,
+	testsuite/modulefiles.deep/plain/dir2/2.0,
+	testsuite/modulefiles.deep/version/.version,
+	testsuite/modulefiles.deep/version/dir1/.version,
+	testsuite/modulefiles.deep/version/dir1/1.0,
+	testsuite/modulefiles.deep/version/dir1/2.0,
+	testsuite/modulefiles.deep/version/dir2/.version,
+	testsuite/modulefiles.deep/version/dir2/1.0,
+	testsuite/modulefiles.deep/version/dir2/3.0,
+	testsuite/modulefiles.deep/version/dir2/2.0/.version,
+	testsuite/modulefiles.deep/version/dir2/2.0/rc1,
+	testsuite/modulefiles.deep/version/dir2/2.0/rc2,
+	testsuite/modules.20-locate/050-locrc.exp,
+	testsuite/modules.80-deep/010-init_ts.exp,
+	testsuite/modules.80-deep/020-load.exp,
+	testsuite/modules.80-deep/030-display.exp,
+	testsuite/modules.80-deep/040-list.exp,
+	testsuite/modules.80-deep/999-cleanup.exp,
+	testsuite/modules.90-avail/030-multiple.exp: * Handle the
+	.modulerc/.version in deep modulefile dirs,   Patches thanks to
+	Lindsay Todd, and others.  * Note that .version takes precedence
+	over .modulerc files.  * Added a short set of tests
+
+2010-09-13 20:59  rkowen
+
+	* testsuite/modulefiles.deep/modulerc/: .modulerc, dir1/.modulerc,
+	dir2/.modulerc, dir2/1.0/.modulerc: file .modulerc was initially
+	added on branch modules-3-2-8.
+
+2010-09-13 20:59  rkowen
+
+	* testsuite/modulefiles.deep/version/: dir1/.version,
+	dir2/.version, dir2/2.0/.version: file .version was initially added
+	on branch modules-3-2-8.
+
+2010-09-13 20:59  rkowen
+
+	* testsuite/modules.80-deep/010-init_ts.exp: file 010-init_ts.exp
+	was initially added on branch modules-3-2-8.
+
+2010-09-13 20:59  rkowen
+
+	* testsuite/modules.80-deep/020-load.exp: file 020-load.exp was
+	initially added on branch modules-3-2-8.
+
+2010-09-13 20:59  rkowen
+
+	* testsuite/modules.80-deep/030-display.exp: file 030-display.exp
+	was initially added on branch modules-3-2-8.
+
+2010-09-13 20:59  rkowen
+
+	* testsuite/modules.80-deep/040-list.exp: file 040-list.exp was
+	initially added on branch modules-3-2-8.
+
+2010-09-13 20:59  rkowen
+
+	* testsuite/modulefiles.deep/: modulerc/dir1/1.0, plain/dir1/1.0,
+	plain/dir2/1.0, version/dir1/1.0, version/dir2/1.0: file 1.0 was
+	initially added on branch modules-3-2-8.
+
+2010-09-13 20:59  rkowen
+
+	* testsuite/modulefiles.deep/: modulerc/dir1/2.0,
+	modulerc/dir2/2.0, plain/dir1/2.0, plain/dir2/2.0,
+	version/dir1/2.0: file 2.0 was initially added on branch
+	modules-3-2-8.
+
+2010-09-13 20:59  rkowen
+
+	* testsuite/modulefiles.deep/: modulerc/dir2/3.0, version/dir2/3.0:
+	file 3.0 was initially added on branch modules-3-2-8.
+
+2010-09-13 20:59  rkowen
+
+	* testsuite/modules.80-deep/999-cleanup.exp: file 999-cleanup.exp
+	was initially added on branch modules-3-2-8.
+
+2010-09-13 20:59  rkowen
+
+	* testsuite/modulefiles.deep/: modulerc/dir2/1.0/rc1,
+	version/dir2/2.0/rc1: file rc1 was initially added on branch
+	modules-3-2-8.
+
+2010-09-13 20:59  rkowen
+
+	* testsuite/modulefiles.deep/: modulerc/dir2/1.0/rc2,
+	version/dir2/2.0/rc2: file rc2 was initially added on branch
+	modules-3-2-8.
+
+2010-07-27 12:09  rkowen
+
+	* Makefile.am, ModuleCmd_Avail.c, ModuleCmd_Clear.c,
+	ModuleCmd_Display.c, ModuleCmd_Help.c, ModuleCmd_Init.c,
+	ModuleCmd_List.c, ModuleCmd_Load.c, ModuleCmd_Purge.c,
+	ModuleCmd_Refresh.c, ModuleCmd_Switch.c, ModuleCmd_Update.c,
+	ModuleCmd_Use.c, ModuleCmd_Whatis.c, NEWS, TODO, cmdAlias.c,
+	cmdChdir.c, cmdConflict.c, cmdInfo.c, cmdIsLoaded.c, cmdLog.c,
+	cmdMisc.c, cmdModule.c, cmdPath.c, cmdSetenv.c, cmdTrace.c,
+	cmdUlvl.c, cmdUname.c, cmdVerbose.c, cmdVersion.c, cmdWhatis.c,
+	cmdXResource.c, configure.ac, error.c, init.c, locate_module.c,
+	main.c, modules.lsm.in, modules_def.h, utility.c, version.c,
+	config/emtcl.m4, config/tcl.m4, doc/.cvsignore, doc/module.1.in,
+	doc/modulefile.4.in, etc/add.modules.in, etc/mkroot.in,
+	etc/global/bashrc.in, etc/global/csh.modules.in,
+	etc/global/profile.modules.in, ext/add.ext.in, ext/mkroot.in,
+	init/.modulespath.in, init/Makefile.am, init/bash.in,
+	init/bash_completion.in, init/csh.in, init/ksh.in, init/perl.in,
+	init/python.in, init/sh.in, init/zsh.in, modulefiles/Makefile.am,
+	modulefiles/dot.in, modulefiles/module-cvs.in,
+	modulefiles/module-info.in, modulefiles/modules.in,
+	modulefiles/null.in, modulefiles/use.own.in,
+	modulefiles/version.in, testsuite/config/unix.exp,
+	testsuite/modulefiles/alias/1.0, testsuite/modulefiles/append/0.1,
+	testsuite/modulefiles/append/0.2, testsuite/modulefiles/append/1.0,
+	testsuite/modulefiles/append/2.1, testsuite/modulefiles/append/2.2,
+	testsuite/modulefiles/break/2.0, testsuite/modulefiles/break/4.0,
+	testsuite/modulefiles/continue/1.0,
+	testsuite/modulefiles/continue/2.0,
+	testsuite/modulefiles/continue/3.0,
+	testsuite/modulefiles/continue/4.0, testsuite/modulefiles/exit/1.0,
+	testsuite/modulefiles/exit/2.0, testsuite/modulefiles/exit/3.0,
+	testsuite/modulefiles/prepend/0.1,
+	testsuite/modulefiles/prepend/0.2,
+	testsuite/modulefiles/prepend/1.0,
+	testsuite/modulefiles/prepend/2.1,
+	testsuite/modulefiles/prepend/2.2,
+	testsuite/modules.00-init/006-procs.exp,
+	testsuite/modules.35-trace/010-init_ts.exp,
+	testsuite/modules.50-cmds/040-append.exp,
+	testsuite/modules.50-cmds/042-append-delim.exp,
+	testsuite/modules.50-cmds/045-append-undo.exp,
+	testsuite/modules.50-cmds/047-app-del-undo.exp,
+	testsuite/modules.50-cmds/050-prepend.exp,
+	testsuite/modules.50-cmds/052-prepend-delim.exp,
+	testsuite/modules.50-cmds/055-prepend-undo.exp,
+	testsuite/modules.50-cmds/057-pre-del-undo.exp,
+	testsuite/modules.50-cmds/060-remove.exp,
+	testsuite/modules.50-cmds/075-alias.exp,
+	testsuite/modules.50-cmds/076-alias-sub.exp,
+	testsuite/modules.50-cmds/078-refresh.exp,
+	testsuite/modules.50-cmds/095-uname.exp,
+	testsuite/modules.50-cmds/100-loglevel.exp,
+	testsuite/modules.50-cmds/175-swap2.exp,
+	testsuite/modules.50-cmds/210-exit.exp,
+	testsuite/modules.50-cmds/220-continue.exp,
+	testsuite/modules.50-cmds/230-loop.exp,
+	testsuite/modules.50-cmds/999-cleanup.exp,
+	testsuite/modules.70-maint/045-listlong.exp,
+	testsuite/modules.90-avail/050-long.exp: Base version is 3-2-0,
+	then merged to 3-2-7.
+
+2010-05-28 12:46  sirdude
+
+	* tcl/modulecmd.tcl: Last patch from Gerrit Renker
+	
+	This one makes it so module switch tries to swap the order if the
+	user messed it up.  If you type: module switch new old instead of:
+	module switch old new it will attempt to correct it.
+	
+	Kent
+
+2010-05-28 09:12  sirdude
+
+	* tcl/modulecmd.tcl: Another patch by Gerrit Renker This one makes
+	module display/show more similar to the c version of modules.
+	
+	Kent
+
+2010-05-28 09:07  sirdude
+
+	* tcl/modulecmd.tcl: Two more patches by Gerrit Renker These two
+	clean up the "version" info and makes the startup files more
+	compatable with the c version of modules.
+	
+	Kent
+
+2010-05-28 07:58  sirdude
+
+	* tcl/modulecmd.tcl: This is patch #6 from Gerrit Renker This patch
+	increased the CSH_LIMIT to the same as linux's default.  (This
+	seams reasonable, if people have older machines that have issues
+	they can always drop it back down to a lower value)
+	
+	Kent
+
+2010-05-28 07:51  sirdude
+
+	* tcl/modulecmd.tcl: This is patch #5 from Gerrit Renker This one
+	improves escaping of special symbols
+	
+	Kent
+
+2010-05-28 07:44  sirdude
+
+	* tcl/modulecmd.tcl: Patch #4 from Gerrit Renker This one cleans up
+	dynamic columns and makes it autodetect
+	
+	Kent
+
+2010-05-27 14:18  sirdude
+
+	* tcl/modulecmd.tcl: small typo in last patch was missing a $
+	
+	Kent
+
+2010-05-27 13:17  sirdude
+
+	* tcl/modulecmd.tcl: Patch #3 submitted by Gerrit Renker This one
+	fixes a heck of a lot of typo's.  (Spelling isn't my strong suit)
+	:)
+	
+	Kent
+
+2010-05-27 13:09  sirdude
+
+	* tcl/modulecmd.tcl: Two patches by Gerrit Renker
+	
+	The first one fixes an issue with sourcing a .versin/.modulerc over
+	and over the second one fixes up listModules so that it behaves
+	better.  (Gerrit has submitted a number of patches, this is just
+	two of them)
+	
+	Kent
+
+2010-05-24 09:01  sirdude
+
+	* tcl/modulecmd.tcl: This is a patch by Gerrit Renker to fix an
+	issue with _LMFILES_ not having correct data when nesting module
+	load/unload commands inside of other modules.
+	
+	Kent
+
+2010-05-22 15:03  rkowen
+
+	* PROBLEMS: Trivial change.
+
+2009-11-16 15:22  rkowen
+
+	* ModuleCmd_Avail.c, cmdInfo.c, cmdVersion.c, locate_module.c,
+	main.c, modules_def.h: A working version of "module-alias", which
+	simplifies the semantics.  An alias is just a replacement string or
+	another alias.
+
+2009-11-12 12:08  rkowen
+
+	* testsuite/modulefiles.deep/version/: .version, module: Adding a
+	deep modulefile test directory.
+
+2009-11-12 12:08  rkowen
+
+	* testsuite/modulefiles.deep/version/.version: file .version was
+	added on branch modules-3-2-8 on 2010-09-14 03:59:24 +0000
+
+2009-11-12 12:08  rkowen
+
+	* testsuite/modulefiles.deep/version/.version: file .version was
+	initially added on branch mfiles2.
+
+2009-11-12 12:08  rkowen
+
+	* testsuite/modulefiles.deep/version/module: file module was
+	initially added on branch mfiles2.
+
+2009-11-09 13:15  rkowen
+
+	* ModuleCmd_Avail.c, ModuleCmd_List.c, ModuleCmd_Load.c,
+	cmdModule.c, cmdVersion.c, init.c, locate_module.c, main.c,
+	modules_def.h, utility.c: Crafted first working version of
+	Locate_Module()
+
+2009-10-15 15:33  rkowen
+
+	* modulefiles/.cvsignore: Ignore the generated notavail modulefile
+
+2009-10-15 15:32  rkowen
+
+	* NEWS, configure.ac, modulefiles/Makefile.am,
+	modulefiles/notavail.in: * Added the "notavail" modulefile (as
+	shown in man page)
+
+2009-10-15 13:32  rkowen
+
+	* init.c, locate_module.c, main.c: Resolved some minor warnings.
+
+2009-10-15 12:08  rkowen
+
+	* Makefile.am, ModuleCmd_Avail.c, ModuleCmd_Init.c,
+	ModuleCmd_List.c, ModuleCmd_Load.c, ModuleCmd_Refresh.c,
+	ModuleCmd_Switch.c, ModuleCmd_Whatis.c, NEWS, PROBLEMS,
+	cmdConflict.c, cmdInfo.c, cmdIsLoaded.c, cmdLog.c, cmdVersion.c,
+	configure.ac, error.c, init.c, locate_module.c, main.c,
+	modules_def.h, ovec.c, ovec.h, utility.c, utilobj.c, uvec.c,
+	testsuite/etc/modulerc, testsuite/etc/rc,
+	testsuite/modules.20-locate/060-rc.exp: Allow loading and unloading
+	the .modulerc & .version files Removed the Tcl intrepretor from
+	many of the locate_modulefile utility routines.  Simplified the
+	error code with uvec.  Added "tag" to MHash object for existence
+	testing.  Passes all tests but 2 generate "duplicate version symbol
+	... found".  Merged in from the mfiles branch.
+
+2009-10-12 12:41  rkowen
+
+	* ModuleCmd_Avail.c, ModuleCmd_Use.c, ModuleCmd_Whatis.c, NEWS,
+	cmdConflict.c, cmdIsLoaded.c, locate_module.c, main.c,
+	modules_def.h, utility.c, testsuite/modules.10-use/040-load.exp:
+	Merged in the 'mpath' branch changes.
+
+2009-10-12 12:37  rkowen
+
+	* testsuite/modules.10-use/040-load.exp: file 040-load.exp was
+	initially added on branch mpath.
+
+2009-10-12 12:37  rkowen
+
+	* ModuleCmd_Avail.c, ModuleCmd_Use.c, ModuleCmd_Whatis.c, NEWS,
+	cmdConflict.c, cmdIsLoaded.c, locate_module.c, main.c,
+	modules_def.h, utility.c, testsuite/modules.10-use/040-load.exp:
+	Instead of having all the various pieces do a SplitIntoList() on
+	the MODULEPATH env.var. just do it once in the main() routine and
+	use the global ModulePath vector elsewhere.
+
+2009-09-22 11:59  rkowen
+
+	* init/: .modulespath.in, Makefile.am, bash.in, csh.in, ksh.in,
+	python.in, sh.in, zsh.in: Merged in the final of the 3.2.7b changes
+	to the init/ files.
+
+2009-09-22 11:40  rkowen
+
+	* init/.modulespath.in: Need the versioning path "noise".
+
+2009-09-22 11:13  rkowen
+
+	* init/Makefile.am: Need to do the same thing with @BASEPREFIX@.
+
+2009-09-22 11:02  rkowen
+
+	* init/Makefile.am: Removed the hard-coded version ... let
+	configure paste it in.
+
+2009-09-22 10:40  rkowen
+
+	* init/: bash.in, csh.in, ksh.in, python.in, sh.in, zsh.in: Added a
+	';' after the last sed command to avoid problems with the Solaris
+	sed.
+
+2009-09-22 10:20  rkowen
+
+	* NEWS: Updated.
+
+2009-09-22 10:19  rkowen
+
+	* doc/.cvsignore, init/bash.in, init/csh.in, init/ksh.in,
+	init/python.in, init/sh.in, init/zsh.in: Fixed a compatibility
+	issue with sed on Solaris (no \t).  Added a patch for the python
+	init script submitted by Mark Bergman <mark.bergman@uphs.upenn.edu>
+
+2009-09-22 09:26  rkowen
+
+	* Makefile.am: Added init/bash_completion.in into the distribution
+	list.
+
+2009-09-22 09:25  rkowen
+
+	* init/: bash.in, csh.in, ksh.in, python.in, sh.in, zsh.in: Changed
+	the sed '\t' to a tab char so it would work on Solaris.
+
+2009-09-22 09:11  rkowen
+
+	* Makefile.am: Added the init/bash_completion.in to the
+	distribution list.
+
+2009-09-16 12:19  rkowen
+
+	* ModuleCmd_Avail.c, ModuleCmd_List.c, ModuleCmd_Load.c,
+	locate_module.c, modules_def.h: Allow SourceRC() and SourceVers()
+	to load or unload the given .modulerc or .version file, to
+	anticipate deep modulefile directories.
+
+2009-09-16 12:16  rkowen
+
+	* init.c, main.c: Moved psep (path separator) initialization to
+	Initialize_Module() right after interpretor is created.
+
+2009-09-16 12:13  rkowen
+
+	* utility.c: Protect against non-existant MHash objects, which
+	tends to drop core.
+
+2009-09-16 12:11  rkowen
+
+	* utilobj.c: Added Tcl_FreeObjv() to clean-up after
+	Tcl_ArgvToObjv().  Added MHash tag and 'exists' accessor.
+
+2009-09-16 12:08  rkowen
+
+	* error.c: Reworked the error string compilation to reduce
+	confusing code.
+
+2009-09-14 22:05  rkowen
+
+	* PROBLEMS, cmdVersion.c, locate_module.c, utility.c: Cleaned up
+	some extraneous MODULESPATH code and other misc changes.
+
+2009-09-14 15:08  rkowen
+
+	* ModuleCmd_Avail.c, ModuleCmd_Init.c, ModuleCmd_List.c,
+	ModuleCmd_Switch.c, ModuleCmd_Whatis.c, cmdConflict.c, cmdInfo.c,
+	cmdLog.c, cmdVersion.c, error.c, locate_module.c, main.c,
+	utility.c: Replaced all explicit references to the path separator
+	"/" to the calculated value of psep.
+
+2009-09-10 14:52  rkowen
+
+	* testsuite/etc/modulerc: file modulerc was initially added on
+	branch mfiles.
+
+2009-09-10 14:52  rkowen
+
+	* ovec.c: file ovec.c was initially added on branch mfiles.
+
+2009-09-10 14:52  rkowen
+
+	* ovec.h: file ovec.h was initially added on branch mfiles.
+
+2009-09-10 14:52  rkowen
+
+	* Makefile.am, ModuleCmd_Init.c, ModuleCmd_List.c,
+	ModuleCmd_Load.c, ModuleCmd_Refresh.c, ModuleCmd_Switch.c, NEWS,
+	cmdConflict.c, cmdIsLoaded.c, configure.ac, init.c,
+	locate_module.c, main.c, modules_def.h, ovec.c, ovec.h, utility.c,
+	utilobj.c, uvec.c, testsuite/etc/modulerc, testsuite/etc/rc,
+	testsuite/modules.20-locate/060-rc.exp: Added the Tcl_Obj vector
+	package.  Removed the need for a Tcl interpretor from some of the
+	utility fns ...  this effort will continue so alternative
+	interpretors can be used.  Added module_setenv() for setting an
+	env.var. instead of Tcl_SetVar2().
+
+2009-09-02 13:37  rkowen
+
+	* Makefile.am, ModuleCmd_Avail.c, ModuleCmd_Clear.c,
+	ModuleCmd_Init.c, ModuleCmd_List.c, ModuleCmd_Load.c,
+	ModuleCmd_Use.c, ModuleCmd_Whatis.c, cmdAlias.c, cmdChdir.c,
+	cmdConflict.c, cmdInfo.c, cmdIsLoaded.c, cmdLog.c, cmdModule.c,
+	cmdPath.c, cmdSetenv.c, cmdUlvl.c, cmdUname.c, cmdVerbose.c,
+	cmdVersion.c, cmdWhatis.c, cmdXResource.c, configure.ac, error.c,
+	init.c, locate_module.c, main.c, utility.c, utilmem.c, utilobj.c,
+	uvec.c, uvec.h, modulefiles/Makefile.am,
+	testsuite/modules.50-cmds/100-loglevel.exp: Merged in the mlist
+	code clean up changes.
+
+2009-09-02 13:37  rkowen
+
+	* cmdChdir.c: file cmdChdir.c was added on branch modules-3-2-0-tag
+	on 2010-07-27 19:09:05 +0000
+
+2009-09-02 13:37  rkowen
+
+	* cmdChdir.c: file cmdChdir.c was added on branch modules-3-2-8 on
+	2010-09-14 05:10:01 +0000
+
+2009-09-02 13:21  rkowen
+
+	* cmdLog.c, error.c, utility.c,
+	testsuite/modules.50-cmds/100-loglevel.exp: Cleaned up more crufty
+	code in the cmdModuleLog routine with regards to splitting and
+	collecting strings.
+
+2009-09-01 12:16  rkowen
+
+	* LICENSE.LGPL, Makefile.am, ModuleCmd_Avail.c, ModuleCmd_Clear.c,
+	ModuleCmd_Init.c, ModuleCmd_List.c, ModuleCmd_Load.c,
+	ModuleCmd_Use.c, ModuleCmd_Whatis.c, NEWS, cmdAlias.c, cmdChdir.c,
+	cmdConflict.c, cmdInfo.c, cmdIsLoaded.c, cmdLog.c, cmdModule.c,
+	cmdPath.c, cmdSetenv.c, cmdUlvl.c, cmdUname.c, cmdVerbose.c,
+	cmdVersion.c, cmdWhatis.c, cmdXResource.c, configure.ac, error.c,
+	init.c, locate_module.c, main.c, modules_def.h, utility.c,
+	utilmem.c, utilobj.c, uvec.c, uvec.h, modulefiles/.cvsignore,
+	modulefiles/HOME.in, modulefiles/Makefile.am: Merging in the
+	changes from the mlist branch.
+
+2009-09-01 12:12  rkowen
+
+	* ModuleCmd_Avail.c, ModuleCmd_List.c, ModuleCmd_Load.c,
+	ModuleCmd_Whatis.c, NEWS, cmdAlias.c, cmdModule.c, cmdPath.c,
+	cmdSetenv.c, cmdVersion.c, configure.ac, init.c, main.c,
+	modules_def.h, utility.c, utilobj.c: * Wrapped the Tcl hash array
+	code into a more convenient form - MHash * Put all hash arrays in
+	the MHash form and removed crufty code.  This reduces and
+	simplifies the code tremendously.
+
+2009-09-01 11:18  rkowen
+
+	* modules_def.h, utilobj.c: Added the MHashInt hash type, which
+	stores an integer (the size of a pointer) as the hash value.
+
+2009-08-31 11:26  rkowen
+
+	* modules_def.h, utilobj.c: Added the mhash_copy constructor.
+
+2009-08-31 08:51  rkowen
+
+	* error.c, modules_def.h, utility.c, utilmem.c, utilobj.c,
+	modulefiles/.cvsignore: Added the MHash front-end to the
+	difficult-to-use Tcl_*Hash* routines.  Moved stringer() from
+	utility.c to utilmem.c .
+
+2009-08-28 13:14  rkowen
+
+	* NEWS, configure.ac, utility.c, modulefiles/HOME.in,
+	modulefiles/Makefile.am: * Included another modulefile to add $HOME
+	to the *PATH hierarchy so directories like $HOME/bin and $HOME/sbin
+	would be prepended to $PATH, etc.
+
+2009-08-28 13:14  rkowen
+
+	* modulefiles/HOME.in: file HOME.in was initially added on branch
+	mlist.
+
+2009-08-28 12:28  rkowen
+
+	* ModuleCmd_Avail.c, ModuleCmd_Whatis.c, NEWS, cmdConflict.c,
+	locate_module.c, modules_def.h, utility.c: Moved the SplitIntoList,
+	etc. code into utility.c.  Added ModulePathList to provide a vector
+	list of modulepaths and simplified the code where needed.  Removed
+	some amazingly hackish strtok knock-offs.
+
+2009-08-28 07:54  rkowen
+
+	* Makefile.am, utility.c, utilmem.c: Broke out the memory routines
+	into a seperate file.
+
+2009-08-28 07:54  rkowen
+
+	* utilmem.c: file utilmem.c was initially added on branch mlist.
+
+2009-08-27 15:07  rkowen
+
+	* uvec.c: file uvec.c was initially added on branch mlist.
+
+2009-08-27 15:07  rkowen
+
+	* uvec.h: file uvec.h was initially added on branch mlist.
+
+2009-08-27 15:07  rkowen
+
+	* LICENSE.LGPL, Makefile.am, ModuleCmd_Clear.c, ModuleCmd_Init.c,
+	ModuleCmd_Use.c, ModuleCmd_Whatis.c, NEWS, cmdAlias.c, cmdChdir.c,
+	cmdConflict.c, cmdInfo.c, cmdIsLoaded.c, cmdLog.c, cmdModule.c,
+	cmdPath.c, cmdSetenv.c, cmdUlvl.c, cmdUname.c, cmdVerbose.c,
+	cmdVersion.c, cmdWhatis.c, cmdXResource.c, error.c, init.c,
+	locate_module.c, main.c, modules_def.h, utility.c, utilobj.c,
+	uvec.c, uvec.h: * Added a unix vector package to ease list
+	handling, to eliminate the bits of code scattered through out.
+
+2009-08-27 15:07  rkowen
+
+	* LICENSE.LGPL: file LICENSE.LGPL was initially added on branch
+	mlist.
+
+2009-08-24 09:49  rkowen
+
+	* cmdConflict.c: Lost value of notloaded_flag in conversion to
+	objv.
+
+2009-08-23 16:30  rkowen
+
+	* ModuleCmd_Avail.c, ModuleCmd_Clear.c, ModuleCmd_Display.c,
+	ModuleCmd_Help.c, ModuleCmd_Init.c, ModuleCmd_List.c,
+	ModuleCmd_Load.c, ModuleCmd_Purge.c, ModuleCmd_Refresh.c,
+	ModuleCmd_Switch.c, ModuleCmd_Update.c, ModuleCmd_Use.c,
+	ModuleCmd_Whatis.c, NEWS, cmdAlias.c, cmdChdir.c, cmdConflict.c,
+	cmdInfo.c, cmdIsLoaded.c, cmdLog.c, cmdMisc.c, cmdModule.c,
+	cmdPath.c, cmdSetenv.c, cmdUlvl.c, cmdUname.c, cmdVerbose.c,
+	cmdVersion.c, cmdWhatis.c, cmdXResource.c, configure.ac, error.c,
+	getopt.c, init.c, locate_module.c, main.c, modules_def.h,
+	utility.c, utilobj.c: Merged the nodeb branch into the main trunk.
+
+2009-08-23 16:26  rkowen
+
+	* ModuleCmd_Avail.c, ModuleCmd_Clear.c, ModuleCmd_Display.c,
+	ModuleCmd_Help.c, ModuleCmd_Init.c, ModuleCmd_List.c,
+	ModuleCmd_Load.c, ModuleCmd_Purge.c, ModuleCmd_Refresh.c,
+	ModuleCmd_Switch.c, ModuleCmd_Update.c, ModuleCmd_Use.c,
+	ModuleCmd_Whatis.c, NEWS, cmdAlias.c, cmdChdir.c, cmdConflict.c,
+	cmdInfo.c, cmdIsLoaded.c, cmdLog.c, cmdMisc.c, cmdModule.c,
+	cmdPath.c, cmdSetenv.c, cmdUlvl.c, cmdUname.c, cmdVerbose.c,
+	cmdVersion.c, cmdWhatis.c, cmdXResource.c, configure.ac, error.c,
+	getopt.c, init.c, locate_module.c, main.c, modules_def.h,
+	utility.c, utilobj.c: Removed the WITH_DEBUGGING_* code, which was
+	burdensome to maintain, rarely used, and gave no useful advantage
+	over using a symbolic stepping debugger.
+
+2009-08-22 23:57  rkowen
+
+	* .indent.pro, Makefile.am, ModuleCmd_Avail.c, ModuleCmd_Clear.c,
+	ModuleCmd_Display.c, ModuleCmd_Help.c, ModuleCmd_Load.c,
+	ModuleCmd_Refresh.c, ModuleCmd_Update.c, ModuleCmd_Use.c,
+	ModuleCmd_Whatis.c, NEWS, cmdAlias.c, cmdChdir.c, cmdConflict.c,
+	cmdInfo.c, cmdIsLoaded.c, cmdLog.c, cmdMisc.c, cmdModule.c,
+	cmdPath.c, cmdSetenv.c, cmdUlvl.c, cmdUname.c, cmdVerbose.c,
+	cmdVersion.c, cmdWhatis.c, cmdXResource.c, error.c, init.c,
+	locate_module.c, main.c, modules_def.h, utility.c, utilobj.c,
+	testsuite/modules.50-cmds/240-chdir.exp: Merged in the btclobj1
+	branch changes to the main trunk - converted the module commands to
+	Tcl dual-ported objects.
+
+2009-08-22 23:26  rkowen
+
+	* .indent.pro, ModuleCmd_Avail.c, ModuleCmd_Clear.c,
+	ModuleCmd_Update.c, ModuleCmd_Use.c, ModuleCmd_Whatis.c, NEWS,
+	cmdAlias.c, cmdChdir.c, cmdConflict.c, cmdIsLoaded.c, cmdLog.c,
+	cmdMisc.c, cmdUname.c, cmdVerbose.c, cmdVersion.c, cmdWhatis.c,
+	cmdXResource.c, error.c, init.c, locate_module.c, modules_def.h,
+	utility.c, utilobj.c, testsuite/modules.50-cmds/240-chdir.exp:
+	Converted the remaining module commands to use Tcl dual-ported
+	objects.  Crafted the remaining module versions of the memory
+	functions realloc & calloc.  Use the Tcl ckalloc() as the basis. 
+	Added the chdir tests and gave it sensible behavior when the
+	directory does not exist or is inaccessible.
+
+2009-08-22 23:26  rkowen
+
+	* testsuite/modules.50-cmds/240-chdir.exp: file 240-chdir.exp was
+	initially added on branch btclobj1.
+
+2009-08-21 14:47  rkowen
+
+	* utilobj.c: file utilobj.c was initially added on branch btclobj1.
+
+2009-08-21 14:47  rkowen
+
+	* .indent.pro, Makefile.am, ModuleCmd_Clear.c, ModuleCmd_Display.c,
+	ModuleCmd_Help.c, ModuleCmd_Load.c, ModuleCmd_Refresh.c,
+	ModuleCmd_Use.c, ModuleCmd_Whatis.c, NEWS, cmdInfo.c, cmdModule.c,
+	cmdPath.c, cmdSetenv.c, cmdUlvl.c, cmdVerbose.c, cmdWhatis.c,
+	error.c, init.c, main.c, modules_def.h, utility.c, utilobj.c:
+	Converted about half of the module commands to use Tcl dual-ported
+	objects.
+
+2009-08-21 14:47  rkowen
+
+	* .indent.pro: file .indent.pro was initially added on branch
+	btclobj1.
+
+2009-08-14 15:16  rkowen
+
+	* Makefile.am: Got cxref running and regenerated the cross
+	references.
+
+2009-08-14 15:16  rkowen
+
+	* locate_module.c: Cleaned up a memory error and redundant code.
+
+2009-08-13 12:17  rkowen
+
+	* ModuleCmd_Avail.c, ModuleCmd_Init.c, ModuleCmd_Purge.c,
+	ModuleCmd_Refresh.c, ModuleCmd_Update.c, NEWS, cmdChdir.c,
+	cmdModule.c, cmdVersion.c, cmdWhatis.c, cmdXResource.c,
+	configure.ac, locate_module.c, main.c, modules_def.h, utility.c: *
+	All string allocation is performed by a common internal routine *
+	--disable-beginenv is now the configuration default
+
+2009-08-11 15:01  rkowen
+
+	* ModuleCmd_Avail.c, ModuleCmd_Clear.c, ModuleCmd_Display.c,
+	ModuleCmd_Help.c, ModuleCmd_Init.c, ModuleCmd_List.c,
+	ModuleCmd_Load.c, ModuleCmd_Purge.c, ModuleCmd_Refresh.c,
+	ModuleCmd_Switch.c, ModuleCmd_Update.c, ModuleCmd_Use.c,
+	ModuleCmd_Whatis.c, NEWS, README, TODO, cmdAlias.c, cmdChdir.c,
+	cmdConflict.c, cmdInfo.c, cmdIsLoaded.c, cmdLog.c, cmdMisc.c,
+	cmdModule.c, cmdPath.c, cmdSetenv.c, cmdUlvl.c, cmdUname.c,
+	cmdVerbose.c, cmdVersion.c, cmdWhatis.c, cmdXResource.c,
+	configure.ac, error.c, getopt.c, init.c, locate_module.c, main.c,
+	modules_def.h, utility.c, doc/module.1.in,
+	testsuite/modulefiles/.moduleavailcache,
+	testsuite/modulefiles/.moduleavailcache.202,
+	testsuite/modulefiles/.moduleavailcachedir,
+	testsuite/modulefiles/.moduleavailcachedir.202,
+	testsuite/modules.00-init/090-switches.exp,
+	testsuite/modules.70-maint/060-apropos.exp: Merged in the bnocache
+	branch to the main source tree.
+
+2009-08-11 14:54  rkowen
+
+	* ModuleCmd_Avail.c, ModuleCmd_Clear.c, ModuleCmd_Display.c,
+	ModuleCmd_Help.c, ModuleCmd_Init.c, ModuleCmd_List.c,
+	ModuleCmd_Load.c, ModuleCmd_Purge.c, ModuleCmd_Refresh.c,
+	ModuleCmd_Switch.c, ModuleCmd_Update.c, ModuleCmd_Use.c,
+	ModuleCmd_Whatis.c, NEWS, README, TODO, cmdAlias.c, cmdChdir.c,
+	cmdConflict.c, cmdInfo.c, cmdIsLoaded.c, cmdLog.c, cmdMisc.c,
+	cmdModule.c, cmdPath.c, cmdSetenv.c, cmdUlvl.c, cmdUname.c,
+	cmdVerbose.c, cmdVersion.c, cmdWhatis.c, cmdXResource.c,
+	configure.ac, error.c, getopt.c, init.c, locate_module.c, main.c,
+	modules_def.h, utility.c, doc/module.1.in,
+	testsuite/modulefiles/.moduleavailcache,
+	testsuite/modulefiles/.moduleavailcache.202,
+	testsuite/modulefiles/.moduleavailcachedir,
+	testsuite/modulefiles/.moduleavailcachedir.202,
+	testsuite/modules.00-init/090-switches.exp,
+	testsuite/modules.70-maint/060-apropos.exp: * Removed the
+	modulefile caching, which has been one of the major   obstacles for
+	deep modulefile directories.  Also fixed up the code to eliminate
+	nearly all of the gcc -Wall warnings.
+
+2009-08-10 12:28  rkowen
+
+	* ModuleCmd_Display.c, NEWS, cmdLog.c, configure.ac, error.c,
+	modules_def.h: Merged the syslogging changes from the bsyslog
+	branch.
+
+2009-08-10 12:22  rkowen
+
+	* ModuleCmd_Display.c, NEWS, cmdLog.c, configure.ac, error.c,
+	modules_def.h: Simplified the module syslogging interaction.  The
+	configure script no longer has individual options for each of the
+	various module error states.  Only the syslog facility can be
+	specified (default = "local7").  Fine tuning can be done via the
+	system global rc file and the module-log command.
+
+2009-08-03 14:04  rkowen
+
+	* Makefile.am, NEWS, cmdInfo.c, cmdLog.c, cmdModule.c, cmdTrace.c,
+	configure.ac, init.c, modules_def.h, doc/modulefile.4.in,
+	modulefiles/module-info.in, testsuite/modulefiles/help/2.0,
+	testsuite/modulefiles/trace/all_off,
+	testsuite/modulefiles/trace/all_on,
+	testsuite/modulefiles/trace/colon,
+	testsuite/modulefiles/trace/dilo_onoff,
+	testsuite/modulefiles/trace/disp_onoff,
+	testsuite/modulefiles/trace/disptrac,
+	testsuite/modulefiles/trace/load_all1,
+	testsuite/modulefiles/trace/load_all2,
+	testsuite/modulefiles/trace/load_on,
+	testsuite/modulefiles/trace/load_onoff,
+	testsuite/modulefiles/trace/load_ovr,
+	testsuite/modules.35-trace/010-init_ts.exp,
+	testsuite/modules.35-trace/020-default.exp,
+	testsuite/modules.35-trace/030-all-on.exp,
+	testsuite/modules.35-trace/031-all-off.exp,
+	testsuite/modules.35-trace/040-load-all.exp,
+	testsuite/modules.35-trace/041-load-all.exp,
+	testsuite/modules.35-trace/042-load-on.exp,
+	testsuite/modules.35-trace/043-load-onoff.exp,
+	testsuite/modules.35-trace/044-load-ovr.exp,
+	testsuite/modules.35-trace/050-disp-onoff.exp,
+	testsuite/modules.35-trace/060-dilo-onoff.exp,
+	testsuite/modules.35-trace/070-colon.exp,
+	testsuite/modules.35-trace/095-cleanup.exp,
+	testsuite/modules.50-cmds/121-prereq-module.exp,
+	testsuite/modules.70-maint/070-display.exp: Merged in the bnotrace
+	branch changes ... essentially removing the module-trace command.
+
+2009-08-03 13:56  rkowen
+
+	* Makefile.am, cmdInfo.c, cmdLog.c, cmdModule.c, cmdTrace.c,
+	configure.ac, init.c, modules_def.h, doc/modulefile.4.in,
+	modulefiles/module-info.in, testsuite/modulefiles/help/2.0,
+	testsuite/modulefiles/trace/all_off,
+	testsuite/modulefiles/trace/all_on,
+	testsuite/modulefiles/trace/colon,
+	testsuite/modulefiles/trace/dilo_onoff,
+	testsuite/modulefiles/trace/disp_onoff,
+	testsuite/modulefiles/trace/disptrac,
+	testsuite/modulefiles/trace/load_all1,
+	testsuite/modulefiles/trace/load_all2,
+	testsuite/modulefiles/trace/load_on,
+	testsuite/modulefiles/trace/load_onoff,
+	testsuite/modulefiles/trace/load_ovr,
+	testsuite/modules.35-trace/010-init_ts.exp,
+	testsuite/modules.35-trace/020-default.exp,
+	testsuite/modules.35-trace/030-all-on.exp,
+	testsuite/modules.35-trace/031-all-off.exp,
+	testsuite/modules.35-trace/040-load-all.exp,
+	testsuite/modules.35-trace/041-load-all.exp,
+	testsuite/modules.35-trace/042-load-on.exp,
+	testsuite/modules.35-trace/043-load-onoff.exp,
+	testsuite/modules.35-trace/044-load-ovr.exp,
+	testsuite/modules.35-trace/050-disp-onoff.exp,
+	testsuite/modules.35-trace/060-dilo-onoff.exp,
+	testsuite/modules.35-trace/070-colon.exp,
+	testsuite/modules.35-trace/095-cleanup.exp,
+	testsuite/modules.50-cmds/121-prereq-module.exp,
+	testsuite/modules.70-maint/070-display.exp: Removed the
+	module-trace command & tests.  It has not been maintained and there
+	was no real indication that it worked as expected.
+
+2009-08-03 13:52  rkowen
+
+	* init/bash_completion.in: Added bash_completion init
+
+2009-08-03 13:52  rkowen
+
+	* init/bash_completion.in: file bash_completion.in was added on
+	branch modules-3-2-0-tag on 2010-07-27 19:09:06 +0000
+
+2009-08-03 13:52  rkowen
+
+	* init/bash_completion.in: file bash_completion.in was added on
+	branch modules-3-2-8 on 2010-09-14 05:10:03 +0000
+
+2009-08-03 09:23  rkowen
+
+	* Makefile.am, ModuleCmd_Avail.c, ModuleCmd_Clear.c,
+	ModuleCmd_Display.c, ModuleCmd_Help.c, ModuleCmd_Init.c,
+	ModuleCmd_List.c, ModuleCmd_Purge.c, ModuleCmd_Refresh.c,
+	ModuleCmd_Switch.c, ModuleCmd_Update.c, ModuleCmd_Use.c,
+	ModuleCmd_Whatis.c, cmdAlias.c, cmdChdir.c, cmdConflict.c,
+	cmdInfo.c, cmdIsLoaded.c, cmdLog.c, cmdMisc.c, cmdModule.c,
+	cmdPath.c, cmdSetenv.c, cmdTrace.c, cmdUlvl.c, cmdUname.c,
+	cmdVerbose.c, cmdVersion.c, cmdWhatis.c, cmdXResource.c,
+	configure.ac, error.c, init.c, locate_module.c, modules_def.h,
+	utility.c, version.c, doc/module.1.in, doc/modulefile.4.in,
+	etc/global/bashrc.in, etc/global/csh.modules.in,
+	etc/global/profile.modules.in, init/.modulespath.in,
+	init/Makefile.am, init/bash.in, init/csh.in, init/filter,
+	init/ksh.in, init/perl.in, init/python.in, init/sh.in, init/zsh.in,
+	modulefiles/Makefile.am: Rolled in the remaining 3.2.7 changes to
+	the main branch.
+
+2009-07-31 09:56  rkowen
+
+	* NEWS: Updated 3.2.7 changes.
+
 2009-07-30 13:10  rkowen
 
 	* ModuleCmd_Purge.c, NEWS, error.c, version.c, init/filter: * Have
@@ -122,6 +1138,26 @@ Do Not Edit!  This is a generated file.
 
 2008-02-19 22:21  rkowen
 
+	* testsuite/modules.50-cmds/175-swap2.exp: file 175-swap2.exp was
+	added on branch modules-3-2-0-tag on 2010-07-27 19:09:06 +0000
+
+2008-02-19 22:21  rkowen
+
+	* testsuite/modules.50-cmds/175-swap2.exp: file 175-swap2.exp was
+	added on branch modules-3-2-8 on 2010-09-14 05:10:09 +0000
+
+2008-02-19 22:21  rkowen
+
+	* testsuite/modulefiles/prepend/2.1: file 2.1 was added on branch
+	modules-3-2-8 on 2010-09-14 05:10:08 +0000
+
+2008-02-19 22:21  rkowen
+
+	* testsuite/modulefiles/prepend/2.2: file 2.2 was added on branch
+	modules-3-2-8 on 2010-09-14 05:10:08 +0000
+
+2008-02-19 22:21  rkowen
+
 	* NEWS, cmdPath.c, configure.ac, init/bash.in,
 	testsuite/modulefiles/append/2.1, testsuite/modulefiles/append/2.2,
 	testsuite/modulefiles/prepend/2.1,
@@ -129,6 +1165,26 @@ Do Not Edit!  This is a generated file.
 	testsuite/modules.50-cmds/060-remove.exp,
 	testsuite/modules.50-cmds/175-swap2.exp: Rolled in the 3.2.7
 	changes so far.
+
+2008-02-19 22:21  rkowen
+
+	* testsuite/modulefiles/: append/2.1, prepend/2.1: file 2.1 was
+	added on branch modules-3-2-0-tag on 2010-07-27 19:09:06 +0000
+
+2008-02-19 22:21  rkowen
+
+	* testsuite/modulefiles/append/2.1: file 2.1 was added on branch
+	modules-3-2-8 on 2010-09-14 05:10:06 +0000
+
+2008-02-19 22:21  rkowen
+
+	* testsuite/modulefiles/: append/2.2, prepend/2.2: file 2.2 was
+	added on branch modules-3-2-0-tag on 2010-07-27 19:09:06 +0000
+
+2008-02-19 22:21  rkowen
+
+	* testsuite/modulefiles/append/2.2: file 2.2 was added on branch
+	modules-3-2-8 on 2010-09-14 05:10:06 +0000
 
 2008-02-19 22:18  rkowen
 
@@ -887,8 +1943,20 @@ Do Not Edit!  This is a generated file.
 2006-06-01 12:56  rkowen
 
 	* testsuite/modules.50-cmds/042-append-delim.exp: file
+	042-append-delim.exp was added on branch modules-3-2-0-tag on
+	2010-07-27 19:09:06 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modules.50-cmds/042-append-delim.exp: file
 	042-append-delim.exp was added on branch modules-3-2-5 on
 	2007-02-14 05:38:23 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modules.50-cmds/042-append-delim.exp: file
+	042-append-delim.exp was added on branch modules-3-2-8 on
+	2010-09-14 05:10:09 +0000
 
 2006-06-01 12:56  rkowen
 
@@ -905,8 +1973,20 @@ Do Not Edit!  This is a generated file.
 2006-06-01 12:56  rkowen
 
 	* testsuite/modules.50-cmds/047-app-del-undo.exp: file
+	047-app-del-undo.exp was added on branch modules-3-2-0-tag on
+	2010-07-27 19:09:06 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modules.50-cmds/047-app-del-undo.exp: file
 	047-app-del-undo.exp was added on branch modules-3-2-5 on
 	2007-02-14 05:38:24 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modules.50-cmds/047-app-del-undo.exp: file
+	047-app-del-undo.exp was added on branch modules-3-2-8 on
+	2010-09-14 05:10:09 +0000
 
 2006-06-01 12:56  rkowen
 
@@ -923,8 +2003,20 @@ Do Not Edit!  This is a generated file.
 2006-06-01 12:56  rkowen
 
 	* testsuite/modules.50-cmds/052-prepend-delim.exp: file
+	052-prepend-delim.exp was added on branch modules-3-2-0-tag on
+	2010-07-27 19:09:06 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modules.50-cmds/052-prepend-delim.exp: file
 	052-prepend-delim.exp was added on branch modules-3-2-5 on
 	2007-02-14 05:38:24 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modules.50-cmds/052-prepend-delim.exp: file
+	052-prepend-delim.exp was added on branch modules-3-2-8 on
+	2010-09-14 05:10:09 +0000
 
 2006-06-01 12:56  rkowen
 
@@ -941,8 +2033,20 @@ Do Not Edit!  This is a generated file.
 2006-06-01 12:56  rkowen
 
 	* testsuite/modules.50-cmds/057-pre-del-undo.exp: file
+	057-pre-del-undo.exp was added on branch modules-3-2-0-tag on
+	2010-07-27 19:09:06 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modules.50-cmds/057-pre-del-undo.exp: file
 	057-pre-del-undo.exp was added on branch modules-3-2-5 on
 	2007-02-14 05:38:24 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modules.50-cmds/057-pre-del-undo.exp: file
+	057-pre-del-undo.exp was added on branch modules-3-2-8 on
+	2010-09-14 05:10:09 +0000
 
 2006-06-01 12:56  rkowen
 
@@ -966,6 +2070,11 @@ Do Not Edit!  This is a generated file.
 
 2006-06-01 12:56  rkowen
 
+	* testsuite/modulefiles/: append/1.0, prepend/1.0: file 1.0 was
+	added on branch modules-3-2-0-tag on 2010-07-27 19:09:06 +0000
+
+2006-06-01 12:56  rkowen
+
 	* testsuite/modulefiles/append/1.0: file 1.0 was added on branch
 	modules-3-2-3 on 2006-06-08 04:23:35 +0000
 
@@ -983,6 +2092,16 @@ Do Not Edit!  This is a generated file.
 
 	* testsuite/modulefiles/: append/1.0, prepend/1.0: file 1.0 was
 	added on branch modules-3-2-5 on 2007-02-14 05:38:23 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modulefiles/append/1.0: file 1.0 was added on branch
+	modules-3-2-8 on 2010-09-14 05:10:06 +0000
+
+2006-06-01 12:56  rkowen
+
+	* testsuite/modulefiles/prepend/1.0: file 1.0 was added on branch
+	modules-3-2-8 on 2010-09-14 05:10:08 +0000
 
 2006-06-01 12:53  rkowen
 
@@ -1102,8 +2221,20 @@ Do Not Edit!  This is a generated file.
 2006-05-25 14:09  rkowen
 
 	* testsuite/modules.50-cmds/076-alias-sub.exp: file
+	076-alias-sub.exp was added on branch modules-3-2-0-tag on
+	2010-07-27 19:09:06 +0000
+
+2006-05-25 14:09  rkowen
+
+	* testsuite/modules.50-cmds/076-alias-sub.exp: file
 	076-alias-sub.exp was added on branch modules-3-2-5 on 2007-02-14
 	05:38:24 +0000
+
+2006-05-25 14:09  rkowen
+
+	* testsuite/modules.50-cmds/076-alias-sub.exp: file
+	076-alias-sub.exp was added on branch modules-3-2-8 on 2010-09-14
+	05:10:09 +0000
 
 2006-05-25 14:09  rkowen
 
@@ -1118,7 +2249,17 @@ Do Not Edit!  This is a generated file.
 2006-05-25 14:09  rkowen
 
 	* testsuite/modulefiles/alias/1.0: file 1.0 was added on branch
+	modules-3-2-0-tag on 2010-07-27 19:09:06 +0000
+
+2006-05-25 14:09  rkowen
+
+	* testsuite/modulefiles/alias/1.0: file 1.0 was added on branch
 	modules-3-2-5 on 2007-02-14 05:38:23 +0000
+
+2006-05-25 14:09  rkowen
+
+	* testsuite/modulefiles/alias/1.0: file 1.0 was added on branch
+	modules-3-2-8 on 2010-09-14 05:10:05 +0000
 
 2006-05-25 14:07  rkowen
 
@@ -1243,12 +2384,27 @@ Do Not Edit!  This is a generated file.
 2006-05-01 07:52  rkowen
 
 	* testsuite/modulefiles/: append/0.1, prepend/0.1: file 0.1 was
+	added on branch modules-3-2-0-tag on 2010-07-27 19:09:06 +0000
+
+2006-05-01 07:52  rkowen
+
+	* testsuite/modulefiles/: append/0.1, prepend/0.1: file 0.1 was
 	added on branch modules-3-2-4 on 2006-06-16 16:10:22 +0000
 
 2006-05-01 07:52  rkowen
 
 	* testsuite/modulefiles/: append/0.1, prepend/0.1: file 0.1 was
 	added on branch modules-3-2-5 on 2007-02-14 05:38:23 +0000
+
+2006-05-01 07:52  rkowen
+
+	* testsuite/modulefiles/append/0.1: file 0.1 was added on branch
+	modules-3-2-8 on 2010-09-14 05:10:06 +0000
+
+2006-05-01 07:52  rkowen
+
+	* testsuite/modulefiles/prepend/0.1: file 0.1 was added on branch
+	modules-3-2-8 on 2010-09-14 05:10:08 +0000
 
 2006-05-01 07:52  rkowen
 
@@ -1268,12 +2424,27 @@ Do Not Edit!  This is a generated file.
 2006-05-01 07:52  rkowen
 
 	* testsuite/modulefiles/: append/0.2, prepend/0.2: file 0.2 was
+	added on branch modules-3-2-0-tag on 2010-07-27 19:09:06 +0000
+
+2006-05-01 07:52  rkowen
+
+	* testsuite/modulefiles/: append/0.2, prepend/0.2: file 0.2 was
 	added on branch modules-3-2-4 on 2006-06-16 16:10:22 +0000
 
 2006-05-01 07:52  rkowen
 
 	* testsuite/modulefiles/: append/0.2, prepend/0.2: file 0.2 was
 	added on branch modules-3-2-5 on 2007-02-14 05:38:23 +0000
+
+2006-05-01 07:52  rkowen
+
+	* testsuite/modulefiles/append/0.2: file 0.2 was added on branch
+	modules-3-2-8 on 2010-09-14 05:10:06 +0000
+
+2006-05-01 07:52  rkowen
+
+	* testsuite/modulefiles/prepend/0.2: file 0.2 was added on branch
+	modules-3-2-8 on 2010-09-14 05:10:08 +0000
 
 2006-05-01 07:52  rkowen
 
@@ -1355,6 +2526,91 @@ Do Not Edit!  This is a generated file.
 2006-03-23 13:49  rkowen
 
 	* init/csh.in: Allow the command to pass a non-zero return status.
+
+2006-03-07 11:43  rkowen
+
+	* testsuite/modules.50-cmds/210-exit.exp: file 210-exit.exp was
+	added on branch modules-3-2-0-tag on 2010-07-27 19:09:06 +0000
+
+2006-03-07 11:43  rkowen
+
+	* testsuite/modules.50-cmds/210-exit.exp: file 210-exit.exp was
+	added on branch modules-3-2-8 on 2010-09-14 05:10:09 +0000
+
+2006-03-07 11:43  rkowen
+
+	* testsuite/modules.50-cmds/220-continue.exp: file 220-continue.exp
+	was added on branch modules-3-2-0-tag on 2010-07-27 19:09:06 +0000
+
+2006-03-07 11:43  rkowen
+
+	* testsuite/modules.50-cmds/220-continue.exp: file 220-continue.exp
+	was added on branch modules-3-2-8 on 2010-09-14 05:10:09 +0000
+
+2006-03-07 11:43  rkowen
+
+	* testsuite/modules.50-cmds/230-loop.exp: file 230-loop.exp was
+	added on branch modules-3-2-0-tag on 2010-07-27 19:09:06 +0000
+
+2006-03-07 11:43  rkowen
+
+	* testsuite/modules.50-cmds/230-loop.exp: file 230-loop.exp was
+	added on branch modules-3-2-8 on 2010-09-14 05:10:09 +0000
+
+2006-03-07 11:43  rkowen
+
+	* testsuite/modules.50-cmds/999-cleanup.exp: file 999-cleanup.exp
+	was added on branch modules-3-2-0-tag on 2010-07-27 19:09:06 +0000
+
+2006-03-07 11:43  rkowen
+
+	* testsuite/modules.50-cmds/999-cleanup.exp: file 999-cleanup.exp
+	was added on branch modules-3-2-8 on 2010-09-14 05:10:09 +0000
+
+2006-03-07 11:43  rkowen
+
+	* testsuite/modulefiles/: continue/1.0, exit/1.0: file 1.0 was
+	added on branch modules-3-2-0-tag on 2010-07-27 19:09:06 +0000
+
+2006-03-07 11:43  rkowen
+
+	* testsuite/modulefiles/: continue/1.0, exit/1.0: file 1.0 was
+	added on branch modules-3-2-8 on 2010-09-14 05:10:08 +0000
+
+2006-03-07 11:43  rkowen
+
+	* testsuite/modulefiles/: continue/2.0, exit/2.0: file 2.0 was
+	added on branch modules-3-2-0-tag on 2010-07-27 19:09:06 +0000
+
+2006-03-07 11:43  rkowen
+
+	* testsuite/modulefiles/: continue/2.0, exit/2.0: file 2.0 was
+	added on branch modules-3-2-8 on 2010-09-14 05:10:08 +0000
+
+2006-03-07 11:43  rkowen
+
+	* testsuite/modulefiles/: continue/3.0, exit/3.0: file 3.0 was
+	added on branch modules-3-2-0-tag on 2010-07-27 19:09:06 +0000
+
+2006-03-07 11:43  rkowen
+
+	* testsuite/modulefiles/: continue/3.0, exit/3.0: file 3.0 was
+	added on branch modules-3-2-8 on 2010-09-14 05:10:08 +0000
+
+2006-03-07 11:43  rkowen
+
+	* testsuite/modulefiles/: break/4.0, continue/4.0: file 4.0 was
+	added on branch modules-3-2-0-tag on 2010-07-27 19:09:06 +0000
+
+2006-03-07 11:43  rkowen
+
+	* testsuite/modulefiles/break/4.0: file 4.0 was added on branch
+	modules-3-2-8 on 2010-09-14 05:10:07 +0000
+
+2006-03-07 11:43  rkowen
+
+	* testsuite/modulefiles/continue/4.0: file 4.0 was added on branch
+	modules-3-2-8 on 2010-09-14 05:10:08 +0000
 
 2006-03-07 11:43  rkowen
 
@@ -2803,7 +4059,7 @@ Do Not Edit!  This is a generated file.
 
 2003-08-07 14:07  harlan
 
-	* tcl/modulecmd.tcl: Add $Revision: 1.50.4.1 $ to the version
+	* tcl/modulecmd.tcl: Add $Revision: 1.50.4.2 $ to the version
 
 2003-08-07 12:52  harlan
 
