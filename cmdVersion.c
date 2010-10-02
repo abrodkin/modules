@@ -47,7 +47,7 @@
  ** 									     ** 
  ** ************************************************************************ **/
 
-static char Id[] = "@(#)$Id: cmdVersion.c,v 1.9.18.2 2010/09/14 03:59:24 rkowen Exp $";
+static char Id[] = "@(#)$Id: cmdVersion.c,v 1.9.18.3 2010/10/02 21:05:01 rkowen Exp $";
 static void *UseId[] = { &UseId, Id };
 
 /** ************************************************************************ **/
@@ -457,7 +457,8 @@ static	char	*scan_versions( char		 *buffer,
 	if( mayloop != NULL ) {
 	    if( mayloop == base || *(mayloop-1) == ':' ) {
 		if( *(mayloop + strlen(ptr->name)) == ':' ) {
-	    	    ErrorLogger( ERR_SYMLOOP, LOC, ptr->name, NULL);
+		    if (strcmp(ptr->name,_default))
+	    		ErrorLogger( ERR_SYMLOOP, LOC, ptr->name, NULL);
 		    return((char *) NULL);	/** ---- EXIT (FAILURE) ---> **/
 		}
 	    }
