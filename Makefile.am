@@ -1,7 +1,7 @@
 ###########################################################################
 ##
 ## File:        ./Makefile.am
-## Versions:    $Id: Makefile.am,v 1.21.4.3 2010/09/23 23:21:48 rkowen Exp $
+## Versions:    $Id: Makefile.am,v 1.21.4.4 2010/10/02 20:08:28 rkowen Exp $
 ## Created:     2002/06/14
 ##
 ###########################################################################
@@ -52,7 +52,11 @@ CTAGS:	$(modulecmd_SOURCES)
 	ctags	$(modulecmd_SOURCES) $(SOURCES_H)
 
 cxref:
-	cxref $(modulecmd_SOURCES) $(SOURCES_H)
+	$(MAKE) clean
+#	may need to edit the cxref-cc script setting
+#	EGREP=/bin/egrep
+	$(MAKE) CC=cxref-cc CXREFCC=$(CC)
+#	cxref-cc $(modulecmd_SOURCES) $(SOURCES_H)
 	@echo "==============================="
 	@echo "You may need to run this twice!"
 	@echo "==============================="
