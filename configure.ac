@@ -1,6 +1,6 @@
 dnl
 dnl File:        configure.in
-dnl Revision:    $Id: configure.ac,v 1.20.16.4 2010/09/27 21:44:33 rkowen Exp $
+dnl Revision:    $Id: configure.ac,v 1.20.16.5 2010/10/04 15:59:50 rkowen Exp $
 dnl Created:     1994/06/18
 dnl Author:      Leif Hedstrom<hedstrom@inf.ethz.ch>
 dnl		 Martin S. Utesch <wstd@hl.siemens.de>
@@ -861,7 +861,7 @@ AC_ARG_WITH(tmp-dir,
 	)dnl
 dnl ---------------------------------------------------------------------------
 AH_TEMPLATE([DEFAULTMANPATH],[DEFAULTMANPATH: default man path])dnl
-AC_ARG_WITH(def-man-path,
+AC_ARG_WITH(man-path,
 	AC_HELP_STRING([--with-man-path=<dir>],[use <dir> for the default MANPATH [[/usr/man:/usr/share/man]]]),
 	AC_DEFINE_UNQUOTED(DEFAULTMANPATH, "$withval")dnl
 	AC_MSG_RESULT([DEFAULTMANPATH = $withval]),
