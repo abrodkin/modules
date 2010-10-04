@@ -1,6 +1,10 @@
 Do Not Edit!  This is a generated file.
 	You should edit the NEWS file instead.
 
+2010-10-04 08:59  rkowen
+
+	* configure.ac: Fixed --with-man-path configure option.
+
 2010-10-02 14:05  rkowen
 
 	* Makefile.am, cmdVersion.c: Prevent needless warnings about
@@ -4059,7 +4063,7 @@ Do Not Edit!  This is a generated file.
 
 2003-08-07 14:07  harlan
 
-	* tcl/modulecmd.tcl: Add $Revision: 1.50.4.2 $ to the version
+	* tcl/modulecmd.tcl: Add $Revision: 1.50.4.3 $ to the version
 
 2003-08-07 12:52  harlan
 
