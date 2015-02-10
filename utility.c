@@ -130,6 +130,7 @@ static  void     EscapeShString(const char* in,
 				 char* out);
 static  void     EscapePerlString(const char* in,
 				 char* out);
+static  void     EscapeFishString(char* in);
 static  void     EscapeCmakeString(const char* in,
 				 char* out);
 static int is_interactive(void) ;
@@ -1142,6 +1143,13 @@ static int output_set_variable(	Tcl_Interp	*interp,
      **/
 		fprintf(stdout, "putenv \"%s\" \"%s\";", var, val);
 
+	} else if (!strcmp((char *) shell_derelict, "fish")) {
+    /**
+     ** FISH
+     **/
+		EscapeFishString(val);
+		fprintf(stdout, "set -xg %s %s;", var, val);
+
 	} else {
     /**
      **  Unknown shell type - print an error message and
@@ -1206,6 +1214,8 @@ static int output_unset_variable(
 		fprintf(stdout, "(putenv \"%s\")\n", var);
 	} else if (!strcmp(shell_derelict, "mel")) {
 		fprintf(stdout, "putenv \"%s\" \"\";", var);
+	} else if (!strcmp(shell_derelict, "fish")) {
+		fprintf(stdout, "set -e %s;", var);
 	} else {
 		if (OK != ErrorLogger(ERR_DERELICT, LOC, shell_derelict, NULL))
 			return (TCL_ERROR); /** ------ EXIT (FAILURE) -----> **/
@@ -2521,6 +2531,20 @@ void EscapeCmakeString(const char* in,
   }
   *out = 0;
 }
+
+void EscapeFishString(
+	char *in
+) {
+
+	while (*in) {
+		if (*in == ':') {
+			*in = ' ';
+		}
+		*in++;
+	}
+	*in = 0;
+}
+
 
 /*++++
  ** ** Function-Header ***************************************************** **

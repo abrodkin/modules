@@ -144,6 +144,7 @@ static char *shellprops [][4] = {
 	{"guile",	"scm",		NULL,		"\n"},
 	{"mel",		"mel",		NULL,		";"},
 	{"cmake",	"cmake",	"cmake",	"\n"},
+	{"fish",	"fish",		"fish",		"\n"},
 	{NULL,		NULL,		NULL,		NULL},
 };
 
